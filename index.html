@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дмитрий Парамонов — DevOps/SRE Team Lead</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F1319;
+    --bg-soft:#121721;
+    --surface:#161C26;
+    --surface-2:#1B2230;
+    --border:#252E3B;
+    --border-soft:#1D2530;
+    --text:#E8EDF3;
+    --text-dim:#8B97A8;
+    --text-faint:#5A6576;
+    --accent:#5FBF8F;
+    --accent-soft:rgba(95,191,143,0.12);
+    --accent-2:#E0A458;
+    --accent-2-soft:rgba(224,164,88,0.12);
+    --accent-3:#6EA8D9;
+    --mono:'JetBrains Mono', ui-monospace, monospace;
+    --sans:'Inter', sans-serif;
+    --radius:10px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(var(--border-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:0.35;
+    pointer-events:none;
+    z-index:0;
+    mask-image: radial-gradient(ellipse 100% 60% at 50% 0%, black 10%, transparent 75%);
+  }
+  a{color:inherit; text-decoration:none;}
+  ul{list-style:none;}
+  section{position:relative; z-index:1;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 28px;}
+  ::selection{background:var(--accent-soft); color:var(--accent);}
+
+  /* ---------- focus ---------- */
+  a:focus-visible, button:focus-visible, summary:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:3px;
+    border-radius:4px;
+  }
+
+  /* ---------- SCROLL PROGRESS ---------- */
+  .scroll-progress{
+    position:fixed; top:0; left:0; height:2px; width:0%;
+    background:linear-gradient(90deg, var(--accent), var(--accent-2));
+    z-index:70; transition:width .08s linear;
+  }
+
+  /* ---------- NAV ---------- */
+  header.nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    background:rgba(15,19,25,0.78);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-inner{
+    max-width:1080px; margin:0 auto; padding:16px 28px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo{
+    font-family:var(--mono); font-weight:600; font-size:14.5px; color:var(--text);
+    letter-spacing:-0.2px;
+  }
+  .logo span{color:var(--accent);}
+  .nav-links{display:flex; gap:28px; align-items:center;}
+  .nav-links a{
+    position:relative;
+    font-family:var(--mono); font-size:12.5px; color:var(--text-dim);
+    text-transform:uppercase; letter-spacing:0.06em;
+    transition:color .2s ease;
+    padding-bottom:3px;
+  }
+  .nav-links a::after{
+    content:""; position:absolute; left:0; right:100%; bottom:0; height:1px;
+    background:var(--accent); transition:right .25s ease;
+  }
+  .nav-links a:hover{color:var(--text);}
+  .nav-links a:hover::after{right:0;}
+  .status-pill{
+    display:flex; align-items:center; gap:7px;
+    font-family:var(--mono); font-size:11.5px; color:var(--accent);
+    border:1px solid var(--border); padding:6px 12px; border-radius:20px;
+    background:var(--surface);
+    white-space:nowrap;
+  }
+  .dot{width:7px; height:7px; border-radius:50%; background:var(--accent); position:relative; flex-shrink:0;}
+  .dot::after{
+    content:""; position:absolute; inset:-4px; border-radius:50%;
+    border:1px solid var(--accent); opacity:0.5;
+    animation:pulseRing 2.2s ease-out infinite;
+  }
+  @keyframes pulseRing{
+    0%{transform:scale(0.6); opacity:0.6;}
+    100%{transform:scale(2.1); opacity:0;}
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:158px 0 90px;
+    position:relative;
+    overflow:hidden;
+  }
+  .orb{
+    position:absolute; border-radius:50%; filter:blur(60px);
+    pointer-events:none; z-index:0; opacity:0.35;
+  }
+  .orb-1{
+    width:420px; height:420px; background:radial-gradient(circle, var(--accent), transparent 70%);
+    top:-160px; right:-120px;
+    animation:driftA 16s ease-in-out infinite;
+  }
+  .orb-2{
+    width:320px; height:320px; background:radial-gradient(circle, var(--accent-3), transparent 70%);
+    top:220px; left:-140px;
+    animation:driftB 20s ease-in-out infinite;
+  }
+  @keyframes driftA{
+    0%,100%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(-40px, 50px) scale(1.15);}
+  }
+  @keyframes driftB{
+    0%,100%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(50px, -30px) scale(1.1);}
+  }
+
+  .eyebrow{
+    font-family:var(--mono); font-size:12.5px; color:var(--text-faint);
+    text-transform:uppercase; letter-spacing:0.14em;
+    display:flex; align-items:center; gap:10px; margin-bottom:22px;
+  }
+  .eyebrow::before{content:"//"; color:var(--accent-2);}
+
+  h1.title{
+    font-family:var(--mono); font-weight:700;
+    font-size:clamp(34px, 6vw, 64px);
+    line-height:1.05; letter-spacing:-0.02em;
+    color:var(--text);
+    max-width:820px;
+  }
+  h1.title .role{
+    display:block; color:var(--accent); margin-top:6px;
+    font-size:clamp(20px, 3vw, 30px); font-weight:600;
+  }
+  .hero-sub{
+    margin-top:22px; max-width:600px; color:var(--text-dim); font-size:16.5px;
+  }
+  .hero-cta{
+    margin-top:34px; display:flex; gap:14px; flex-wrap:wrap;
+  }
+  .btn{
+    font-family:var(--mono); font-size:13.5px; font-weight:600;
+    padding:13px 22px; border-radius:8px; letter-spacing:0.01em;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+    border:1px solid transparent; cursor:pointer;
+  }
+  .btn-primary{background:var(--accent); color:#0B0F13;}
+  .btn-primary:hover{transform:translateY(-2px); background:#6ecb9c; box-shadow:0 10px 30px -10px rgba(95,191,143,0.6);}
+  .btn-ghost{border-color:var(--border); color:var(--text); background:var(--surface);}
+  .btn-ghost:hover{transform:translateY(-2px); border-color:var(--accent);}
+
+  /* terminal card */
+  .terminal{
+    margin-top:56px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+    max-width:640px;
+    box-shadow:0 30px 60px -30px rgba(0,0,0,0.6);
+  }
+  .terminal-bar{
+    display:flex; align-items:center; gap:8px;
+    padding:11px 14px; background:var(--surface-2);
+    border-bottom:1px solid var(--border);
+  }
+  .terminal-bar span{width:10px; height:10px; border-radius:50%; display:inline-block;}
+  .terminal-bar span:nth-child(1){background:#E0705F;}
+  .terminal-bar span:nth-child(2){background:#E0A458;}
+  .terminal-bar span:nth-child(3){background:#5FBF8F;}
+  .terminal-bar .path{
+    margin-left:8px; font-family:var(--mono); font-size:11.5px; color:var(--text-faint);
+  }
+  .terminal-body{
+    padding:22px 20px; font-family:var(--mono); font-size:13.5px; color:var(--text-dim);
+    min-height:150px;
+  }
+  .terminal-body .line{margin-bottom:6px; white-space:pre-wrap;}
+  .terminal-body .prompt{color:var(--accent);}
+  .terminal-body .key{color:var(--accent-3);}
+  .terminal-body .val{color:var(--text);}
+  .caret{
+    display:inline-block; width:7px; height:15px; background:var(--accent);
+    vertical-align:middle; margin-left:2px;
+    animation:blink 1s step-end infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+
+  /* metrics */
+  .metrics{
+    margin-top:56px;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+    background:var(--border); border:1px solid var(--border); border-radius:var(--radius);
+    overflow:hidden;
+    perspective:800px;
+  }
+  .metric{
+    background:var(--surface); padding:22px 20px;
+    transition:transform .18s ease, background .18s ease;
+    will-change:transform;
+  }
+  .metric:hover{background:var(--surface-2);}
+  .metric .num{
+    font-family:var(--mono); font-weight:700; font-size:28px; color:var(--text);
+  }
+  .metric .num span{color:var(--accent);}
+  .metric .label{
+    margin-top:6px; font-size:12.5px; color:var(--text-dim);
+  }
+
+  /* ---------- SECTION HEADS ---------- */
+  .section-pad{padding:100px 0;}
+  .section-head{margin-bottom:52px;}
+  .section-head .eyebrow{margin-bottom:14px;}
+  .section-head h2{
+    font-family:var(--mono); font-size:clamp(24px,3.4vw,34px);
+    font-weight:700; letter-spacing:-0.01em;
+  }
+  .section-head p{color:var(--text-dim); margin-top:12px; max-width:560px;}
+
+  /* ---------- generic reveal ---------- */
+  .reveal{
+    opacity:0; transform:translateY(24px);
+    transition:opacity .6s cubic-bezier(.2,.7,.2,1), transform .6s cubic-bezier(.2,.7,.2,1);
+  }
+  .reveal.in-view{opacity:1; transform:translateY(0);}
+
+  /* ---------- ABOUT ---------- */
+  .about-grid{display:grid; grid-template-columns:1.1fr 0.9fr; gap:46px; align-items:start;}
+  .about-text p{color:var(--text-dim); margin-bottom:16px; font-size:15.5px;}
+  .about-text strong{color:var(--text); font-weight:600;}
+  .readme{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:26px 24px;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .readme:hover{transform:translateY(-3px); box-shadow:0 20px 40px -25px rgba(0,0,0,0.7);}
+  .readme h3{
+    font-family:var(--mono); font-size:13px; color:var(--accent-2);
+    text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px;
+  }
+  .readme ul li{
+    display:flex; justify-content:space-between; gap:12px;
+    font-size:13.5px; padding:9px 0; border-bottom:1px dashed var(--border);
+    color:var(--text-dim);
+  }
+  .readme ul li:last-child{border-bottom:none;}
+  .readme ul li b{color:var(--text); font-weight:600; text-align:right;}
+
+  /* ---------- PIPELINE / EXPERIENCE ---------- */
+  .pipeline{position:relative;}
+  .pipeline-track{
+    position:absolute; left:19px; top:8px; bottom:8px; width:2px;
+    background:var(--border);
+    overflow:hidden;
+  }
+  .pipeline-fill{
+    position:absolute; left:0; top:0; width:100%; height:0%;
+    background:linear-gradient(var(--accent), var(--accent-3));
+    box-shadow:0 0 12px rgba(95,191,143,0.5);
+    transition:height .1s linear;
+  }
+  .stage{
+    position:relative;
+    padding-left:56px;
+    padding-bottom:44px;
+    opacity:0; transform:translateY(18px);
+    transition:opacity .6s ease, transform .6s ease;
+  }
+  .stage.in-view{opacity:1; transform:translateY(0);}
+  .stage:last-child{padding-bottom:0;}
+  .stage-node{
+    position:absolute; left:0; top:2px;
+    width:40px; height:40px; border-radius:50%;
+    background:var(--surface); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:11px; color:var(--text-dim);
+    z-index:2;
+    transition:border-color .3s ease, color .3s ease, background .3s ease;
+  }
+  .stage.in-view .stage-node{border-color:var(--accent); color:var(--accent);}
+  .stage.is-current .stage-node{
+    border-color:var(--accent); color:var(--accent); background:var(--accent-soft);
+  }
+  .stage.is-current .stage-node .live-dot{
+    width:8px; height:8px; border-radius:50%; background:var(--accent);
+    animation:pulseRing2 1.6s ease-out infinite;
+  }
+  @keyframes pulseRing2{
+    0%{box-shadow:0 0 0 0 rgba(95,191,143,0.55);}
+    100%{box-shadow:0 0 0 9px rgba(95,191,143,0);}
+  }
+  .stage-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:22px 22px;
+    transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  .stage-card:hover{
+    transform:translateY(-3px);
+    border-color:rgba(95,191,143,0.35);
+    box-shadow:0 22px 44px -28px rgba(0,0,0,0.75);
+  }
+  .stage.is-current .stage-card{border-color:rgba(95,191,143,0.35);}
+  .stage-top{
+    display:flex; flex-wrap:wrap; gap:10px 16px; align-items:baseline; justify-content:space-between;
+  }
+  .stage-role{font-weight:700; font-size:16.5px; color:var(--text);}
+  .stage-company{color:var(--accent-3); font-weight:600;}
+  .stage-date{
+    font-family:var(--mono); font-size:12px; color:var(--text-faint); white-space:nowrap;
+  }
+  .stage-status{
+    font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em;
+    padding:3px 8px; border-radius:4px; margin-left:8px;
+  }
+  .status-done{background:var(--accent-soft); color:var(--accent);}
+  .status-live{background:var(--accent-2-soft); color:var(--accent-2);}
+  .stage-summary{margin-top:10px; color:var(--text-dim); font-size:14.5px;}
+  .stage details{margin-top:14px;}
+  .stage summary{
+    cursor:pointer; font-family:var(--mono); font-size:12px; color:var(--accent-3);
+    list-style:none; display:inline-flex; align-items:center; gap:6px;
+    transition:color .15s ease;
+  }
+  .stage summary:hover{color:var(--accent);}
+  .stage summary::-webkit-details-marker{display:none;}
+  .stage summary::before{content:"▸"; transition:transform .25s ease;}
+  .stage details[open] summary::before{transform:rotate(90deg);}
+  .stage-detail-body{margin-top:12px; color:var(--text-dim); font-size:14px;
+    animation:detailIn .3s ease;
+  }
+  @keyframes detailIn{
+    from{opacity:0; transform:translateY(-6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .stage-detail-body li{position:relative; padding-left:16px; margin-bottom:7px;}
+  .stage-detail-body li::before{content:"—"; position:absolute; left:0; color:var(--text-faint);}
+  .stage-tags{margin-top:14px; display:flex; flex-wrap:wrap; gap:7px;}
+  .tag-mini{
+    font-family:var(--mono); font-size:11px; color:var(--text-dim);
+    border:1px solid var(--border); padding:3px 9px; border-radius:5px;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .tag-mini:hover{border-color:var(--accent); color:var(--text);}
+
+  /* ---------- SKILLS ---------- */
+  .skills-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:18px;}
+  .skill-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:22px;
+    transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  .skill-card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(95,191,143,0.3);
+    box-shadow:0 20px 40px -26px rgba(0,0,0,0.7);
+  }
+  .skill-card h4{
+    font-family:var(--mono); font-size:12.5px; color:var(--accent);
+    text-transform:uppercase; letter-spacing:0.06em; margin-bottom:14px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .skill-card h4::before{content:"●"; font-size:8px; color:var(--accent-2);}
+  .skill-tags{display:flex; flex-wrap:wrap; gap:8px;}
+  .skill-tags span{
+    font-family:var(--mono); font-size:12px; color:var(--text-dim);
+    background:var(--surface-2); border:1px solid var(--border);
+    padding:5px 10px; border-radius:6px;
+    transition:border-color .15s ease, color .15s ease, transform .15s ease;
+  }
+  .skill-tags span:hover{border-color:var(--accent); color:var(--text); transform:translateY(-2px);}
+
+  /* ---------- EDUCATION / LANG ---------- */
+  .edu-grid{display:grid; grid-template-columns:1.3fr 0.7fr; gap:20px;}
+  .edu-card, .lang-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:24px;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .edu-card:hover, .lang-card:hover{transform:translateY(-3px); box-shadow:0 20px 40px -25px rgba(0,0,0,0.7);}
+  .edu-card h4, .lang-card h4{
+    font-family:var(--mono); font-size:12px; color:var(--accent-2); text-transform:uppercase;
+    letter-spacing:0.06em; margin-bottom:12px;
+  }
+  .edu-card p{color:var(--text); font-weight:600;}
+  .edu-card p.small{color:var(--text-dim); font-weight:400; margin-top:6px; font-size:13.5px;}
+  .lang-row{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--border); font-size:14px;}
+  .lang-row:last-child{border-bottom:none;}
+  .lang-row b{color:var(--text);}
+  .lang-row span{color:var(--text-dim); font-family:var(--mono); font-size:12.5px;}
+
+  /* ---------- CONTACT ---------- */
+  .contact-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:48px; position:relative; overflow:hidden;
+  }
+  .contact-card::before{
+    content:""; position:absolute; top:-40%; right:-10%; width:340px; height:340px;
+    background:radial-gradient(circle, rgba(95,191,143,0.14), transparent 70%);
+    pointer-events:none;
+    animation:driftA 14s ease-in-out infinite;
+  }
+  .contact-inner{position:relative; z-index:1; display:grid; grid-template-columns:1.2fr 0.8fr; gap:40px; align-items:center;}
+  .contact-inner h2{font-family:var(--mono); font-size:clamp(22px,3vw,30px); font-weight:700; margin-bottom:14px;}
+  .contact-inner p{color:var(--text-dim); max-width:440px; margin-bottom:0;}
+  .contact-links{display:flex; flex-direction:column; gap:12px;}
+  .contact-link{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    font-family:var(--mono); font-size:13.5px; color:var(--text);
+    background:var(--surface-2); border:1px solid var(--border); border-radius:8px;
+    padding:13px 16px; transition:border-color .15s ease, transform .15s ease;
+  }
+  .contact-link:hover{border-color:var(--accent); transform:translateX(3px);}
+  .contact-link .k{color:var(--text-faint); font-size:11.5px; text-transform:uppercase; letter-spacing:0.05em;}
+
+  footer{
+    padding:30px 0 44px; text-align:center;
+    font-family:var(--mono); font-size:12px; color:var(--text-faint);
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:860px){
+    .metrics{grid-template-columns:repeat(2,1fr);}
+    .about-grid, .edu-grid, .contact-inner{grid-template-columns:1fr;}
+    .skills-grid{grid-template-columns:1fr;}
+    .nav-links{display:none;}
+  }
+  @media (max-width:560px){
+    .hero{padding-top:132px;}
+    .stage{padding-left:44px;}
+    .pipeline-track{left:15px;}
+    .stage-node{width:32px; height:32px; font-size:9.5px;}
+    .contact-card{padding:30px 22px;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="logo">dp<span>@</span>devops<span>:~$</span></div>
+    <nav class="nav-links">
+      <a href="#about">whoami</a>
+      <a href="#experience">опыт</a>
+      <a href="#skills">навыки</a>
+      <a href="#education">образование</a>
+      <a href="#contact">контакты</a>
+    </nav>
+    <div class="status-pill"><span class="dot"></span>open to work</div>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="wrap">
+      <div class="eyebrow">Санкт-Петербург · готов к переезду · remote-friendly</div>
+      <h1 class="title">Парамонов Дмитрий
+        <span class="role">DevOps / SRE Team Lead</span>
+      </h1>
+      <p class="hero-sub">17+ лет в IT, из них 8+ — в DevOps. Строю CI/CD-конвейеры, перевожу инфраструктуру в контейнеры и Kubernetes, довожу микросервисы от коммита до прод-сегмента и держу production стабильным.</p>
+
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="Rezume_Paramonov.pdf" download>↓ Скачать резюме (PDF)</a>
+        <a class="btn btn-ghost" href="#contact">Связаться</a>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span></span><span></span><span></span>
+          <div class="path">~/paramonov — zsh</div>
+        </div>
+        <div class="terminal-body" id="termBody">
+          <div class="line"><span class="prompt">$</span> whoami</div>
+        </div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric"><div class="num"><span class="count-up" data-target="17">0</span>+</div><div class="label">лет опыта в IT</div></div>
+        <div class="metric"><div class="num"><span class="count-up" data-target="250">0</span>+</div><div class="label">серверов под управлением</div></div>
+        <div class="metric"><div class="num"><span class="count-up" data-target="21">0</span></div><div class="label">микросервис доставлен в прод (ВТБ + ФНП)</div></div>
+        <div class="metric"><div class="num"><span class="count-up" data-target="12">0</span></div><div class="label">человек в подчинении, макс.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section-pad" id="about">
+    <div class="wrap about-grid">
+      <div>
+        <div class="section-head reveal">
+          <div class="eyebrow">whoami</div>
+          <h2>От сисадмина до Team Lead'а</h2>
+        </div>
+        <div class="about-text reveal">
+          <p>Прошёл путь от системного администратора и совладельца собственного бизнеса до <strong>DevOps Team Lead</strong> в международной компании. Последние 8+ лет сфокусирован на современных DevOps-практиках: контейнеризация на Docker, оркестрация в Kubernetes/OpenShift — преимущественно для FinTech.</p>
+          <p>Цель в каждом проекте — минимальный <strong>time-to-market</strong> и внедрение практик DevSecOps для надёжной и стабильной работы систем в production. Есть опыт полного цикла: от найма и обучения команды до архитектуры инфраструктуры и инцидент-менеджмента.</p>
+          <p>Разрешение на работу в России и ОАЭ, готов к переезду и редким командировкам.</p>
+        </div>
+      </div>
+      <div class="readme reveal">
+        <h3>// профиль</h3>
+        <ul>
+          <li>Желаемая роль <b>DevOps / SRE Team Lead</b></li>
+          <li>Также рассматриваю <b>CTO · CIO</b></li>
+          <li>Формат <b>Удалённо, полный день</b></li>
+          <li>Локация <b>Санкт-Петербург</b></li>
+          <li>Разрешение на работу <b>Россия · ОАЭ</b></li>
+          <li>Английский <b>B2</b></li>
+          <li>Опыт в DevOps <b>8+ лет</b></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE / PIPELINE -->
+  <section class="section-pad" id="experience">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow">CI / CD карьеры</div>
+        <h2>Опыт работы — 17 лет 2 месяца</h2>
+        <p>Каждый этап карьеры — как стадия конвейера: собран, протестирован и задеплоен в следующую среду. Последний — сейчас в статусе <b style="color:var(--accent)">PROD / live</b>.</p>
+      </div>
+
+      <div class="pipeline">
+        <div class="pipeline-track"><div class="pipeline-fill" id="pipelineFill"></div></div>
+
+        <div class="stage is-current">
+          <div class="stage-node"><span class="live-dot"></span></div>
+          <div class="stage-card">
+            <div class="stage-top">
+              <div><span class="stage-role">DevOps Team Lead</span> · <span class="stage-company">Crypto Industry International</span></div>
+              <div><span class="stage-date">июнь 2023 — н.в.</span><span class="stage-status status-live">live</span></div>
+            </div>
+            <p class="stage-summary">ОАЭ. Организация и развитие DevOps-процессов бизнеса: от прод-эксплуатации микросервисов до найма ИТ-специалистов.</p>
+            <details>
+              <summary>Подробнее</summary>
+              <div class="stage-detail-body">
+                <ul>
+                  <li>Обеспечение процессов разработки, тестирования, внедрения и эксплуатации микросервисов, инцидент-менеджмент при нештатных ситуациях</li>
+                  <li>Ведение документации проектов, взаимодействие с владельцами продукта, архитекторами информационных систем, департаментами разработки и эксплуатации</li>
+                  <li>Участие в проектировании архитектуры программного продукта</li>
+                  <li>Утверждение требований и регламентов для отделов разработки, тестирования и сопровождения ПО</li>
+                  <li>Организация, ведение и балансировка бэклога задач для последующей реализации</li>
+                  <li>Организация процесса обучения и найма новых IT-специалистов</li>
+                  <li>Масштабирование серверной инфраструктуры, разработка стратегии администрирования серверов</li>
+                  <li>Поддержка автоматизированных систем для масштабирования и управления существующей IT-инфраструктурой</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="stage-node">09</div>
+          <div class="stage-card">
+            <div class="stage-top">
+              <div><span class="stage-role">Lead DevOps</span> · <span class="stage-company">Иннотех, Группа компаний</span></div>
+              <div><span class="stage-date">апр 2021 — июнь 2023</span><span class="stage-status status-done">done</span></div>
+            </div>
+            <p class="stage-summary">Основной клиент — Банк ВТБ. Перенос инфраструктуры в VTB.Cloud, CI/CD на TeamCity + OpenShift, миграция на DreamPipe.</p>
+            <details>
+              <summary>Подробнее</summary>
+              <div class="stage-detail-body">
+                <ul>
+                  <li>Стрим «Торгово-сервисные предприятия» (эквайринг МСБ): силами нескольких команд разработано 9 информационных систем на микросервисной архитектуре (Docker → OpenShift, Java 8-11/Spring Boot, Maven, PostgreSQL, Nginx, React/NPM)</li>
+                  <li>Перенос всей инфраструктуры (разработка, тестирование, прод) в новый ЦОД на базе «VTB.Cloud»; созданы сегменты DEV, ST, IFT, LT, PRE-PROD, HOTFIX и продуктовый сегмент PROD</li>
+                  <li>Организован непрерывный конвейер сборки и доставки микросервисов на TeamCity CI/CD + OpenShift Templates/ENV с интеграцией в «Омниканальную» платформу банка</li>
+                  <li>Стрим «Государственные услуги» (ФНП): разработано 12 микросервисов; миграция конвейеров на единый внутрибанковский стандарт «DreamPipe» (TeamCity + Helm Charts, практики DevSecOps)</li>
+                  <li>Миграция с IBM MQ на VTB Apache ActiveMQ Artemis на ОС Astra Linux; перевод БД из standalone в PostgreSQL-кластер (Astra Linux)</li>
+                  <li>Реализован CI/CD-процесс: DEV → ST → IFT → LT → Pre-Prod → PROD (2 instance)</li>
+                  <li>Участие в аудитах и приёмо-сдаточных испытаниях с ИБ, оформление заявок ЗНО/ЗНИ, ведение RDS в Jira</li>
+                  <li>Участие в корпоративном сообществе «Лидеры DevOps», координация разработчиков, аналитиков, архитекторов, SRE/QA и администраторов</li>
+                  <li>Наставничество Junior/Middle специалистов в рамках программы «Buddy», участие в найме и онбординге</li>
+                </ul>
+                <div class="stage-tags">
+                  <span class="tag-mini">OpenShift/K8s</span><span class="tag-mini">TeamCity</span><span class="tag-mini">Kafka</span><span class="tag-mini">SonarQube</span><span class="tag-mini">Fortify SAST/DAST</span><span class="tag-mini">Jira/Confluence</span><span class="tag-mini">Bitbucket</span>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="stage-node">08</div>
+          <div class="stage-card">
+            <div class="stage-top">
+              <div><span class="stage-role">Senior DevOps</span> · <span class="stage-company">DELL</span></div>
+              <div><span class="stage-date">дек 2018 — апр 2021</span><span class="stage-status status-done">done</span></div>
+            </div>
+            <p class="stage-summary">Команда Pipelines. Ansible-автоматизация, Kubernetes в гибридном облаке, мониторинг Prometheus + Grafana.</p>
+            <details>
+              <summary>Подробнее</summary>
+              <div class="stage-detail-body">
+                <ul>
+                  <li>Администрирование и оптимизация Atlassian-стека (Jira, Confluence, Bitbucket): конфигурации проектов, обновления, мониторинг производительности, интеграции с другими инструментами</li>
+                  <li>Разработка плана обновления устаревшей инфраструктуры до современных версий продуктов в новых окружениях</li>
+                  <li>Создание матрицы ответственности команды</li>
+                  <li>Внедрение системы резервного копирования и восстановления на базе UrBackup</li>
+                  <li>Написание автоматизированных сценариев на Ansible</li>
+                  <li>Управление Jenkins: установка/настройка плагинов, автоматизация сборок и поставок</li>
+                  <li>Контейнеризация приложений на Docker/Docker-compose</li>
+                  <li>Конфигурирование Kubernetes-кластеров в гибридной облачной среде, интеграция с GitLab CI/CD, настройка Nginx</li>
+                  <li>Мониторинг на Prometheus и Grafana: Node-exporters, правила, дашборды</li>
+                  <li>Сотрудничество с командами из США и Индии, участие в международных конференциях и demo-сессиях</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="stage-node">07</div>
+          <div class="stage-card">
+            <div class="stage-top">
+              <div><span class="stage-role">Middle DevOps</span> · <span class="stage-company">FINOM</span></div>
+              <div><span class="stage-date">фев — авг 2018</span><span class="stage-status status-done">done</span></div>
+            </div>
+            <p class="stage-summary">Криптоотрасль. CI/CD на GitLab, перевод Jira/Confluence на собственные сервера с авторизацией через AD.</p>
+            <details>
+              <summary>Подробнее</summary>
+              <div class="stage-detail-body">
+                <ul>
+                  <li>Реализованные проекты: онлайн-сервис облачного майнинга, основной портал компании, торговый терминал для криптобирж, landing-pages других услуг</li>
+                  <li>Выстроены и отладены процессы CI/CD на базе GitLab: Dev → Test → Pre-Prod → Production</li>
+                  <li>Стек: Linux (CentOS 7, Ubuntu 18.04), Nginx/Apache, PostgreSQL/MariaDB, Git/GitLab, Node.js/Vue.js, PHP/Bash/Python, Ansible, Docker/LXD</li>
+                  <li>Безопасность: iptables, Fail2ban, Cloudflare CDN, Let's Encrypt; мониторинг Nagios+Nagiosgraph, NRPE, Zabbix; ITSM на GLPI</li>
+                  <li>Перевод Jira и Confluence из облака Atlassian на собственные сервера, авторизация через Active Directory</li>
+                  <li>Внедрены Self Service Password и парольный менеджер TeamPass</li>
+                  <li>Организовано резервное копирование всех данных в Amazon S3</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="stage-node">06</div>
+          <div class="stage-card">
+            <div class="stage-top">
+              <div><span class="stage-role">DevOps</span> · <span class="stage-company">ПрофИТ Солюшенз Нетворкинг Телеком</span></div>
+              <div><span class="stage-date">фев — авг 2017</span><span class="stage-status status-done">done</span></div>
+            </div>
+            <p class="stage-summary">Внедрение ITSM/ITIL на базе GLPI, CI/CD на Jenkins, администрирование VMware ESXi.</p>
+            <details>
+              <summary>Подробнее</summary>
+              <div class="stage-detail-body">
+                <ul>
+                  <li>Внедрение ITSM/ITIL на базе GLPI</li>
+                  <li>CI/CD на Jenkins; работа с Atlassian-стеком (Jira, Confluence, Bitbucket)</li>
+                  <li>Администрирование VMware ESXi</li>
+                  <li>Docker и Docker-compose с Portainer (GUI) и Wharfee</li>
+                  <li>Мониторинг на Nagios/Zabbix</li>
+                  <li>БД: MariaDB, MySQL, PostgreSQL, MS SQL</li>
+                  <li>Web-стек: LAMP, Nginx, php-fpm, Tomcat, IIS</li>
+                  <li>Администрирование Linux/Windows; OpenVPN, SSP, PXE, SSL/TLS, SSH</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="stage-node">05</div>
+          <div class="stage-card">
+            <div class="stage-top">
+              <div><span class="stage-role">Founder — CEO & CIO</span> · <span class="stage-company">IThelperSPb</span></div>
+              <div><span class="stage-date">март 2016 — фев 2017</span><span class="stage-status status-done">done</span></div>
+            </div>
+            <p class="stage-summary">IT-решения на Microsoft Azure, системное администрирование, внедрение ITSM/ITIL, мониторинг Nagios/Zabbix/Cacti.</p>
+            <details>
+              <summary>Подробнее</summary>
+              <div class="stage-detail-body">
+                <ul>
+                  <li>Внедрение высокопроизводительных IT-решений на базе публичного облака Microsoft Azure для частных компаний</li>
+                  <li>Услуги VPS и IT-консалтинг, системное администрирование Windows/*nix</li>
+                  <li>Внедрение ITSM/ITIL-системы: управление запросами и инцидентами (ServiceDesk/HelpDesk), Problem/Change/Project/Time management, управление конфигурациями, лицензиями и расходными материалами</li>
+                  <li>Автоматизированная система инвентаризации (сервера, рабочие станции, ПО)</li>
+                  <li>Мониторинг: Nagios, Zabbix, Cacti</li>
+                  <li>Внедрение корпоративных порталов и CRM-систем, создание интернет-магазинов и сайтов</li>
+                  <li>SEO-продвижение (Яндекс, Mail, Google) и SMM (VK, Facebook, Instagram, Twitter)</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="stage-node">04</div>
+          <div class="stage-card">
+            <div class="stage-top">
+              <div><span class="stage-role">Старший специалист по системному администрированию</span> · <span class="stage-company">Объединенная Вагонная Компания</span></div>
+              <div><span class="stage-date">дек 2014 — март 2016</span><span class="stage-status status-done">done</span></div>
+            </div>
+            <p class="stage-summary">Аудит IT-инфраструктуры, реорганизация Active Directory, внедрение виртуализации VMware ESXi.</p>
+            <details>
+              <summary>Подробнее</summary>
+              <div class="stage-detail-body">
+                <ul>
+                  <li>Проведён аудит и анализ действующей IT-инфраструктуры предприятия</li>
+                  <li>Усовершенствована структура объектов в Active Directory: созданы организационные подразделения по департаментам, что позволило гибче управлять GPO</li>
+                  <li>На серверах MS Exchange созданы дополнительные почтовые базы, организовано распределение почтовых ящиков</li>
+                  <li>Внедрена среда виртуализации на базе VMware ESXi</li>
+                  <li>Развёрнуты новые сервисы на Linux: ITSM-приложение GLPI, мониторинг Nagios+Cacti/Zabbix, proxy-сервер Squid+LightSquid, XMPP-сервер Openfire</li>
+                  <li>Создан внутренний корпоративный портал на базе ONLYOFFICE и внедрена ERP-система Odoo/OpenERP</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="stage-node">03</div>
+          <div class="stage-card">
+            <div class="stage-top">
+              <div><span class="stage-role">Co-Founder — CEO & CIO</span> · <span class="stage-company">ООО «Микрозаймфинанс»</span></div>
+              <div><span class="stage-date">янв 2012 — дек 2014</span><span class="stage-status status-done">done</span></div>
+            </div>
+            <p class="stage-summary">Бизнес построен с нуля: регистрация, IT-инфраструктура, CRM, реклама и полный операционный цикл МФО.</p>
+            <details>
+              <summary>Подробнее</summary>
+              <div class="stage-detail-body">
+                <ul>
+                  <li>Бизнес полностью создан с нуля: регистрация в ИФНС (ОГРН от 13.02.2012), ПФР, ФСС; включение в реестр МФО ФСФР России и реестр операторов персональных данных</li>
+                  <li>Открыт расчётный счёт в банке ВТБ 24; заключены договоры с бюро кредитных историй НБКИ и Объединённое кредитное бюро, с коллекторским агентством и профессиональными юристами</li>
+                  <li>Создан сайт компании: онлайн-заявки на микрозайм, калькулятор займа, форма обратной связи; официальные страницы в VK, Odnoklassniki, LiveJournal, Twitter</li>
+                  <li>Выведен в TOP по ключевым запросам в поисковых системах; настроены рекламные кампании (Яндекс.Директ, Google AdWords, VK, Odnoklassniki, Twitter)</li>
+                  <li>Внедрена многопользовательская сетевая CRM-система для автоматизации бизнес-процессов МФО</li>
+                  <li>Организована IT-площадка под хостинг, сервер БД и почты, созданы аналитические платформы</li>
+                  <li>Организована работа персонала (кредитные менеджеры), документооборот, финансовая и бухгалтерская отчётность, база постоянных клиентов</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="stage-node">02</div>
+          <div class="stage-card">
+            <div class="stage-top">
+              <div><span class="stage-role">Главный системный администратор</span> · <span class="stage-company">Т-Банк</span></div>
+              <div><span class="stage-date">янв — дек 2011</span><span class="stage-status status-done">done</span></div>
+            </div>
+            <p class="stage-summary">250+ серверов, 1200+ пользователей, 4 ЦОД, команда из 6 человек. Мониторинг и автоматизация highload-систем.</p>
+            <details>
+              <summary>Подробнее</summary>
+              <div class="stage-detail-body">
+                <ul>
+                  <li>Системное администрирование IT-инфраструктуры на Windows/*nix</li>
+                  <li>Автоматизация основных бизнес-процессов программными и аппаратными решениями</li>
+                  <li>Анализ, оценка и предотвращение рисков, связанных с функционированием банковского ПО</li>
+                  <li>Внедрение систем автоматического мониторинга и оповещения о сбоях</li>
+                  <li>Оптимизация и регламентация процессов в highload-системах</li>
+                  <li>Постановка задач и контроль разработки/ввода в эксплуатацию интегрированных ИТ-решений</li>
+                  <li>Составление ТЗ, технической документации и рабочих инструкций</li>
+                  <li>Масштаб: &gt;250 серверов, &gt;1200 пользователей ПК, 4 ЦОД, 6 человек в подчинении</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="stage-node">01</div>
+          <div class="stage-card">
+            <div class="stage-top">
+              <div><span class="stage-role">Заместитель директора департамента ИТ</span> · <span class="stage-company">ЛЕКСПРО, ООО</span></div>
+              <div><span class="stage-date">фев 2008 — янв 2011</span><span class="stage-status status-done">done</span></div>
+            </div>
+            <p class="stage-summary">Юридический холдинг. IT-инфраструктура с нуля для нового юрлица, СХД и резервное копирование, виртуализация на Hyper-V.</p>
+            <details>
+              <summary>Подробнее</summary>
+              <div class="stage-detail-body">
+                <ul>
+                  <li>Внедрение MS Project Server и MS Team Foundation Server</li>
+                  <li>Перевод одного из офисов на новую архитектурную IT-модель: новый домен, антивирусная защита, СХД, СРК, лицензирование ОС и ПО</li>
+                  <li>Подготовка и размещение серверов в дата-центре на Collocation</li>
+                  <li>Организация видео-конференц-связи между дочерними компаниями холдинга на оборудовании Polycom</li>
+                  <li>Построение с нуля всей IT-инфраструктуры офиса на ~50 ПК для нового юридического лица в группе компаний (ЛВС, интернет, телефония, закупка оборудования и ПО)</li>
+                  <li>Организация СХД и автоматизация резервного копирования: Symantec Backup Exec 12, ленточная библиотека HP LTO Ultrium2, NAS Promise VTrak M610p</li>
+                  <li>Реорганизация основного домена; внедрение виртуализации на MS Hyper-V 2008 с миграцией физических серверов через MS SCVMM</li>
+                  <li>Обеспечена стабильная работа критически важных серверов (MS SQL 2005/2008, WSUS, CRM, Linux-сервисы: FTP, HTTP, Nagios, Squid, MySQL, XMPP, iptables, VPN, SSH, Postfix)</li>
+                  <li>Организована и регламентирована деятельность IT-персонала в режиме 24x7x365</li>
+                  <li>Масштаб: 40 серверов, ~500 пользователей, 6 распределённых географически офисов, 12 человек в подчинении</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="section-pad" id="skills">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow">stack.yaml</div>
+        <h2>Технологии и навыки</h2>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-card reveal">
+          <h4>Контейнеризация и оркестрация</h4>
+          <div class="skill-tags">
+            <span>Docker</span><span>Docker Compose</span><span>Kubernetes</span><span>Kubespray</span><span>OpenShift</span><span>LXD/LXC</span><span>Vagrant</span>
+          </div>
+        </div>
+        <div class="skill-card reveal">
+          <h4>CI/CD и SCM</h4>
+          <div class="skill-tags">
+            <span>Jenkins</span><span>GitLab CI</span><span>TeamCity</span><span>Bitbucket</span><span>GitHub</span><span>SVN</span><span>Ansible</span>
+          </div>
+        </div>
+        <div class="skill-card reveal">
+          <h4>Мониторинг и наблюдаемость</h4>
+          <div class="skill-tags">
+            <span>Prometheus</span><span>Grafana</span><span>Zabbix</span><span>Nagios</span><span>Cacti</span><span>Alertmanager</span>
+          </div>
+        </div>
+        <div class="skill-card reveal">
+          <h4>Базы данных и message brokers</h4>
+          <div class="skill-tags">
+            <span>PostgreSQL</span><span>MySQL/MariaDB</span><span>MS SQL</span><span>Apache Kafka</span><span>ActiveMQ Artemis</span>
+          </div>
+        </div>
+        <div class="skill-card reveal">
+          <h4>Облака и виртуализация</h4>
+          <div class="skill-tags">
+            <span>AWS</span><span>MS Azure</span><span>Yandex.Cloud</span><span>DigitalOcean</span><span>VMware ESXi</span><span>Hyper-V</span><span>Proxmox</span><span>KVM</span>
+          </div>
+        </div>
+        <div class="skill-card reveal">
+          <h4>DevSecOps, ITSM и управление</h4>
+          <div class="skill-tags">
+            <span>SonarQube</span><span>Fortify SAST/DAST</span><span>Jira</span><span>Confluence</span><span>GLPI / ITIL</span><span>Управление командой</span><span>Управление бэклогом</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section class="section-pad" id="education">
+    <div class="wrap edu-grid">
+      <div class="edu-card reveal">
+        <h4>Образование</h4>
+        <p>Санкт-Петербургский Государственный Университет Аэрокосмического Приборостроения</p>
+        <p class="small">Вычислительные машины, системы и сети — инженер-программист, 2006</p>
+        <p class="small" style="margin-top:14px;">Повышение квалификации: «Внедрение сетевой инфраструктуры Microsoft Windows Server 2003» — SOFTLINE, 2006</p>
+      </div>
+      <div class="lang-card reveal">
+        <h4>Языки</h4>
+        <div class="lang-row"><b>Русский</b><span>родной</span></div>
+        <div class="lang-row"><b>Английский</b><span>B2</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section-pad" id="contact">
+    <div class="wrap">
+      <div class="contact-card reveal">
+        <div class="contact-inner">
+          <div>
+            <h2>Готов обсудить новую роль DevOps/SRE Team Lead</h2>
+            <p>Открыт к удалённым и релокационным предложениям, редким командировкам. Отвечаю быстро — предпочтительный канал: телефон/мессенджер.</p>
+          </div>
+          <div class="contact-links">
+            <a class="contact-link" href="tel:+79319724546"><span><span class="k">Телефон</span><br>+7 (931) 972-45-46</span> →</a>
+            <a class="contact-link" href="mailto:forestplus@ya.ru"><span><span class="k">Email</span><br>forestplus@ya.ru</span> →</a>
+            <a class="contact-link" href="Rezume_Paramonov.pdf" download><span><span class="k">Резюме</span><br>Скачать PDF</span> ↓</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">© Дмитрий Парамонов · exit 0</div>
+</footer>
+
+<script>
+  document.querySelector('footer .wrap').textContent = '© ' + new Date().getFullYear() + ' Дмитрий Парамонов · exit 0';
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- scroll progress bar ---------- */
+  const progressEl = document.getElementById('scrollProgress');
+  function updateProgress(){
+    const h = document.documentElement;
+    const pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progressEl.style.width = Math.min(100, Math.max(0, pct)) + '%';
+  }
+  let progressTicking = false;
+  window.addEventListener('scroll', ()=>{
+    if(!progressTicking){
+      requestAnimationFrame(()=>{ updateProgress(); progressTicking = false; });
+      progressTicking = true;
+    }
+  });
+  updateProgress();
+
+  /* ---------- hero terminal typewriter ---------- */
+  const termBody = document.getElementById('termBody');
+  const linesToType = [
+    { html: '<span class="key">role</span>: <span class="val">DevOps / SRE Team Lead</span>' },
+    { html: '<span class="key">experience</span>: <span class="val">17y 2m (8y+ DevOps)</span>' },
+    { html: '<span class="key">location</span>: <span class="val">Saint Petersburg, RU</span>' },
+    { html: '<span class="key">work_permit</span>: <span class="val">RU, UAE</span>' },
+    { html: '<span class="key">status</span>: <span class="val" style="color:var(--accent)">open_to_work</span>' }
+  ];
+
+  function typeLines(container, lines, done){
+    let i = 0;
+    function next(){
+      if(i >= lines.length){ if(done) done(); return; }
+      const div = document.createElement('div');
+      div.className = 'line';
+      const target = document.createElement('span');
+      div.appendChild(target);
+      container.appendChild(div);
+      target.innerHTML = lines[i].html;
+      target.style.opacity = '0';
+      target.style.transition = 'opacity .25s ease';
+      requestAnimationFrame(()=> target.style.opacity = '1');
+      i++;
+      setTimeout(next, 260);
+    }
+    next();
+  }
+
+  if(reduceMotion){
+    linesToType.forEach(l => {
+      const div = document.createElement('div');
+      div.className = 'line';
+      div.innerHTML = l.html;
+      termBody.appendChild(div);
+    });
+  } else {
+    setTimeout(()=>{
+      typeLines(termBody, linesToType, ()=>{
+        const caretLine = document.createElement('div');
+        caretLine.className = 'line';
+        caretLine.innerHTML = '<span class="prompt">$</span> <span class="caret"></span>';
+        termBody.appendChild(caretLine);
+      });
+    }, 500);
+  }
+
+  /* ---------- count-up metrics ---------- */
+  function animateCount(el){
+    const target = parseInt(el.dataset.target, 10);
+    if(reduceMotion){ el.textContent = target; return; }
+    const duration = 1200;
+    const start = performance.now();
+    function tick(now){
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(eased * target);
+      if(p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  const countEls = document.querySelectorAll('.count-up');
+  const countIO = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        animateCount(entry.target);
+        countIO.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  countEls.forEach(el => countIO.observe(el));
+
+  /* ---------- generic reveal (staggered) ---------- */
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealIO = new IntersectionObserver((entries)=>{
+    entries.forEach((entry, idx)=>{
+      if(entry.isIntersecting){
+        const el = entry.target;
+        const siblingsDelay = Array.from(el.parentElement.children).indexOf(el) * 70;
+        setTimeout(()=> el.classList.add('in-view'), reduceMotion ? 0 : siblingsDelay);
+        revealIO.unobserve(el);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => revealIO.observe(el));
+
+  /* ---------- pipeline stages reveal + progress fill ---------- */
+  const stages = document.querySelectorAll('.stage');
+  const stageIO = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        stageIO.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  stages.forEach(s => stageIO.observe(s));
+
+  const pipelineEl = document.querySelector('.pipeline');
+  const pipelineFill = document.getElementById('pipelineFill');
+  function updatePipelineFill(){
+    if(!pipelineEl) return;
+    const rect = pipelineEl.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const total = rect.height;
+    // how much of the pipeline has scrolled past the "reading line" (65% of viewport height)
+    const scrolled = (vh * 0.65) - rect.top;
+    const pct = Math.min(1, Math.max(0, scrolled / total));
+    pipelineFill.style.height = (pct * 100) + '%';
+  }
+  let pipelineTicking = false;
+  window.addEventListener('scroll', ()=>{
+    if(!pipelineTicking){
+      requestAnimationFrame(()=>{ updatePipelineFill(); pipelineTicking = false; });
+      pipelineTicking = true;
+    }
+  });
+  updatePipelineFill();
+
+  /* ---------- tilt effect on metric cards ---------- */
+  if(!reduceMotion && window.matchMedia('(pointer:fine)').matches){
+    document.querySelectorAll('.metric').forEach(card=>{
+      card.addEventListener('mousemove', (e)=>{
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transform = `perspective(600px) rotateX(${(-y*6).toFixed(2)}deg) rotateY(${(x*6).toFixed(2)}deg) translateY(-2px)`;
+      });
+      card.addEventListener('mouseleave', ()=>{ card.style.transform = ''; });
+    });
+  }
+
+  window.addEventListener('resize', ()=>{ updatePipelineFill(); });
+</script>
+
+</body>
+</html>
