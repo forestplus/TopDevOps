@@ -1,2 +1,0 @@
-# TopDevOps
-My personal site 
