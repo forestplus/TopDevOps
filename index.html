@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Дмитрий Парамонов — DevOps Team Lead</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23050508'/%3E%3Ctext x='50' y='68' font-size='56' font-family='monospace' font-weight='700' fill='%2300d4ff' text-anchor='middle'%3E%3E_%3C/text%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -127,6 +128,37 @@
         }
         .status-dot { width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 10px var(--accent-green); }
         @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); } 50% { box-shadow: 0 0 0 8px rgba(16,185,129,0); } }
+        .status-alert { font-weight: 800; animation: alertBlink 1s steps(2, jump-none) infinite; padding: 0 2px; border-radius: 4px; }
+        @keyframes alertBlink {
+            0%, 49% { color: #ff3b3b; text-shadow: 0 0 8px rgba(255,59,59,0.85); }
+            50%, 100% { color: #ffffff; text-shadow: 0 0 8px rgba(255,255,255,0.85); }
+        }
+        @media (prefers-reduced-motion: reduce) { .status-alert { animation: none; color: #ff3b3b; } }
+
+        /* full-width AI/ML news ticker */
+        .news-ticker-bar {
+            width: 100vw; margin-left: calc(50% - 50vw); position: relative; z-index: 1;
+            background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .news-ticker-inner { display: flex; align-items: center; height: 2.4rem; }
+        .news-ticker-label {
+            flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 700;
+            color: var(--accent-cyan); background: var(--bg-primary); padding: 0 1rem; height: 100%;
+            display: flex; align-items: center; letter-spacing: 0.04em; border-right: 1px solid var(--border);
+        }
+        .news-ticker-viewport { overflow: hidden; white-space: nowrap; flex: 1; height: 100%; display: flex; align-items: center; }
+        .news-ticker-track { display: flex; width: max-content; animation: newsScroll 42s linear infinite; padding-left: 1rem; }
+        .news-ticker-track a, .news-ticker-track span {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-secondary);
+            padding-right: 3rem; text-decoration: none; flex-shrink: 0;
+        }
+        .news-ticker-track a:hover { color: var(--accent-cyan); }
+        .news-ticker-track a::before { content: '▸ '; color: var(--accent-cyan); }
+        @keyframes newsScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .news-ticker-bar:hover .news-ticker-track { animation-play-state: paused; }
+        @media (prefers-reduced-motion: reduce) { .news-ticker-track { animation: none; } }
+        @media (max-width: 640px) { .news-ticker-label { font-size: 0.62rem; padding: 0 0.6rem; } }
         .hero-specs { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 0.6rem; }
         .hero-spec-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; padding: 0.25rem 0.7rem; border: 1px solid var(--border); border-radius: 20px; color: var(--text-secondary); }
         .hero-name {
@@ -290,7 +322,7 @@
 
     <!-- Header -->
     <header id="header">
-        <a href="#top" class="logo" aria-label="Home / Главная">dmitry@devops<span>~</span></a>
+        <a href="#top" class="logo" aria-label="Home / Главная">dmitriy@devops<span>~</span></a>
         <nav>
             <a href="#top" data-ru="Главная" data-en="Home">Главная</a>
             <a href="#about" data-ru="Обо мне" data-en="About">Обо мне</a>
@@ -309,9 +341,9 @@
         <div class="hero-content">
             <div class="status-badge">
                 <span class="status-dot"></span>
-                <span data-ru="НА СВЯЗИ · ОТКРЫТ К ПРЕДЛОЖЕНИЯМ" data-en="ONLINE · OPEN TO OFFERS">НА СВЯЗИ · ОТКРЫТ К ПРЕДЛОЖЕНИЯМ</span>
+                <span data-ru="НА СВЯЗИ · " data-en="ONLINE · ">НА СВЯЗИ · </span><span class="status-alert" data-ru="ОТКРЫТ К НОВЫМ И ИНТЕРЕСНЫМ ПРОЕКТАМ" data-en="OPEN TO NEW & INTERESTING PROJECTS">ОТКРЫТ К НОВЫМ И ИНТЕРЕСНЫМ ПРОЕКТАМ</span>
             </div>
-            <h1 class="hero-name">Дмитрий Парамонов</h1>
+            <h1 class="hero-name" data-ru="Дмитрий Парамонов" data-en="Dmitriy Paramonov">Дмитрий Парамонов</h1>
             <p class="hero-title">DevOps Team Lead</p>
             <p class="hero-location" data-ru="Санкт-Петербург · открыт к переезду и удалёнке · РФ / ОАЭ" data-en="Saint Petersburg · open to relocation & remote · RU / UAE work authorization">Санкт-Петербург · открыт к переезду и удалёнке · РФ / ОАЭ</p>
 
@@ -379,6 +411,18 @@
             </div>
         </div>
     </section>
+
+    <!-- AI/ML live news ticker -->
+    <div class="news-ticker-bar" aria-live="off">
+        <div class="news-ticker-inner">
+            <span class="news-ticker-label" data-ru="AI / ML НОВОСТИ //" data-en="AI / ML NEWS //">AI / ML НОВОСТИ //</span>
+            <div class="news-ticker-viewport">
+                <div class="news-ticker-track" id="news-ticker-track">
+                    <span data-ru="Загрузка новостей…" data-en="Loading news…">Загрузка новостей…</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Stats -->
     <div class="stats">
@@ -772,9 +816,12 @@
     <footer>
         <p class="footer-status">
             <span class="footer-dot"></span>
-            <span data-ru="Дмитрий Парамонов · DevOps Team Lead · Санкт-Петербург / ОАЭ" data-en="Dmitry Paramonov · DevOps Team Lead · Saint Petersburg / UAE">Дмитрий Парамонов · DevOps Team Lead · Санкт-Петербург / ОАЭ</span>
+            <span data-ru="Дмитрий Парамонов · DevOps Team Lead · Санкт-Петербург / ОАЭ" data-en="Dmitriy Paramonov · DevOps Team Lead · Saint Petersburg / UAE">Дмитрий Парамонов · DevOps Team Lead · Санкт-Петербург / ОАЭ</span>
         </p>
-        <p style="margin-top:0.5rem; font-size:0.7rem;">© 2026 Дмитрий Парамонов</p>
+        <p style="margin-top:0.5rem; font-size:0.7rem;" data-ru="© 2026 Дмитрий Парамонов" data-en="© 2026 Dmitriy Paramonov">© 2026 Дмитрий Парамонов</p>
+        <p style="margin-top:0.8rem;">
+            <img src="https://visitor-badge.laobi.icu/badge?page_id=forestplus.TopDevOps&left_text=visitors" alt="visitors" loading="lazy" style="height:20px; opacity:0.85; vertical-align:middle;" onerror="this.style.display='none'">
+        </p>
     </footer>
 
     <script>
@@ -930,6 +977,48 @@
             if (resumeBtnHero) resumeBtnHero.setAttribute('href', resumeHref);
             document.documentElement.setAttribute('lang', lang);
         }
+
+        // ========== AI/ML NEWS TICKER ==========
+        (function () {
+            const track = document.getElementById('news-ticker-track');
+            if (!track) return;
+
+            const FALLBACK_LINKS = [
+                { title: 'Свежие новости AI — TechCrunch', url: 'https://techcrunch.com/category/artificial-intelligence/' },
+                { title: 'AI news — The Verge', url: 'https://www.theverge.com/ai-artificial-intelligence' },
+                { title: 'AI news — MIT Technology Review', url: 'https://www.technologyreview.com/topic/artificial-intelligence/' },
+                { title: 'Hacker News — AI discussions', url: 'https://hn.algolia.com/?q=AI' },
+                { title: 'Anthropic — новости', url: 'https://www.anthropic.com/news' },
+                { title: 'OpenAI — новости', url: 'https://openai.com/news/' },
+            ];
+
+            function renderTicker(items) {
+                track.innerHTML = '';
+                // duplicate the list twice for a seamless infinite scroll loop
+                for (let copy = 0; copy < 2; copy++) {
+                    items.forEach((item) => {
+                        const a = document.createElement('a');
+                        a.href = item.url;
+                        a.target = '_blank';
+                        a.rel = 'noopener';
+                        a.textContent = item.title;
+                        track.appendChild(a);
+                    });
+                }
+            }
+
+            fetch('https://hn.algolia.com/api/v1/search_by_date?tags=story&query=AI%20OR%20LLM%20OR%20machine%20learning%20OR%20neural%20network&hitsPerPage=16')
+                .then((r) => { if (!r.ok) throw new Error('bad response'); return r.json(); })
+                .then((data) => {
+                    const hits = (data.hits || [])
+                        .filter((h) => h.title && (h.url || h.story_url))
+                        .slice(0, 12)
+                        .map((h) => ({ title: h.title, url: h.url || `https://news.ycombinator.com/item?id=${h.objectID}` }));
+                    if (hits.length < 4) throw new Error('too few results');
+                    renderTicker(hits);
+                })
+                .catch(() => renderTicker(FALLBACK_LINKS));
+        })();
     </script>
 </body>
 </html>
