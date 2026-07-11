@@ -55,6 +55,7 @@
         .logo {
             font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 600;
             color: var(--accent-cyan); text-shadow: 0 0 20px var(--glow-cyan);
+            text-decoration: none; cursor: pointer;
         }
         .logo span { color: var(--text-primary); }
         nav { display: flex; gap: 2rem; align-items: center; }
@@ -143,6 +144,7 @@
         }
         .hero-title { font-size: 1.2rem; color: var(--accent-purple); font-weight: 600; text-align: center; }
         .hero-location { color: var(--text-secondary); font-size: 0.9rem; text-align: center; }
+        .hero-cta { margin-top: 1rem; }
         .stats {
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;
             max-width: 900px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1;
@@ -160,7 +162,7 @@
         .stat-card:hover { transform: translateY(-5px); border-color: var(--accent-cyan); box-shadow: 0 10px 40px rgba(0,212,255,0.1); }
         .stat-number { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-family: 'JetBrains Mono', monospace; }
         .stat-label { color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.3rem; }
-        section { position: relative; z-index: 1; padding: 6rem 2rem; }
+        section { position: relative; z-index: 1; padding: 6rem 2rem; scroll-margin-top: 80px; }
         .section-title { font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 3rem; position: relative; display: inline-block; left: 50%; transform: translateX(-50%); }
         .section-title::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 3px; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple)); border-radius: 2px; }
         .section-subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 3rem; font-size: 0.9rem; }
@@ -228,6 +230,9 @@
         .contact-btn:hover { border-color: var(--accent-cyan); box-shadow: 0 0 30px rgba(0,212,255,0.2); transform: translateY(-3px); }
         .contact-btn.telegram:hover { border-color: #0088cc; box-shadow: 0 0 30px rgba(0,136,204,0.2); }
         .contact-btn.email:hover { border-color: var(--accent-pink); box-shadow: 0 0 30px rgba(236,72,153,0.2); }
+        .contact-btn.resume:hover { border-color: var(--accent-green); box-shadow: 0 0 30px rgba(16,185,129,0.2); }
+        .contact-btn.linkedin:hover { border-color: var(--accent-purple); box-shadow: 0 0 30px rgba(124,58,237,0.2); }
+        .contact-btn.phone:hover { border-color: var(--accent-orange); box-shadow: 0 0 30px rgba(245,158,11,0.2); }
         .contact-icon { font-size: 1.3rem; }
         footer { text-align: center; padding: 3rem 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.8rem; position: relative; z-index: 1; }
         footer .heart { color: var(--accent-pink); animation: heartbeat 1.5s infinite; }
@@ -259,7 +264,6 @@
             .photo-container { width: 200px; height: 200px; }
         }
     </style>
-<base target="_blank">
 </head>
 <body>
 
@@ -276,21 +280,22 @@
 
     <!-- Header -->
     <header id="header">
-        <div class="logo">dmitry@devops<span>~</span></div>
+        <a href="#top" class="logo" aria-label="Home / Главная">dmitry@devops<span>~</span></a>
         <nav>
+            <a href="#top" data-ru="Главная" data-en="Home">Главная</a>
             <a href="#about" data-ru="Обо мне" data-en="About">Обо мне</a>
             <a href="#experience" data-ru="Опыт" data-en="Experience">Опыт</a>
             <a href="#skills" data-ru="Навыки" data-en="Skills">Навыки</a>
             <a href="#contact" data-ru="Контакты" data-en="Contact">Контакты</a>
         </nav>
         <div class="lang-switch">
-            <button class="active" onclick="setLang('ru')">RU</button>
-            <button onclick="setLang('en')">EN</button>
+            <button class="active" onclick="setLang('ru', this)">RU</button>
+            <button onclick="setLang('en', this)">EN</button>
         </div>
     </header>
 
     <!-- Hero -->
-    <section class="hero">
+    <section class="hero" id="top">
         <div class="hero-content">
             <div class="hero-left">
                 <div class="terminal-window">
@@ -312,7 +317,7 @@
             </div>
             <div class="hero-right">
                 <div class="photo-container">
-                    <img src="https://forestplus.github.io/TopDevOps/img/photo.jpg" alt="Дмитрий Парамонов" onerror="this.src='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face'">
+                    <img src="assets/dmitry.png" alt="Дмитрий Парамонов">
                 </div>
                 <div class="status-badge">
                     <span class="status-dot"></span>
@@ -321,6 +326,12 @@
                 <h1 class="hero-name">Дмитрий Парамонов</h1>
                 <p class="hero-title">DevOps Team Lead</p>
                 <p class="hero-location" data-ru="Санкт-Петербург · открыт к переезду и удалёнке · РФ / ОАЭ" data-en="Saint Petersburg · open to relocation & remote · RU / UAE work authorization">Санкт-Петербург · открыт к переезду и удалёнке · РФ / ОАЭ</p>
+                <div class="hero-cta">
+                    <a href="resume.pdf" id="resume-btn-hero" class="contact-btn resume" download>
+                        <span class="contact-icon">⬇</span>
+                        <span data-ru="Скачать резюме" data-en="Download resume">Скачать резюме</span>
+                    </a>
+                </div>
             </div>
         </div>
     </section>
@@ -328,20 +339,20 @@
     <!-- Stats -->
     <div class="stats">
         <div class="stat-card fade-in">
-            <div class="stat-number" data-target="17">0</div>
+            <div class="stat-number" data-target="20">0</div>
             <div class="stat-label" data-ru="лет опыта в IT" data-en="years in IT">лет опыта в IT</div>
         </div>
         <div class="stat-card fade-in">
-            <div class="stat-number" data-target="101">0</div>
+            <div class="stat-number" data-target="250">0</div>
             <div class="stat-label" data-ru="серверов под управлением" data-en="servers managed">серверов под управлением</div>
         </div>
         <div class="stat-card fade-in">
-            <div class="stat-number" data-target="4">0</div>
-            <div class="stat-label" data-ru="этапа карьеры" data-en="career stages">этапа карьеры</div>
+            <div class="stat-number" data-target="10">0</div>
+            <div class="stat-label" data-ru="этапов карьеры" data-en="career stages">этапов карьеры</div>
         </div>
         <div class="stat-card fade-in">
-            <div class="stat-number" data-target="3">0</div>
-            <div class="stat-label" data-ru="года в DevOps/SRE" data-en="years in DevOps/SRE">года в DevOps/SRE</div>
+            <div class="stat-number" data-target="9">0</div>
+            <div class="stat-label" data-ru="лет в DevOps/SRE" data-en="years in DevOps/SRE">лет в DevOps/SRE</div>
         </div>
     </div>
 
@@ -653,13 +664,25 @@
         <div class="contacts">
             <p data-ru="Открыт к интересным проектам и долгосрочному сотрудничеству. Напишите мне!" data-en="Open to interesting projects and long-term collaboration. Reach out to me!">Открыт к интересным проектам и долгосрочному сотрудничеству. Напишите мне!</p>
             <div class="contact-buttons">
-                <a href="https://t.me/dmitryparamonov" class="contact-btn telegram" target="_blank">
+                <a href="resume.pdf" id="resume-btn" class="contact-btn resume" download>
+                    <span class="contact-icon">⬇</span>
+                    <span id="resume-btn-text" data-ru="Скачать резюме" data-en="Download resume">Скачать резюме</span>
+                </a>
+                <a href="https://www.linkedin.com/in/topdevops" class="contact-btn linkedin" target="_blank" rel="noopener">
+                    <span class="contact-icon">in</span>
+                    <span>LinkedIn</span>
+                </a>
+                <a href="https://t.me/TopDevOps" class="contact-btn telegram" target="_blank" rel="noopener">
                     <span class="contact-icon">✈️</span>
                     <span>Telegram</span>
                 </a>
-                <a href="mailto:dmitry@paramonov.dev" class="contact-btn email">
+                <a href="mailto:forestplus@ya.ru" class="contact-btn email">
                     <span class="contact-icon">📧</span>
                     <span data-ru="Email" data-en="Email">Email</span>
+                </a>
+                <a href="tel:+79319724546" class="contact-btn phone">
+                    <span class="contact-icon">📞</span>
+                    <span data-ru="+7 (931) 972-45-46" data-en="+7 (931) 972-45-46">+7 (931) 972-45-46</span>
                 </a>
             </div>
         </div>
@@ -668,7 +691,7 @@
     <!-- Footer -->
     <footer>
         <p><span class="heart">♥</span> <span data-ru="Сделано с любовью к DevOps" data-en="Made with love for DevOps">Сделано с любовью к DevOps</span></p>
-        <p style="margin-top:0.5rem; font-size:0.7rem;">© 2024 Дмитрий Парамонов</p>
+        <p style="margin-top:0.5rem; font-size:0.7rem;">© 2026 Дмитрий Парамонов</p>
     </footer>
 
     <script>
@@ -810,13 +833,19 @@
 
         // ========== LANGUAGE SWITCH ==========
         let currentLang = 'ru';
-        function setLang(lang) {
+        function setLang(lang, btn) {
             currentLang = lang;
-            document.querySelectorAll('.lang-switch button').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('.lang-switch button').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
             document.querySelectorAll('[data-ru]').forEach(el => {
                 el.textContent = el.dataset[lang];
             });
+            const resumeBtn = document.getElementById('resume-btn');
+            const resumeBtnHero = document.getElementById('resume-btn-hero');
+            const resumeHref = lang === 'en' ? 'resume_en.pdf' : 'resume.pdf';
+            if (resumeBtn) resumeBtn.setAttribute('href', resumeHref);
+            if (resumeBtnHero) resumeBtnHero.setAttribute('href', resumeHref);
+            document.documentElement.setAttribute('lang', lang);
         }
     </script>
 </body>
