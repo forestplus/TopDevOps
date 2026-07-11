@@ -83,42 +83,52 @@
             position: relative; padding: 6rem 2rem 4rem; z-index: 1;
         }
         .hero-content {
-            display: flex; flex-direction: column; align-items: center; gap: 2.2rem;
-            max-width: 760px; width: 100%;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+            max-width: 1200px; width: 100%; align-items: center;
         }
-        /* live ops dashboard — replaces the old terminal + photo */
-        .ops-panel {
-            width: 100%; background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 16px; overflow: hidden; box-shadow: 0 0 40px rgba(0,212,255,0.06);
+        .terminal-window {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+            padding: 1.5rem; font-family: 'JetBrains Mono', monospace;
+            box-shadow: 0 0 40px rgba(0,212,255,0.05); position: relative; overflow: hidden;
         }
-        .ops-header {
-            display: flex; align-items: center; gap: 0.6rem; padding: 0.8rem 1.2rem;
-            border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem; color: var(--text-secondary); letter-spacing: 0.06em;
+        .terminal-window::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 30px;
+            background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+            border-radius: 12px 12px 0 0;
         }
-        .ops-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); animation: pulse2 2s infinite; }
-        @keyframes pulse2 { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .ops-metrics { display: grid; grid-template-columns: repeat(4, 1fr); }
-        .ops-metric { padding: 1.1rem 0.6rem; text-align: center; border-right: 1px solid var(--border); }
-        .ops-metric:last-child { border-right: none; }
-        .ops-value { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; color: var(--accent-cyan); }
-        .ops-label { font-size: 0.65rem; color: var(--text-muted); margin-top: 0.25rem; }
-        .spark { display: flex; gap: 2px; justify-content: center; align-items: flex-end; height: 16px; margin-top: 0.5rem; }
-        .spark span { width: 3px; border-radius: 1px; background: var(--accent-cyan); opacity: 0.55; animation: sparkPulse 2.2s ease-in-out infinite; transform-origin: bottom; }
-        .spark span:nth-child(1){height:35%;animation-delay:0s;}
-        .spark span:nth-child(2){height:65%;animation-delay:.15s;}
-        .spark span:nth-child(3){height:45%;animation-delay:.3s;}
-        .spark span:nth-child(4){height:80%;animation-delay:.45s;}
-        .spark span:nth-child(5){height:55%;animation-delay:.6s;}
-        .spark span:nth-child(6){height:70%;animation-delay:.75s;}
-        @keyframes sparkPulse { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(1.5); } }
-        .ops-ticker { border-top: 1px solid var(--border); overflow: hidden; white-space: nowrap; padding: 0.6rem 0; }
-        .ops-ticker-track { display: flex; width: max-content; animation: tickerScroll 24s linear infinite; }
-        .ops-ticker-set { display: flex; gap: 2.2rem; flex-shrink: 0; padding-right: 2.2rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); }
-        @keyframes tickerScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-        @media (prefers-reduced-motion: reduce) {
-            .ops-ticker-track, .spark span, .ops-dot { animation: none; }
+        .terminal-dots { position: absolute; top: 10px; left: 15px; display: flex; gap: 6px; z-index: 2; }
+        .terminal-dots span { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+        .terminal-body { margin-top: 1.5rem; font-size: 0.9rem; line-height: 2; }
+        .terminal-line { opacity: 0; animation: fadeInUp 0.5s forwards; }
+        .terminal-line:nth-child(1) { animation-delay: 0.2s; }
+        .terminal-line:nth-child(2) { animation-delay: 0.6s; }
+        .terminal-line:nth-child(3) { animation-delay: 1.0s; }
+        .terminal-line:nth-child(4) { animation-delay: 1.4s; }
+        .terminal-line:nth-child(5) { animation-delay: 1.8s; }
+        .terminal-line:nth-child(6) { animation-delay: 2.2s; }
+        .terminal-line:nth-child(7) { animation-delay: 2.6s; }
+        .prompt { color: var(--accent-green); }
+        .command { color: var(--text-primary); }
+        .output { color: var(--accent-cyan); }
+        .cursor { display: inline-block; width: 8px; height: 16px; background: var(--accent-cyan); animation: blink 1s infinite; vertical-align: middle; margin-left: 2px; }
+        @keyframes blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
+        .hero-right { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+        .photo-container { position: relative; width: 280px; height: 280px; }
+        .photo-container::before {
+            content: ''; position: absolute; inset: -4px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
+            animation: rotate 4s linear infinite; opacity: 0.7;
         }
+        .photo-container::after {
+            content: ''; position: absolute; inset: -4px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
+            animation: rotate 4s linear infinite reverse; opacity: 0.3; filter: blur(10px);
+        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .photo-container img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; position: relative; z-index: 2; border: 3px solid var(--bg-primary); }
         .status-badge {
             display: inline-flex; align-items: center; gap: 0.5rem;
             background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);
@@ -127,8 +137,6 @@
         }
         .status-dot { width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 10px var(--accent-green); }
         @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); } 50% { box-shadow: 0 0 0 8px rgba(16,185,129,0); } }
-        .hero-specs { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 0.6rem; }
-        .hero-spec-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; padding: 0.25rem 0.7rem; border: 1px solid var(--border); border-radius: 20px; color: var(--text-secondary); }
         .hero-name {
             font-size: 2.5rem; font-weight: 800; text-align: center;
             background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
@@ -206,30 +214,9 @@
         .skill-item {
             padding: 0.4rem 0.8rem; background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.1);
             border-radius: 6px; font-size: 0.8rem; color: var(--text-secondary); transition: all 0.3s ease;
-            font-family: 'JetBrains Mono', monospace; cursor: default; position: relative;
+            font-family: 'JetBrains Mono', monospace; cursor: default;
         }
         .skill-item:hover { background: rgba(0,212,255,0.15); border-color: var(--accent-cyan); color: var(--accent-cyan); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,212,255,0.15); }
-        /* hover tooltip "cloud" with a short explanation */
-        .skill-item::after {
-            content: attr(data-tip-ru);
-            position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(4px);
-            background: var(--bg-secondary); border: 1px solid var(--accent-cyan); color: var(--text-primary);
-            font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.72rem; line-height: 1.35;
-            white-space: normal; width: max-content; max-width: 220px; text-align: center;
-            padding: 0.5rem 0.7rem; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 14px rgba(0,212,255,0.15);
-            opacity: 0; visibility: hidden; pointer-events: none; z-index: 20;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-        html[lang="en"] .skill-item::after { content: attr(data-tip-en); }
-        .skill-item::before {
-            content: ''; position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%);
-            border: 5px solid transparent; border-top-color: var(--accent-cyan);
-            opacity: 0; visibility: hidden; transition: opacity 0.2s ease; z-index: 20; pointer-events: none;
-        }
-        .skill-item:hover::after, .skill-item:hover::before { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-        @media (max-width: 640px) {
-            .skill-item::after, .skill-item::before { display: none; }
-        }
         .contacts { text-align: center; max-width: 600px; margin: 0 auto; }
         .contact-buttons { display: flex; justify-content: center; gap: 1.5rem; margin-top: 2rem; flex-wrap: wrap; }
         .contact-btn {
@@ -248,8 +235,8 @@
         .contact-btn.phone:hover { border-color: var(--accent-orange); box-shadow: 0 0 30px rgba(245,158,11,0.2); }
         .contact-icon { font-size: 1.3rem; }
         footer { text-align: center; padding: 3rem 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.8rem; position: relative; z-index: 1; }
-        .footer-status { font-family: 'JetBrains Mono', monospace; display: inline-flex; align-items: center; gap: 0.5rem; letter-spacing: 0.02em; }
-        .footer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); animation: pulse2 2s infinite; }
+        footer .heart { color: var(--accent-pink); animation: heartbeat 1.5s infinite; }
+        @keyframes heartbeat { 0%,100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { opacity: 0; transform: translateY(30px); transition: all 0.6s ease; }
         .fade-in.visible { opacity: 1; transform: translateY(0); }
@@ -259,6 +246,9 @@
         .glow-orb-3 { width: 250px; height: 250px; background: var(--accent-pink); bottom: 10%; left: 30%; animation: float 12s ease-in-out infinite; }
         @keyframes float { 0%,100% { transform: translate(0,0); } 33% { transform: translate(30px,-30px); } 66% { transform: translate(-20px,20px); } }
         @media (max-width: 900px) {
+            .hero-content { grid-template-columns: 1fr; text-align: center; }
+            .hero-left { order: 2; }
+            .hero-right { order: 1; }
             .stats { grid-template-columns: repeat(2, 1fr); }
             .pillars { grid-template-columns: 1fr; }
             .timeline::before { left: 20px; }
@@ -267,12 +257,11 @@
             .timeline-dot { left: 20px; }
             nav { display: none; }
             .contact-buttons { flex-direction: column; align-items: center; }
-            .ops-metrics { grid-template-columns: repeat(2, 1fr); }
-            .ops-metric:nth-child(2) { border-right: none; }
         }
         @media (max-width: 600px) {
             .stats { grid-template-columns: repeat(2, 1fr); }
             .hero-name { font-size: 1.8rem; }
+            .photo-container { width: 200px; height: 200px; }
         }
     </style>
 </head>
@@ -308,75 +297,41 @@
     <!-- Hero -->
     <section class="hero" id="top">
         <div class="hero-content">
-            <div class="status-badge">
-                <span class="status-dot"></span>
-                <span data-ru="НА СВЯЗИ · ОТКРЫТ К ПРЕДЛОЖЕНИЯМ" data-en="ONLINE · OPEN TO OFFERS">НА СВЯЗИ · ОТКРЫТ К ПРЕДЛОЖЕНИЯМ</span>
-            </div>
-            <h1 class="hero-name">Дмитрий Парамонов</h1>
-            <p class="hero-title">DevOps Team Lead</p>
-            <p class="hero-location" data-ru="Санкт-Петербург · открыт к переезду и удалёнке · РФ / ОАЭ" data-en="Saint Petersburg · open to relocation & remote · RU / UAE work authorization">Санкт-Петербург · открыт к переезду и удалёнке · РФ / ОАЭ</p>
-
-            <div class="hero-specs" aria-label="Также рассматриваю">
-                <span class="hero-spec-tag" data-ru="DevOps-инженер" data-en="DevOps Engineer">DevOps-инженер</span>
-                <span class="hero-spec-tag">CIO</span>
-                <span class="hero-spec-tag">CTO</span>
-                <span class="hero-spec-tag" data-ru="Менеджер продукта" data-en="Product Manager">Менеджер продукта</span>
-                <span class="hero-spec-tag" data-ru="Методолог" data-en="Methodologist">Методолог</span>
-            </div>
-
-            <!-- Live ops dashboard — replaces photo + terminal -->
-            <div class="ops-panel" aria-hidden="true">
-                <div class="ops-header">
-                    <span class="ops-dot"></span>
-                    <span data-ru="SYSTEM STATUS // production" data-en="SYSTEM STATUS // production">SYSTEM STATUS // production</span>
-                </div>
-                <div class="ops-metrics">
-                    <div class="ops-metric">
-                        <div class="ops-value">99.98%</div>
-                        <div class="ops-label" data-ru="uptime" data-en="uptime">uptime</div>
-                        <div class="spark"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+            <div class="hero-left">
+                <div class="terminal-window">
+                    <div class="terminal-dots">
+                        <span class="dot-red"></span>
+                        <span class="dot-yellow"></span>
+                        <span class="dot-green"></span>
                     </div>
-                    <div class="ops-metric">
-                        <div class="ops-value">42ms</div>
-                        <div class="ops-label" data-ru="latency p95" data-en="latency p95">latency p95</div>
-                        <div class="spark"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-                    </div>
-                    <div class="ops-metric">
-                        <div class="ops-value">128/128</div>
-                        <div class="ops-label" data-ru="pods healthy" data-en="pods healthy">pods healthy</div>
-                        <div class="spark"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-                    </div>
-                    <div class="ops-metric">
-                        <div class="ops-value">0</div>
-                        <div class="ops-label" data-ru="open incidents" data-en="open incidents">open incidents</div>
-                        <div class="spark"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-                    </div>
-                </div>
-                <div class="ops-ticker">
-                    <div class="ops-ticker-track">
-                        <div class="ops-ticker-set">
-                            <span data-ru="▸ [OK] проверка здоровья кластера пройдена" data-en="▸ [OK] cluster health check passed">▸ [OK] проверка здоровья кластера пройдена</span>
-                            <span data-ru="▸ [INFO] rolling deployment завершён" data-en="▸ [INFO] rolling deployment completed">▸ [INFO] rolling deployment завершён</span>
-                            <span data-ru="▸ [OK] backup-снапшот подтверждён" data-en="▸ [OK] backup snapshot verified">▸ [OK] backup-снапшот подтверждён</span>
-                            <span data-ru="▸ [INFO] autoscaling: +2 узла" data-en="▸ [INFO] autoscaling: +2 nodes added">▸ [INFO] autoscaling: +2 узла</span>
-                            <span data-ru="▸ [OK] сертификат обновлён (Let's Encrypt)" data-en="▸ [OK] certificate renewed (Let's Encrypt)">▸ [OK] сертификат обновлён (Let's Encrypt)</span>
-                        </div>
-                        <div class="ops-ticker-set" aria-hidden="true">
-                            <span data-ru="▸ [OK] проверка здоровья кластера пройдена" data-en="▸ [OK] cluster health check passed">▸ [OK] проверка здоровья кластера пройдена</span>
-                            <span data-ru="▸ [INFO] rolling deployment завершён" data-en="▸ [INFO] rolling deployment completed">▸ [INFO] rolling deployment завершён</span>
-                            <span data-ru="▸ [OK] backup-снапшот подтверждён" data-en="▸ [OK] backup snapshot verified">▸ [OK] backup-снапшот подтверждён</span>
-                            <span data-ru="▸ [INFO] autoscaling: +2 узла" data-en="▸ [INFO] autoscaling: +2 nodes added">▸ [INFO] autoscaling: +2 узла</span>
-                            <span data-ru="▸ [OK] сертификат обновлён (Let's Encrypt)" data-en="▸ [OK] certificate renewed (Let's Encrypt)">▸ [OK] сертификат обновлён (Let's Encrypt)</span>
-                        </div>
+                    <div class="terminal-body">
+                        <div class="terminal-line"><span class="prompt">$</span> <span class="command">whoami</span></div>
+                        <div class="terminal-line"><span class="output">Дмитрий Парамонов</span></div>
+                        <div class="terminal-line"><span class="prompt">$</span> <span class="command">cat role.txt</span></div>
+                        <div class="terminal-line"><span class="output">DevOps Team Lead</span></div>
+                        <div class="terminal-line"><span class="prompt">$</span> <span class="command">cat location.txt</span></div>
+                        <div class="terminal-line"><span class="output">Санкт-Петербург / РФ / ОАЭ</span></div>
+                        <div class="terminal-line"><span class="prompt">$</span> <span class="command">status</span><span class="cursor"></span></div>
                     </div>
                 </div>
             </div>
-
-            <div class="hero-cta">
-                <a href="resume.pdf" id="resume-btn-hero" class="contact-btn resume" download>
-                    <span class="contact-icon">⬇</span>
-                    <span data-ru="Скачать резюме" data-en="Download resume">Скачать резюме</span>
-                </a>
+            <div class="hero-right">
+                <div class="photo-container">
+                    <img src="assets/dmitry.png" alt="Дмитрий Парамонов">
+                </div>
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span data-ru="НА СВЯЗИ · ОТКРЫТ К ПРЕДЛОЖЕНИЯМ" data-en="ONLINE · OPEN TO OFFERS">НА СВЯЗИ · ОТКРЫТ К ПРЕДЛОЖЕНИЯМ</span>
+                </div>
+                <h1 class="hero-name">Дмитрий Парамонов</h1>
+                <p class="hero-title">DevOps Team Lead</p>
+                <p class="hero-location" data-ru="Санкт-Петербург · открыт к переезду и удалёнке · РФ / ОАЭ" data-en="Saint Petersburg · open to relocation & remote · RU / UAE work authorization">Санкт-Петербург · открыт к переезду и удалёнке · РФ / ОАЭ</p>
+                <div class="hero-cta">
+                    <a href="resume.pdf" id="resume-btn-hero" class="contact-btn resume" download>
+                        <span class="contact-icon">⬇</span>
+                        <span data-ru="Скачать резюме" data-en="Download resume">Скачать резюме</span>
+                    </a>
+                </div>
             </div>
         </div>
     </section>
@@ -407,8 +362,8 @@
         <p class="section-subtitle" data-ru="кто_я / about_me" data-en="who_am_i / about_me">кто_я / about_me</p>
         <div class="about">
             <div class="about-text fade-in">
-                <p data-ru="Почти 20 лет в IT — прошёл путь от инженера технической поддержки до совладельца бизнеса и CEO/CIO. Последние 9+ лет полностью сфокусирован на DevOps- и SRE-практиках: контейнеризация приложений на Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. Открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и ОАЭ."
-                   data-en="Nearly 20 years in IT — from technical support engineer to business co-owner and CEO/CIO. For the past 9+ years I have been fully focused on DevOps and SRE practices: containerizing applications with Docker and orchestrating them on Kubernetes and OpenShift, mainly in fintech projects and bank-grade highload systems. I build production infrastructure with minimal time-to-market, apply DevSecOps practices to improve system reliability, and set up transparent development, testing, and operations processes. Beyond the technical side, I hire, onboard, and mentor engineers, own the backlog, and coordinate developers, SRE, QA, and administrators. Open to interesting projects and long-term collaboration — remote, hybrid, or on-site, in Russia and the UAE.">Почти 20 лет в IT — прошёл путь от инженера технической поддержки до совладельца бизнеса и CEO/CIO. Последние 9+ лет полностью сфокусирован на DevOps- и SRE-практиках: контейнеризация приложений на Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. Открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и ОАЭ.</p>
+                <p data-ru="Прошёл путь от инженера технической поддержки до CEO и CIO. Последние 9+ лет полностью сфокусирован на DevOps-методологии: контейнеризация приложений на Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах. Строю production-инфраструктуру с минимальным time-to-market и внедряю практики DevSecOps для повышения надёжности систем. Открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и ОАЭ."
+                   data-en="I have gone from technical support engineer to business co-owner and CEO/CIO. For the past 9+ years I have been fully focused on DevOps practices: containerizing applications with Docker and orchestrating them on Kubernetes and OpenShift, mainly in fintech projects. I build production infrastructure with minimal time-to-market and apply DevSecOps practices to improve system reliability. Open to interesting projects and long-term collaboration — remote, hybrid, or on-site, in Russia and the UAE.">Прошёл путь от инженера технической поддержки до CEO и CIO. Последние 9+ лет полностью сфокусирован на DevOps-методологии: контейнеризация приложений на Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах. Строю production-инфраструктуру с минимальным time-to-market и внедряю практики DevSecOps для повышения надёжности систем. Открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и ОАЭ.</p>
             </div>
             <div class="pillars">
                 <div class="pillar fade-in">
@@ -468,10 +423,9 @@
                     <div class="timeline-details">
                         <ul>
                             <li data-ru="Эквайринг для МСБ: 9 микросервисов, перенос инфраструктуры в VTB.Cloud" data-en="SMB acquiring: 9 microservices, migrated infrastructure to VTB.Cloud">Эквайринг для МСБ: 9 микросервисов, перенос инфраструктуры в VTB.Cloud</li>
-                            <li data-ru="Госуслуги в банковских процессах (ФНП): 12 микросервисов, миграция на DreamPipe CI/CD" data-en="Government services in banking (Federal Notary Chamber): 12 microservices, migrated to DreamPipe CI/CD">Госуслуги в банковских процессах (ФНП): 12 микросервисов, миграция на DreamPipe CI/CD</li>
-                            <li data-ru="Перевёл очереди сообщений с IBM MQ на Apache ActiveMQ Artemis, БД — в PostgreSQL-кластер на Astra Linux" data-en="Migrated messaging from IBM MQ to Apache ActiveMQ Artemis; migrated the database to a PostgreSQL cluster on Astra Linux">Перевёл очереди сообщений с IBM MQ на Apache ActiveMQ Artemis, БД — в PostgreSQL-кластер на Astra Linux</li>
-                            <li data-ru="Координировал команды разработчиков, SRE, QA и администраторов; наставник Junior/Middle в программе «Buddy», участие в подборе персонала" data-en="Coordinated developers, SRE, QA, and administrators; mentored Junior/Middle specialists in the 'Buddy' program, contributed to hiring">Координировал команды разработчиков, SRE, QA и администраторов; наставник Junior/Middle в программе «Buddy», участие в подборе персонала</li>
-                            <li data-ru="Активный участник внутреннего сообщества «Лидеры DevOps», проведение демо-сессий и приёмо-сдаточных испытаний" data-en="Active member of the internal 'DevOps Leaders' community; ran demo sessions and acceptance testing">Активный участник внутреннего сообщества «Лидеры DevOps», проведение демо-сессий и приёмо-сдаточных испытаний</li>
+                            <li data-ru="Госуслуги в банковских процессах: 12 микросервисов, миграция на DreamPipe CI/CD" data-en="Government services in banking: 12 microservices, migrated to DreamPipe CI/CD">Госуслуги в банковских процессах: 12 микросервисов, миграция на DreamPipe CI/CD</li>
+                            <li data-ru="Перевёл очереди сообщений с IBM MQ на Apache ActiveMQ Artemis" data-en="Migrated messaging from IBM MQ to Apache ActiveMQ Artemis">Перевёл очереди сообщений с IBM MQ на Apache ActiveMQ Artemis</li>
+                            <li data-ru="Наставничество Junior/Middle-специалистов, участие в подборе персонала" data-en="Mentored Junior/Middle specialists, contributed to hiring">Наставничество Junior/Middle-специалистов, участие в подборе персонала</li>
                         </ul>
                         <div class="timeline-tags">
                             <span class="timeline-tag">Docker</span><span class="timeline-tag">OpenShift</span><span class="timeline-tag">TeamCity</span><span class="timeline-tag">SonarQube</span><span class="timeline-tag">Fortify</span><span class="timeline-tag">PostgreSQL</span><span class="timeline-tag">Kafka</span><span class="timeline-tag">VTB.Cloud</span>
@@ -488,11 +442,10 @@
                     <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
                     <div class="timeline-details">
                         <ul>
-                            <li data-ru="Развернул кластеры Kubernetes «с нуля» (kubeadm) в гибридном облаке Azure + VMware ESXi, интегрировал с GitLab CI/CD" data-en="Built Kubernetes clusters from scratch (kubeadm) on hybrid Azure + VMware ESXi, integrated with GitLab CI/CD">Развернул кластеры Kubernetes «с нуля» (kubeadm) в гибридном облаке Azure + VMware ESXi, интегрировал с GitLab CI/CD</li>
-                            <li data-ru="Администрировал Atlassian Stack (Jira, Confluence, Bitbucket), участвовал в миграции на GitHub Enterprise" data-en="Administered the Atlassian Stack (Jira, Confluence, Bitbucket); contributed to migration to GitHub Enterprise">Администрировал Atlassian Stack (Jira, Confluence, Bitbucket), участвовал в миграции на GitHub Enterprise</li>
-                            <li data-ru="Провёл аудит legacy-инфраструктуры и разработал дорожную карту модернизации стека; построил матрицу ответственности по всему стеку технологий" data-en="Audited legacy infrastructure and delivered a modernization roadmap; built a company-wide responsibility matrix across the technology stack">Провёл аудит legacy-инфраструктуры и разработал дорожную карту модернизации стека; построил матрицу ответственности по всему стеку технологий</li>
-                            <li data-ru="Внедрил резервное копирование промышленного уровня (UrBackup), автоматизировал рутинные задачи через Ansible" data-en="Deployed enterprise-grade backup and disaster recovery (UrBackup); automated routine operations with Ansible">Внедрил резервное копирование промышленного уровня (UrBackup), автоматизировал рутинные задачи через Ansible</li>
-                            <li data-ru="Настроил мониторинг: Prometheus, Grafana, Alertmanager; регулярно взаимодействовал с командами из США и Индии" data-en="Set up monitoring: Prometheus, Grafana, Alertmanager; regularly collaborated with distributed teams in the US and India">Настроил мониторинг: Prometheus, Grafana, Alertmanager; регулярно взаимодействовал с командами из США и Индии</li>
+                            <li data-ru="Развернул кластеры Kubernetes «с нуля» на Azure + VMware ESXi" data-en="Built Kubernetes clusters from scratch on hybrid Azure + VMware ESXi">Развернул кластеры Kubernetes «с нуля» на Azure + VMware ESXi</li>
+                            <li data-ru="Администрировал Atlassian Stack, участвовал в миграции на GitHub Enterprise" data-en="Administered the Atlassian Stack; contributed to migration to GitHub Enterprise">Администрировал Atlassian Stack, участвовал в миграции на GitHub Enterprise</li>
+                            <li data-ru="Внедрил резервное копирование промышленного уровня (UrBackup)" data-en="Deployed enterprise-grade backup and disaster recovery (UrBackup)">Внедрил резервное копирование промышленного уровня (UrBackup)</li>
+                            <li data-ru="Настроил мониторинг: Prometheus, Grafana, Alertmanager" data-en="Set up monitoring: Prometheus, Grafana, Alertmanager">Настроил мониторинг: Prometheus, Grafana, Alertmanager</li>
                         </ul>
                     </div>
                 </div>
@@ -522,7 +475,7 @@
                     <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
                     <div class="timeline-details">
                         <ul>
-                            <li data-ru="Внедрил ITSM/ITIL на базе GLPI: заявки (ServiceDesk/HelpDesk), инциденты, проблемы, изменения" data-en="Implemented ITSM/ITIL on GLPI: ticketing (ServiceDesk/HelpDesk), incidents, problems, changes">Внедрил ITSM/ITIL на базе GLPI: заявки (ServiceDesk/HelpDesk), инциденты, проблемы, изменения</li>
+                            <li data-ru="Внедрил ITSM/ITIL на базе GLPI" data-en="Implemented ITSM/ITIL on GLPI">Внедрил ITSM/ITIL на базе GLPI</li>
                             <li data-ru="CI/CD на Jenkins, администрирование Atlassian Stack" data-en="CI/CD on Jenkins; administered the Atlassian Stack">CI/CD на Jenkins, администрирование Atlassian Stack</li>
                             <li data-ru="Администрирование VMware ESXi, Docker/Docker-compose + Portainer" data-en="Administered VMware ESXi, Docker/Docker-compose + Portainer">Администрирование VMware ESXi, Docker/Docker-compose + Portainer</li>
                         </ul>
@@ -539,7 +492,7 @@
                     <div class="timeline-details">
                         <ul>
                             <li data-ru="Облачные решения на Microsoft Azure для частных компаний" data-en="Delivered cloud IT solutions on Microsoft Azure for private companies">Облачные решения на Microsoft Azure для частных компаний</li>
-                            <li data-ru="Внедрял ITSM/ITIL-процессы: управление заявками и инцидентами, конфигурациями, лицензиями; автоматизированная инвентаризация серверов и рабочих станций" data-en="Implemented ITSM/ITIL processes: ticket and incident management, configuration and license management; automated inventory of servers and workstations">Внедрял ITSM/ITIL-процессы: управление заявками и инцидентами, конфигурациями, лицензиями; автоматизированная инвентаризация серверов и рабочих станций</li>
+                            <li data-ru="Внедрял ITSM/ITIL-процессы, автоматизированную инвентаризацию" data-en="Implemented ITSM/ITIL processes and automated asset inventory">Внедрял ITSM/ITIL-процессы, автоматизированную инвентаризацию</li>
                             <li data-ru="Разрабатывал сайты, интернет-магазины, корпоративные порталы и CRM" data-en="Built websites, online stores, corporate portals, and CRM systems">Разрабатывал сайты, интернет-магазины, корпоративные порталы и CRM</li>
                         </ul>
                     </div>
@@ -555,7 +508,7 @@
                     <div class="timeline-details">
                         <ul>
                             <li data-ru="Реструктурировал Active Directory, настроил дополнительные базы MS Exchange" data-en="Restructured Active Directory; configured additional MS Exchange databases">Реструктурировал Active Directory, настроил дополнительные базы MS Exchange</li>
-                            <li data-ru="Внедрил виртуализацию VMware ESXi, развернул GLPI (ITSM: заявки, инциденты, лицензии, инвентаризация), мониторинг Nagios/Cacti/Zabbix" data-en="Implemented VMware ESXi virtualization; deployed GLPI (ITSM: tickets, incidents, licenses, inventory); monitoring on Nagios/Cacti/Zabbix">Внедрил виртуализацию VMware ESXi, развернул GLPI (ITSM: заявки, инциденты, лицензии, инвентаризация), мониторинг Nagios/Cacti/Zabbix</li>
+                            <li data-ru="Внедрил виртуализацию VMware ESXi, развернул GLPI, мониторинг Nagios/Cacti/Zabbix" data-en="Implemented VMware ESXi virtualization; deployed GLPI, Nagios/Cacti/Zabbix">Внедрил виртуализацию VMware ESXi, развернул GLPI, мониторинг Nagios/Cacti/Zabbix</li>
                             <li data-ru="Запустил корпоративный портал ONLYOFFICE и ERP-систему Odoo" data-en="Launched an ONLYOFFICE corporate portal and Odoo ERP system">Запустил корпоративный портал ONLYOFFICE и ERP-систему Odoo</li>
                         </ul>
                     </div>
@@ -620,114 +573,85 @@
             <div class="skill-category fade-in">
                 <div class="skill-category-title"><span class="icon">🚀</span> <span data-ru="Оркестрация" data-en="Orchestration">Оркестрация</span></div>
                 <div class="skill-items">
-                    <span class="skill-item" data-tip-ru="Оркестрация контейнеров в кластере" data-tip-en="Container orchestration at scale">Kubernetes</span>
-                    <span class="skill-item" data-tip-ru="Kubernetes-платформа Red Hat для enterprise" data-tip-en="Red Hat's enterprise Kubernetes platform">OpenShift</span>
-                    <span class="skill-item" data-tip-ru="Контейнеризация приложений" data-tip-en="Application containerization">Docker</span>
-                    <span class="skill-item" data-tip-ru="Пакетный менеджер для Kubernetes" data-tip-en="Package manager for Kubernetes">Helm</span>
-                    <span class="skill-item" data-tip-ru="Развёртывание кластеров Kubernetes через Ansible" data-tip-en="Deploy Kubernetes clusters via Ansible">Kubespray</span>
+                    <span class="skill-item">Kubernetes</span>
+                    <span class="skill-item">OpenShift</span>
+                    <span class="skill-item">Docker</span>
+                    <span class="skill-item">Helm</span>
+                    <span class="skill-item">Kubespray</span>
                 </div>
             </div>
             <div class="skill-category fade-in">
                 <div class="skill-category-title"><span class="icon">☁️</span> <span data-ru="Облака" data-en="Cloud">Облака</span></div>
                 <div class="skill-items">
-                    <span class="skill-item" data-tip-ru="Облачная платформа Amazon" data-tip-en="Amazon's cloud platform">AWS</span>
-                    <span class="skill-item" data-tip-ru="Облачная платформа Microsoft" data-tip-en="Microsoft's cloud platform">Microsoft Azure</span>
-                    <span class="skill-item" data-tip-ru="Российская облачная платформа" data-tip-en="Russian cloud platform">Яндекс Облако</span>
-                    <span class="skill-item" data-tip-ru="Приватное облако Банка ВТБ" data-tip-en="VTB Bank's private cloud">VTB.Cloud</span>
+                    <span class="skill-item">AWS</span>
+                    <span class="skill-item">Microsoft Azure</span>
+                    <span class="skill-item">Яндекс Облако</span>
+                    <span class="skill-item">VTB.Cloud</span>
                 </div>
             </div>
             <div class="skill-category fade-in">
                 <div class="skill-category-title"><span class="icon">🖥️</span> <span data-ru="VPS / Bare metal" data-en="VPS / Bare metal">VPS / Bare metal</span></div>
                 <div class="skill-items">
-                    <span class="skill-item" data-tip-ru="Немецкий провайдер VPS и серверов" data-tip-en="German VPS & server provider">Hetzner</span>
-                    <span class="skill-item" data-tip-ru="Облачный провайдер для разработчиков" data-tip-en="Developer-friendly cloud provider">DigitalOcean</span>
-                    <span class="skill-item" data-tip-ru="Европейский облачный провайдер" data-tip-en="European cloud provider">Scaleway</span>
-                    <span class="skill-item" data-tip-ru="Европейский хостинг-провайдер" data-tip-en="European hosting provider">OVH</span>
-                    <span class="skill-item" data-tip-ru="Физические серверы по запросу" data-tip-en="On-demand physical servers">Bare Metal aaS</span>
+                    <span class="skill-item">Hetzner</span>
+                    <span class="skill-item">DigitalOcean</span>
+                    <span class="skill-item">Scaleway</span>
+                    <span class="skill-item">OVH</span>
                 </div>
             </div>
             <div class="skill-category fade-in">
                 <div class="skill-category-title"><span class="icon">📦</span> <span data-ru="Виртуализация" data-en="Virtualization">Виртуализация</span></div>
                 <div class="skill-items">
-                    <span class="skill-item" data-tip-ru="Гипервизор для виртуализации серверов" data-tip-en="Server virtualization hypervisor">VMware ESXi</span>
-                    <span class="skill-item" data-tip-ru="Гипервизор виртуализации от Microsoft" data-tip-en="Microsoft's virtualization hypervisor">Microsoft Hyper-V</span>
-                    <span class="skill-item" data-tip-ru="Виртуализация на базе ядра Linux" data-tip-en="Linux kernel-based virtualization">KVM</span>
-                    <span class="skill-item" data-tip-ru="Open-source платформа виртуализации" data-tip-en="Open-source virtualization platform">Proxmox</span>
-                    <span class="skill-item" data-tip-ru="Контейнерная виртуализация на Linux" data-tip-en="Linux container-based virtualization">OpenVZ</span>
-                    <span class="skill-item" data-tip-ru="Системные контейнеры Linux" data-tip-en="Linux system containers">LXD / LXC</span>
-                    <span class="skill-item" data-tip-ru="Управление воспроизводимыми dev-окружениями" data-tip-en="Reproducible dev environments">Vagrant</span>
+                    <span class="skill-item">VMware ESXi</span>
+                    <span class="skill-item">Microsoft Hyper-V</span>
+                    <span class="skill-item">KVM</span>
+                    <span class="skill-item">Proxmox</span>
+                    <span class="skill-item">Vagrant</span>
                 </div>
             </div>
             <div class="skill-category fade-in">
                 <div class="skill-category-title"><span class="icon">⚙️</span> <span>CI / CD</span></div>
                 <div class="skill-items">
-                    <span class="skill-item" data-tip-ru="CI/CD сервер от JetBrains" data-tip-en="JetBrains' CI/CD server">TeamCity</span>
-                    <span class="skill-item" data-tip-ru="Популярный open-source CI/CD сервер" data-tip-en="Popular open-source CI/CD server">Jenkins</span>
-                    <span class="skill-item" data-tip-ru="CI/CD, встроенный в GitLab" data-tip-en="CI/CD built into GitLab">GitLab CI</span>
-                    <span class="skill-item" data-tip-ru="CI/CD, встроенный в GitHub" data-tip-en="CI/CD built into GitHub">GitHub Actions</span>
+                    <span class="skill-item">TeamCity</span>
+                    <span class="skill-item">Jenkins</span>
+                    <span class="skill-item">GitLab CI</span>
+                    <span class="skill-item">GitHub Actions</span>
                 </div>
             </div>
             <div class="skill-category fade-in">
-                <div class="skill-category-title"><span class="icon">🤖</span> <span data-ru="Автоматизация и скрипты" data-en="Automation & scripting">Автоматизация и скрипты</span></div>
+                <div class="skill-category-title"><span class="icon">🤖</span> <span data-ru="Автоматизация" data-en="Automation">Автоматизация</span></div>
                 <div class="skill-items">
-                    <span class="skill-item" data-tip-ru="Автоматизация конфигураций без агентов" data-tip-en="Agentless configuration automation">Ansible</span>
-                    <span class="skill-item" data-tip-ru="Скриптинг в Linux/Unix" data-tip-en="Linux/Unix shell scripting">Bash</span>
-                    <span class="skill-item" data-tip-ru="Язык для автоматизации и скриптов" data-tip-en="Automation & scripting language">Python</span>
-                    <span class="skill-item" data-tip-ru="Скриптинг и автоматизация в Windows" data-tip-en="Windows scripting & automation">PowerShell</span>
-                    <span class="skill-item" data-tip-ru="Язык для Jenkins Pipeline" data-tip-en="Language for Jenkins pipelines">Groovy</span>
-                    <span class="skill-item" data-tip-ru="Формат конфигураций для IaC" data-tip-en="Config format for IaC">YAML</span>
-                </div>
-            </div>
-            <div class="skill-category fade-in">
-                <div class="skill-category-title"><span class="icon">🔐</span> <span data-ru="Сети и безопасность" data-en="Networking & security">Сети и безопасность</span></div>
-                <div class="skill-items">
-                    <span class="skill-item" data-tip-ru="Файрвол и фильтрация трафика в Linux" data-tip-en="Linux firewall & traffic filtering">iptables / Firewalld</span>
-                    <span class="skill-item" data-tip-ru="Защита от брутфорс-атак" data-tip-en="Brute-force attack protection">Fail2Ban</span>
-                    <span class="skill-item" data-tip-ru="Защищённые VPN-туннели" data-tip-en="Secure VPN tunnels">OpenVPN</span>
-                    <span class="skill-item" data-tip-ru="Каталог пользователей и аутентификация" data-tip-en="Directory & authentication service">LDAP</span>
-                    <span class="skill-item" data-tip-ru="Бесплатные SSL-сертификаты" data-tip-en="Free SSL certificates">Let's Encrypt</span>
+                    <span class="skill-item">Ansible</span>
+                    <span class="skill-item">Bash</span>
+                    <span class="skill-item">Python</span>
+                    <span class="skill-item">PowerShell</span>
                 </div>
             </div>
             <div class="skill-category fade-in">
                 <div class="skill-category-title"><span class="icon">📊</span> <span data-ru="Мониторинг" data-en="Monitoring">Мониторинг</span></div>
                 <div class="skill-items">
-                    <span class="skill-item" data-tip-ru="Сбор метрик и алертинг" data-tip-en="Metrics collection & alerting">Prometheus</span>
-                    <span class="skill-item" data-tip-ru="Дашборды и визуализация метрик" data-tip-en="Dashboards & metrics visualization">Grafana</span>
-                    <span class="skill-item" data-tip-ru="Мониторинг инфраструктуры" data-tip-en="Infrastructure monitoring">Zabbix</span>
-                    <span class="skill-item" data-tip-ru="Мониторинг доступности сервисов" data-tip-en="Service availability monitoring">Nagios</span>
-                    <span class="skill-item" data-tip-ru="Графики метрик по SNMP" data-tip-en="SNMP metric graphing">Cacti</span>
-                    <span class="skill-item" data-tip-ru="Маршрутизация алертов Prometheus" data-tip-en="Routes alerts from Prometheus">Alertmanager</span>
+                    <span class="skill-item">Prometheus</span>
+                    <span class="skill-item">Grafana</span>
+                    <span class="skill-item">Zabbix</span>
+                    <span class="skill-item">Nagios</span>
+                    <span class="skill-item">Alertmanager</span>
                 </div>
             </div>
             <div class="skill-category fade-in">
                 <div class="skill-category-title"><span class="icon">🗄️</span> <span data-ru="Данные" data-en="Data">Данные</span></div>
                 <div class="skill-items">
-                    <span class="skill-item" data-tip-ru="Реляционная СУБД" data-tip-en="Relational database">PostgreSQL</span>
-                    <span class="skill-item" data-tip-ru="Реляционные СУБД" data-tip-en="Relational databases">MySQL / MariaDB</span>
-                    <span class="skill-item" data-tip-ru="Потоковая передача событий" data-tip-en="Event streaming platform">Kafka</span>
-                    <span class="skill-item" data-tip-ru="Брокер сообщений" data-tip-en="Message broker">ActiveMQ Artemis</span>
-                </div>
-            </div>
-            <div class="skill-category fade-in">
-                <div class="skill-category-title"><span class="icon">🎫</span> <span data-ru="ITSM / ITIL" data-en="ITSM / ITIL">ITSM / ITIL</span></div>
-                <div class="skill-items">
-                    <span class="skill-item" data-tip-ru="ITSM-система: заявки, инциденты, лицензии, инвентаризация" data-tip-en="ITSM suite: tickets, incidents, licenses, inventory">GLPI</span>
-                    <span class="skill-item" data-ru="ServiceDesk / HelpDesk" data-en="ServiceDesk / HelpDesk" data-tip-ru="Приём и обработка обращений пользователей" data-tip-en="User request intake & handling">ServiceDesk / HelpDesk</span>
-                    <span class="skill-item" data-ru="Управление инцидентами" data-en="Incident management" data-tip-ru="Быстрое восстановление сервиса после сбоя" data-tip-en="Fast service restoration after outages">Управление инцидентами</span>
-                    <span class="skill-item" data-ru="Управление проблемами" data-en="Problem management" data-tip-ru="Поиск и устранение корневых причин" data-tip-en="Root-cause analysis & resolution">Управление проблемами</span>
-                    <span class="skill-item" data-ru="Управление изменениями" data-en="Change management" data-tip-ru="Контролируемое внедрение изменений" data-tip-en="Controlled rollout of changes">Управление изменениями</span>
-                    <span class="skill-item" data-ru="Управление лицензиями" data-en="License management" data-tip-ru="Учёт и контроль лицензий ПО" data-tip-en="Software license tracking & control">Управление лицензиями</span>
-                    <span class="skill-item" data-ru="Автоматическая инвентаризация" data-en="Automated asset inventory" data-tip-ru="Автоматический учёт оборудования и ПО" data-tip-en="Automated hardware & software inventory">Автоматическая инвентаризация</span>
+                    <span class="skill-item">PostgreSQL</span>
+                    <span class="skill-item">MySQL / MariaDB</span>
+                    <span class="skill-item">Kafka</span>
+                    <span class="skill-item">ActiveMQ</span>
                 </div>
             </div>
             <div class="skill-category fade-in">
                 <div class="skill-category-title"><span class="icon">📋</span> <span data-ru="Управление" data-en="Management">Управление</span></div>
                 <div class="skill-items">
-                    <span class="skill-item" data-tip-ru="Безопасность встроена в CI/CD" data-tip-en="Security built into CI/CD">DevSecOps</span>
-                    <span class="skill-item" data-tip-ru="Инженерная надёжность эксплуатации" data-tip-en="Engineering reliability for operations">SRE</span>
-                    <span class="skill-item" data-tip-ru="Планирование развития продукта" data-tip-en="Product development planning">Roadmap</span>
-                    <span class="skill-item" data-ru="Управление бэклогом" data-en="Backlog management" data-tip-ru="Приоритизация задач команды" data-tip-en="Team task prioritization">Управление бэклогом</span>
-                    <span class="skill-item" data-ru="Наём и наставничество" data-en="Hiring & mentoring" data-tip-ru="Подбор и развитие специалистов" data-tip-en="Hiring & developing specialists">Наём и наставничество</span>
+                    <span class="skill-item">ITIL / ITSM</span>
+                    <span class="skill-item">DevSecOps</span>
+                    <span class="skill-item">SRE</span>
+                    <span class="skill-item">Roadmap</span>
                 </div>
             </div>
         </div>
@@ -766,10 +690,7 @@
 
     <!-- Footer -->
     <footer>
-        <p class="footer-status">
-            <span class="footer-dot"></span>
-            <span data-ru="Дмитрий Парамонов · DevOps Team Lead · Санкт-Петербург / ОАЭ" data-en="Dmitry Paramonov · DevOps Team Lead · Saint Petersburg / UAE">Дмитрий Парамонов · DevOps Team Lead · Санкт-Петербург / ОАЭ</span>
-        </p>
+        <p><span class="heart">♥</span> <span data-ru="Сделано с любовью к DevOps" data-en="Made with love for DevOps">Сделано с любовью к DevOps</span></p>
         <p style="margin-top:0.5rem; font-size:0.7rem;">© 2026 Дмитрий Парамонов</p>
     </footer>
 
