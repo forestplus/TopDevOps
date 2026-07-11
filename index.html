@@ -1,813 +1,813 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Дмитрий Парамонов — DevOps Team Lead</title>
+<meta name="description" content="Дмитрий Парамонов — DevOps Team Lead. 17+ лет в IT, 9+ лет в DevOps/SRE, финтех, Kubernetes, CI/CD, DevSecOps.">
+<meta property="og:title" content="Дмитрий Парамонов — DevOps Team Lead">
+<meta property="og:description" content="17+ лет в IT · DevOps/SRE · Kubernetes · CI/CD · DevSecOps · Санкт-Петербург / ОАЭ">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230a0f0d%22/><text x=%2250%22 y=%2268%22 font-size=%2258%22 fill=%22%2300ff9c%22 font-family=%22monospace%22 text-anchor=%22middle%22>&gt;_</text></svg>">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+:root{
+  --bg:#0a0f0d;
+  --bg-2:#0e1512;
+  --panel:#111a16;
+  --line:#1e2c26;
+  --text:#d7e6df;
+  --muted:#7f978c;
+  --accent:#00ff9c;
+  --accent-dim:#0a5c3f;
+  --amber:#ffb454;
+  --danger:#ff6b6b;
+  --mono: "JetBrains Mono","SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  --sans: "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  --radius:10px;
+  --maxw:960px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);scroll-behavior:smooth;}
+body{overflow-x:hidden;line-height:1.55;position:relative;}
+a{color:var(--accent);text-decoration:none;}
+a:hover{text-decoration:underline;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;}
+img{max-width:100%;display:block;}
 
-  :root{
-    --bg:#0B1120; --panel:#121A2E; --panel-2:#161F38; --border:#253253;
-    --accent:#5EEAD4; --accent-2:#4A86E8; --accent-dim:#2A6E64; --warn:#F2B84B; --pink:#F691B3;
-    --text:#E7ECF3; --muted:#8B96AC;
-    --mono:'JetBrains Mono', monospace; --sans:'Inter', -apple-system, sans-serif;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  html{scroll-behavior:smooth;}
-  body{
-    background:var(--bg); color:var(--text); font-family:var(--sans); line-height:1.6;
-    overflow-x:hidden;
-    position:relative;
-  }
-  a{color:var(--accent); text-decoration:none;}
-  .wrap{max-width:960px; margin:0 auto; padding:0 24px; position:relative; z-index:2;}
+/* circuit-grid backdrop */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,255,156,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,255,156,.05) 1px,transparent 1px);
+  background-size:42px 42px;
+  mask-image:radial-gradient(ellipse 70% 55% at 50% 0%,#000 0%,transparent 75%);
+}
+/* scanline / vignette texture */
+body::after{
+  content:"";position:fixed;inset:0;z-index:90;pointer-events:none;
+  background:repeating-linear-gradient(to bottom,rgba(255,255,255,.018) 0px,rgba(255,255,255,.018) 1px,transparent 1px,transparent 3px),
+    radial-gradient(ellipse 90% 70% at 50% 0%,transparent 55%,rgba(0,0,0,.55) 100%);
+}
 
-  /* ---------- Прогресс-бар скролла ---------- */
-  #scroll-progress{
-    position:fixed; top:0; left:0; height:3px; width:0%;
-    background:linear-gradient(90deg, var(--accent), var(--accent-2));
-    z-index:200; transition:width .08s linear;
-    box-shadow:0 0 12px rgba(94,234,212,0.6);
-  }
+.grad-text{background:linear-gradient(100deg,var(--accent) 0%,#5ad1ff 45%,#7a8cff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.blink{display:inline-block;width:.55em;background:var(--accent);animation:blink 1s steps(1) infinite;}
+@keyframes blink{50%{opacity:0;}}
+@media (prefers-reduced-motion: reduce){ .blink{animation:none;opacity:1;} }
 
-  /* ---------- Летающие градиентные орбы (фон) ---------- */
-  #orb-field{position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;}
-  .orb{position:absolute; border-radius:50%; filter:blur(60px); opacity:0.35;}
-  .orb-1{width:420px; height:420px; background:radial-gradient(circle, rgba(94,234,212,0.5), transparent 70%); top:-8%; left:-6%; animation:float1 22s ease-in-out infinite;}
-  .orb-2{width:360px; height:360px; background:radial-gradient(circle, rgba(74,134,232,0.45), transparent 70%); top:30%; right:-8%; animation:float2 26s ease-in-out infinite;}
-  .orb-3{width:300px; height:300px; background:radial-gradient(circle, rgba(242,184,75,0.35), transparent 70%); bottom:-6%; left:20%; animation:float3 19s ease-in-out infinite;}
-  .orb-4{width:260px; height:260px; background:radial-gradient(circle, rgba(246,145,179,0.3), transparent 70%); bottom:10%; right:15%; animation:float1 30s ease-in-out infinite reverse;}
-  @keyframes float1{0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(60px,40px) scale(1.12);}}
-  @keyframes float2{0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-50px,60px) scale(0.9);}}
-  @keyframes float3{0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(40px,-50px) scale(1.08);}}
+/* language toggling */
+[data-lang-content]{display:none;}
+html[data-lang="ru"] [data-lang-content="ru"]{display:block;}
+html[data-lang="en"] [data-lang-content="en"]{display:block;}
+html[data-lang="ru"] span[data-lang-content="ru"],
+html[data-lang="en"] span[data-lang-content="en"]{display:inline;}
 
-  .topbar{border-bottom:1px solid var(--border); padding:14px 0; font-family:var(--mono); font-size:12px; color:var(--muted); position:sticky; top:0; background:rgba(11,17,32,0.92); backdrop-filter:blur(6px); z-index:50;}
-  .topbar .wrap{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;}
-  .status-dot{width:8px; height:8px; border-radius:50%; background:var(--accent); display:inline-block; margin-right:8px; animation:pulse 2s infinite;}
-  .status-dot.idle{background:var(--warn); animation:none;}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(94,234,212,0.5);} 70%{box-shadow:0 0 0 6px rgba(94,234,212,0);} 100%{box-shadow:0 0 0 0 rgba(94,234,212,0);}}
-  #live-clock{font-variant-numeric:tabular-nums;}
+/* scroll progress bar */
+#progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--amber));width:0%;z-index:100;transition:width .1s linear;}
 
-  .hero{padding:64px 0 28px;}
-  .hero-grid{display:flex; gap:40px; align-items:center;}
-  .avatar-wrap{position:relative; flex-shrink:0;}
-  .avatar-wrap::before{
-    content:""; position:absolute; inset:-6px; border-radius:16px;
-    background:linear-gradient(135deg, var(--accent), var(--accent-2), var(--pink));
-    opacity:0.55; filter:blur(10px); z-index:-1; animation:spin-glow 6s linear infinite;
-  }
-  @keyframes spin-glow{0%{filter:blur(10px) hue-rotate(0deg);} 100%{filter:blur(10px) hue-rotate(360deg);}}
-  .avatar{width:132px; height:132px; border-radius:12px; object-fit:cover; border:1px solid var(--border); display:block; transition:transform .3s;}
-  .avatar:hover{transform:scale(1.04) rotate(-1deg);}
-  .eyebrow{font-family:var(--mono); font-size:12px; color:var(--accent); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px;}
-  h1{font-family:var(--mono); font-weight:800; font-size:40px; letter-spacing:-0.5px; color:#fff; margin-bottom:8px; background:linear-gradient(90deg,#fff,#cfe9ff 60%,var(--accent)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
-  .role{font-size:17px; color:var(--muted); margin-bottom:14px; min-height:52px;}
-  #typed-cursor{color:var(--accent); animation:blink 1s step-start infinite;}
-  @keyframes blink{50%{opacity:0;}}
+/* ambient orbs */
+.orb{position:fixed;border-radius:50%;filter:blur(60px);opacity:.25;z-index:0;pointer-events:none;}
+.orb-a{width:420px;height:420px;background:var(--accent);top:-120px;left:-120px;animation:float1 22s ease-in-out infinite;}
+.orb-b{width:360px;height:360px;background:#3a6cff;bottom:-100px;right:-100px;animation:float2 26s ease-in-out infinite;}
+@keyframes float1{0%,100%{transform:translate(0,0);}50%{transform:translate(60px,80px);}}
+@keyframes float2{0%,100%{transform:translate(0,0);}50%{transform:translate(-60px,-60px);}}
+@media (prefers-reduced-motion: reduce){
+  .orb{animation:none;}
+  *{scroll-behavior:auto !important;}
+}
 
-  .ticker-box{
-    font-family:var(--mono); font-size:12px; color:var(--accent);
-    background:var(--panel); border:1px solid var(--border); border-radius:6px;
-    padding:8px 12px; margin-bottom:20px; max-width:460px; overflow:hidden;
-    white-space:nowrap;
-  }
-  .ticker-box::before{content:"$ "; color:var(--muted);}
+/* topbar */
+header.top{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(10,15,13,.75);border-bottom:1px solid var(--line);}
+.top-inner{max-width:var(--maxw);margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.brand{font-family:var(--mono);font-size:14px;color:var(--muted);}
+.brand b{color:var(--accent);}
+.lang-switch{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;font-family:var(--mono);font-size:12px;}
+.lang-switch button{background:transparent;border:none;color:var(--muted);padding:6px 10px;cursor:pointer;font-family:var(--mono);font-size:12px;}
+.lang-switch button[aria-pressed="true"]{background:var(--accent-dim);color:var(--accent);}
 
-  .metrics-row{display:flex; gap:28px; flex-wrap:wrap; margin-top:6px; margin-bottom:22px;}
-  .metric{font-family:var(--mono);}
-  .metric .num{font-size:20px; font-weight:700; color:var(--accent);}
-  .metric .lbl{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px;}
+main{max-width:var(--maxw);margin:0 auto;padding:0 20px;position:relative;z-index:1;}
 
-  .hero-ctas{display:flex; gap:12px; flex-wrap:wrap;}
-  .btn{font-family:var(--mono); font-weight:700; padding:12px 20px; border-radius:6px; font-size:13.5px; white-space:nowrap; border:1px solid transparent; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:.18s;}
-  .btn-primary{background:var(--accent); color:#04231F;}
-  .btn-primary:hover{background:#7FF3E0; transform:translateY(-2px); box-shadow:0 6px 18px rgba(94,234,212,0.25);}
-  .btn-ghost{background:transparent; color:var(--text); border-color:var(--border);}
-  .btn-ghost:hover{border-color:var(--accent); color:var(--accent); transform:translateY(-2px);}
+/* terminal window chrome around hero */
+.terminal{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,var(--panel),var(--bg-2));box-shadow:0 30px 80px -30px rgba(0,255,156,.12), inset 0 0 0 1px rgba(255,255,255,.02);overflow:hidden;margin:36px 0;position:relative;}
+.terminal::before{content:"";position:absolute;inset:-1px;border-radius:14px;padding:1px;background:linear-gradient(120deg,rgba(0,255,156,.35),transparent 30%,transparent 70%,rgba(122,140,255,.35));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;}
+.term-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.015);}
+.term-dot{width:10px;height:10px;border-radius:50%;}
+.term-dot.r{background:#ff6b6b;}
+.term-dot.y{background:#ffb454;}
+.term-dot.g{background:#00ff9c;}
+.term-title{margin-left:6px;font-family:var(--mono);font-size:11px;color:var(--muted);}
+.term-body{padding:36px 28px 32px;}
+.term-line{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:14px;min-height:16px;white-space:pre-wrap;line-height:1.7;}
+.term-line .prompt{color:var(--accent);}
+.term-line .out{color:var(--text);}
 
-  .section{padding:44px 0; border-top:1px solid var(--border); opacity:0; transform:translateY(20px); transition:opacity .6s ease, transform .6s ease;}
-  .section.visible{opacity:1; transform:translateY(0);}
-  .section-label{font-family:var(--mono); font-size:12px; color:var(--warn); letter-spacing:1px; margin-bottom:18px;}
-  .section-label::before{content:"// ";}
-  .section-label .hint{color:var(--muted); text-transform:none;}
-  h2{font-size:22px; font-weight:700; color:#fff; margin-bottom:16px;}
-  .about-text{color:#C7CFDE; font-size:15px; max-width:680px;}
+/* hero */
+.hero{padding:0;display:grid;grid-template-columns:120px 1fr;gap:28px;align-items:start;}
+@media (max-width:640px){.hero{grid-template-columns:1fr;text-align:center;}}
+.photo-wrap{width:120px;height:120px;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 0 0 4px rgba(0,255,156,.06), 0 0 30px -6px rgba(0,255,156,.5);transform-style:preserve-3d;transition:transform .15s ease;margin:0 auto;position:relative;}
+.photo-wrap img{width:100%;height:100%;object-fit:cover;}
+.photo-ring{position:absolute;inset:-6px;border-radius:20px;border:1px dashed rgba(0,255,156,.35);animation:spin 16s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@media (prefers-reduced-motion: reduce){.photo-ring{animation:none;}}
 
-  .principles{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin-top:20px;}
-  .principle{
-    background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px 18px;
-    font-size:13.5px; color:#C7CFDE; transform-style:preserve-3d; will-change:transform;
-    transition:transform .12s ease, box-shadow .12s ease, border-color .2s;
-  }
-  .principle:hover{border-color:var(--accent); box-shadow:0 14px 30px -10px rgba(94,234,212,0.25);}
-  .principle b{display:block; color:var(--accent); font-family:var(--mono); font-size:12px; margin-bottom:6px; text-transform:uppercase;}
+/* CI/CD pipeline strip */
+.pipeline{display:flex;align-items:center;gap:0;margin:26px 0 6px;font-family:var(--mono);font-size:11px;color:var(--muted);position:relative;flex-wrap:wrap;}
+.pipeline .stage{display:flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid var(--line);border-radius:20px;background:var(--panel);position:relative;z-index:1;}
+.pipeline .stage .led{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);}
+.pipeline .arrow{width:22px;height:1px;background:var(--line);position:relative;overflow:visible;}
+.pipeline .arrow::after{content:"";position:absolute;top:-2px;left:0;width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:runner 3.2s linear infinite;}
+.pipeline .arrow:nth-of-type(2)::after{animation-delay:0s;}
+@keyframes runner{0%{left:0;opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{left:100%;opacity:0;}}
+@media (prefers-reduced-motion: reduce){.pipeline .arrow::after{animation:none;opacity:0;}}
+@media (max-width:640px){.pipeline{justify-content:center;}}
+.status-line{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.06em;display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.status-line .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+.loc{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:14px;}
+h1{font-size:clamp(30px,5.5vw,46px);margin:0 0 4px;letter-spacing:-.01em;font-weight:800;}
+.role{font-size:16px;color:var(--muted);margin:0 0 20px;font-family:var(--mono);}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0 22px;}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,1fr);}}
+.stat{border:1px solid var(--line);border-radius:var(--radius);padding:12px 10px;background:var(--panel);text-align:center;transition:.2s;}
+.stat:hover{border-color:var(--accent);box-shadow:0 0 24px -8px rgba(0,255,156,.45);transform:translateY(-2px);}
+.stat .num{font-family:var(--mono);font-size:24px;color:var(--accent);font-weight:700;}
+.stat .label{font-size:11px;color:var(--muted);margin-top:2px;}
+.cta-row{display:flex;gap:10px;flex-wrap:wrap;}
+@media (max-width:640px){.cta-row{justify-content:center;}}
+.btn{font-family:var(--mono);font-size:13px;padding:10px 16px;border-radius:8px;border:1px solid var(--line);color:var(--text);background:var(--panel);cursor:pointer;transition:.15s;}
+.btn:hover{border-color:var(--accent);color:var(--accent);text-decoration:none;}
+.btn.primary{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
 
-  /* ---------- CI/CD таймлайн карьеры ---------- */
-  .timeline{position:relative; margin-top:28px; padding-left:36px;}
-  .timeline::before{
-    content:""; position:absolute; left:7px; top:6px; bottom:6px; width:2px;
-    background:var(--border);
-  }
-  .timeline-fill{
-    position:absolute; left:7px; top:6px; width:2px; height:0%;
-    background:linear-gradient(180deg, var(--accent), var(--accent-2));
-    box-shadow:0 0 10px rgba(94,234,212,0.6);
-    transition:height .1s linear;
-  }
-  .stage{position:relative; padding-bottom:26px; opacity:0.35; transition:opacity .4s ease;}
-  .stage.active{opacity:1;}
-  .stage:last-child{padding-bottom:0;}
-  .stage-dot{
-    position:absolute; left:-36px; top:2px; width:16px; height:16px; border-radius:50%;
-    background:var(--panel-2); border:2px solid var(--border); transition:.3s;
-  }
-  .stage.active .stage-dot{border-color:var(--accent); background:var(--accent); box-shadow:0 0 12px rgba(94,234,212,0.7);}
-  .stage-card{
-    background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px 18px; cursor:pointer;
-  }
-  .stage-card:hover{border-color:var(--accent-dim);}
-  .stage-head{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap;}
-  .stage-ts{font-family:var(--mono); font-size:11px; color:var(--muted); white-space:nowrap; padding-top:3px;}
-  .stage-title{font-size:15px; color:#fff; font-weight:700;}
-  .stage-company{font-size:12.5px; color:var(--accent); font-family:var(--mono); margin-top:2px;}
-  .stage-toggle{font-family:var(--mono); color:var(--muted); font-size:14px; transition:transform .2s;}
-  .stage-card.open .stage-toggle{transform:rotate(45deg); color:var(--accent);}
-  .stage-text{color:#AEB7C9; font-size:13.5px; max-height:0; overflow:hidden; transition:max-height .25s ease;}
-  .stage-card.open .stage-text{max-height:260px; margin-top:10px;}
-  .stage-text li{margin-left:16px; margin-bottom:3px;}
+/* section headers */
+.eyebrow{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.08em;margin:0 0 6px;}
+section{padding:44px 0;border-top:1px solid var(--line);}
+h2{font-size:22px;margin:0 0 18px;}
 
-  .skills-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px;}
-  .skill-panel{
-    background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px;
-    transform-style:preserve-3d; will-change:transform; transition:transform .12s ease, box-shadow .12s ease;
-  }
-  .skill-panel:hover{box-shadow:0 14px 30px -10px rgba(74,134,232,0.25);}
-  .skill-panel .cat{font-family:var(--mono); font-size:11px; color:var(--warn); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;}
-  .tag-list{display:flex; flex-wrap:wrap; gap:6px;}
-  .tag{font-family:var(--mono); font-size:11.5px; background:var(--panel-2); border:1px solid var(--border); color:#C7CFDE; padding:3px 8px; border-radius:4px; cursor:pointer; transition:.15s;}
-  .tag:hover, .tag.active{border-color:var(--accent); color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset;}
+/* about */
+.about-text{max-width:700px;color:var(--text);}
+.values{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px;}
+@media (max-width:760px){.values{grid-template-columns:repeat(2,1fr);}}
+.value{border:1px solid var(--line);border-radius:var(--radius);padding:14px;background:var(--panel);}
+.value b{color:var(--accent);display:block;font-family:var(--mono);font-size:13px;margin-bottom:6px;}
+.value p{margin:0;font-size:13px;color:var(--muted);}
 
-  .contact-panel{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:32px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:24px;}
-  .contact-links{display:flex; flex-direction:column; gap:10px;}
-  .contact-row{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:14px;}
-  .contact-row a{color:var(--text); display:flex; align-items:center; gap:10px;}
-  .contact-row a:hover{color:var(--accent);}
-  .contact-row .k{color:var(--muted); width:80px; display:inline-block; font-size:12px;}
-  .copy-btn{background:none; border:1px solid var(--border); color:var(--muted); font-family:var(--mono); font-size:10.5px; padding:2px 7px; border-radius:4px; cursor:pointer; transition:.15s;}
-  .copy-btn:hover{color:var(--accent); border-color:var(--accent);}
-  .contact-ctas{display:flex; flex-direction:column; gap:10px;}
+/* timeline — git-log graph rail */
+.timeline-rail{position:relative;padding-left:26px;}
+.timeline-rail::before{content:"";position:absolute;left:5px;top:8px;bottom:8px;width:1px;background:linear-gradient(180deg,var(--accent),var(--line) 12%,var(--line) 88%,transparent);}
+.job{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);margin-bottom:10px;overflow:hidden;position:relative;}
+.job::before{content:"";position:absolute;left:-25px;top:20px;width:10px;height:10px;border-radius:50%;background:var(--bg);border:2px solid var(--muted);z-index:1;}
+.job.current::before{border-color:var(--accent);box-shadow:0 0 10px var(--accent);}
+.job summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;transition:background .15s;}
+.job summary:hover{background:rgba(0,255,156,.03);}
+.job summary::-webkit-details-marker{display:none;}
+.job summary .role-title{font-weight:600;font-size:15px;}
+.job summary .company{color:var(--muted);font-size:13px;}
+.job summary .dates{font-family:var(--mono);font-size:12px;color:var(--accent);white-space:nowrap;}
+.job[open] summary{border-bottom:1px solid var(--line);}
+.job .body{padding:14px 16px;font-size:14px;color:var(--text);}
+.job .body ul{margin:8px 0 0;padding-left:18px;}
+.job .body li{margin-bottom:4px;}
+.job .toolset{margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--muted);}
+.present-badge{font-family:var(--mono);font-size:10px;background:var(--accent-dim);color:var(--accent);padding:2px 7px;border-radius:20px;margin-left:6px;}
 
-  footer{text-align:center; padding:36px 0; color:var(--muted); font-family:var(--mono); font-size:12px; border-top:1px solid var(--border); position:relative; z-index:2;}
+/* skills */
+.skill-group{margin-bottom:16px;}
+.skill-group h3{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em;margin:0 0 8px;text-transform:uppercase;}
+.tags{display:flex;flex-wrap:wrap;gap:7px;}
+.tag{border:1px solid var(--line);border-radius:20px;padding:4px 10px;font-size:12px;color:var(--text);background:var(--bg-2);transition:.15s;}
+.tag:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 12px -3px rgba(0,255,156,.5);}
 
-  #to-top{
-    position:fixed; right:20px; bottom:20px; width:42px; height:42px; border-radius:50%;
-    background:var(--panel); border:1px solid var(--border); color:var(--accent);
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
-    opacity:0; pointer-events:none; transition:opacity .25s, transform .2s; font-family:var(--mono); font-size:16px;
-    z-index:100;
-  }
-  #to-top.show{opacity:1; pointer-events:auto;}
-  #to-top:hover{transform:translateY(-3px);}
+/* contact */
+.contact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+@media (max-width:640px){.contact-grid{grid-template-columns:1fr;}}
+.contact-card{border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;background:var(--panel);display:flex;justify-content:space-between;align-items:center;font-size:13px;}
+.contact-card .k{font-family:var(--mono);color:var(--muted);font-size:11px;}
+.copy-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;}
+.copy-btn:hover{color:var(--accent);}
 
-  @media (max-width:640px){
-    .hero-grid{flex-direction:column; align-items:flex-start;}
-    h1{font-size:29px;}
-    .contact-panel{flex-direction:column; align-items:flex-start;}
-    .ticker-box{max-width:100%;}
-    .timeline{padding-left:30px;}
-    .stage-dot{left:-30px;}
-  }
+footer{border-top:1px solid var(--line);padding:24px 0 40px;font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;align-items:center;}
+footer a{color:var(--muted);}
+#visits-badge{height:20px;opacity:.85;}
+
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease, transform .5s ease;}
+.reveal.in{opacity:1;transform:translateY(0);}
 </style>
 </head>
 <body>
-<div id="orb-field">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-  <div class="orb orb-4"></div>
-</div>
-<div id="scroll-progress"></div>
 
-  <div class="topbar">
-    <div class="wrap">
-      <div><span class="status-dot" id="status-dot"></span><span id="status-text">СИСТЕМА: НА СВЯЗИ, ОТКРЫТ К ПРЕДЛОЖЕНИЯМ</span></div>
-      <div>Санкт-Петербург · <span id="live-clock"></span></div>
+<div id="progress"></div>
+<div class="orb orb-a"></div>
+<div class="orb orb-b"></div>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">&gt;_ <b>forestplus/TopDevOps</b></div>
+    <div class="lang-switch" role="group" aria-label="Language / Язык">
+      <button id="btn-ru" aria-pressed="true" onclick="setLang('ru')">RU</button>
+      <button id="btn-en" aria-pressed="false" onclick="setLang('en')">EN</button>
     </div>
   </div>
+</header>
 
-  <div class="wrap">
-    <div class="hero">
-      <div class="hero-grid">
-        <div class="avatar-wrap"><img class="avatar" id="tilt-avatar" src="data:image/jpeg;base64,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" alt="<?php echo htmlspecialchars($profile['name']); ?></div>
+<main>
+
+  <!-- HERO -->
+  <div class="terminal" style="margin-top:28px;">
+    <div class="term-bar">
+      <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+      <span class="term-title">dmitry@devops — zsh — 96×24</span>
+    </div>
+    <div class="term-body">
+      <div class="term-line"><span class="prompt">$</span> <span id="typed-line" class="out"></span><span class="blink">&nbsp;</span></div>
+
+      <section class="hero">
+        <div class="photo-wrap" id="tilt-card">
+          <div class="photo-ring"></div>
+          <img src="assets/dmitry.png" alt="Дмитрий Парамонов" width="120" height="120" loading="eager">
+        </div>
         <div>
-          <div class="eyebrow"><span id="greeting">Добрый день</span> · статус: <span id="status-short">на связи</span></div>
-          <h1>Дмитрий Парамонов</h1>
-          <div class="role"><span id="typed-role"></span><span id="typed-cursor">|</span></div>
-          <div class="ticker-box"><span id="ticker-text"></span></div>
-          <div class="metrics-row">
-            <div class="metric">
-              <div class="num" data-count="18+" id="metric-experience">0</div>
-              <div class="lbl">лет опыта</div>
+          <div class="status-line">
+            <span class="dot"></span>
+            <span data-lang-content="ru">СИСТЕМА: НА СВЯЗИ, ОТКРЫТ К ПРЕДЛОЖЕНИЯМ</span>
+            <span data-lang-content="en">STATUS: ONLINE, OPEN TO OFFERS</span>
+          </div>
+          <div class="loc">
+            <span data-lang-content="ru">Санкт-Петербург · открыт к переезду и удалёнке · РФ / ОАЭ</span>
+            <span data-lang-content="en">Saint Petersburg, Russia · open to relocation &amp; remote · RU / UAE work authorization</span>
+          </div>
+          <h1><span class="grad-text">Дмитрий Парамонов</span></h1>
+          <p class="role">DevOps Team Lead</p>
+
+          <div class="stats">
+            <div class="stat"><div class="num" data-count="17" data-suffix="+">0</div>
+              <div class="label"><span data-lang-content="ru">лет опыта в IT</span><span data-lang-content="en">years in IT</span></div>
             </div>
-            <div class="metric">
-              <div class="num" data-count="250+">0</div>
-              <div class="lbl">серверов под управлением</div>
+            <div class="stat"><div class="num" data-count="250" data-suffix="+">0</div>
+              <div class="label"><span data-lang-content="ru">серверов под управлением</span><span data-lang-content="en">servers managed</span></div>
             </div>
-            <div class="metric">
-              <div class="num" data-count="10">0</div>
-              <div class="lbl">этапов карьеры</div>
+            <div class="stat"><div class="num" data-count="11" data-suffix="">0</div>
+              <div class="label"><span data-lang-content="ru">этапов карьеры</span><span data-lang-content="en">career stages</span></div>
             </div>
-            <div class="metric">
-              <div class="num" data-count="№1" id="metric-visits">0</div>
-              <div class="lbl">визит на страницу</div>
+            <div class="stat"><div class="num" data-count="9" data-suffix="+">0</div>
+              <div class="label"><span data-lang-content="ru">лет в DevOps/SRE</span><span data-lang-content="en">years in DevOps/SRE</span></div>
             </div>
           </div>
-          <div class="hero-ctas">
-            <a class="btn btn-primary" href="resume.pdf" download="Rezume_Paramonov_DevOps_Team_Lead.pdf">⬇ Скачать резюме</a>
-            <a class="btn btn-ghost" href="https://www.linkedin.com/in/topdevops" target="_blank">Написать в LinkedIn →</a>
+
+          <div class="pipeline" aria-hidden="true">
+            <div class="stage"><span class="led"></span>BUILD</div>
+            <div class="arrow"></div>
+            <div class="stage"><span class="led"></span>TEST</div>
+            <div class="arrow"></div>
+            <div class="stage"><span class="led"></span>DEPLOY</div>
+            <div class="arrow"></div>
+            <div class="stage"><span class="led"></span>MONITOR</div>
+          </div>
+
+          <div class="cta-row" style="margin-top:20px;">
+            <a class="btn primary" data-lang-content="ru" href="resume.pdf">⬇ Скачать резюме (RU)</a>
+            <a class="btn primary" data-lang-content="en" href="resume_en.pdf">⬇ Download resume (EN)</a>
+            <a class="btn" href="https://www.linkedin.com/in/topdevops" target="_blank" rel="noopener">
+              <span data-lang-content="ru">LinkedIn →</span><span data-lang-content="en">LinkedIn →</span>
+            </a>
+            <a class="btn" href="https://t.me/TopDevOps" target="_blank" rel="noopener">Telegram →</a>
           </div>
         </div>
-      </div>
+      </section>
     </div>
-
-    <div class="section">
-      <div class="section-label">кто_я</div>
-      <p class="about-text">
-        Прошёл путь от инженера технической поддержки до CEO и CIO. Последние 9 лет полностью сфокусирован на DevOps-методологии: контейнеризация приложений на Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах. Строю production-инфраструктуру с минимальным time-to-market и внедряю практики DevSecOps для повышения надёжности систем. Открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и ОАЭ.
-      </p>
-      <div class="principles">
-        <div class="principle tilt"><b>Надёжность</b>Проектирую инфраструктуру так, чтобы инциденты решались быстро, а не повторялись.</div>
-        <div class="principle tilt"><b>Скорость</b>Выстраиваю CI/CD и автоматизацию, которые сокращают time-to-market.</div>
-        <div class="principle tilt"><b>Люди</b>Нанимаю, обучаю и выращиваю сильные DevOps-команды.</div>
-        <div class="principle tilt"><b>Безопасность</b>Внедряю DevSecOps как часть процесса, а не отдельный этап.</div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label">журнал_опыта <span class="hint">— нажмите на запись, чтобы раскрыть подробности</span></div>
-      <h2>Опыт работы (<span id="exp-years">18</span> лет <span id="exp-months">0</span> мес.)</h2>
-
-      <div class="timeline" id="timeline">
-        <div class="timeline-fill" id="timeline-fill"></div>
-
-        <div class="stage">
-          <div class="stage-dot"></div>
-          <div class="stage-card" onclick="this.classList.toggle('open')">
-            <div class="stage-head">
-              <div>
-                <div class="stage-title">DevOps Team Lead</div>
-                <div class="stage-company">Crypto Industry International · ОАЭ</div>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div class="stage-ts">июн 2023 — дек 2025<br>2г 7м</div>
-                <div class="stage-toggle">+</div>
-              </div>
-            </div>
-            <div class="stage-text">
-              Организация, управление и развитие DevOps-процессов компании.
-              <ul>
-                <li>Обеспечивал стабильную работу микросервисной инфраструктуры, вёл инцидент-менеджмент</li>
-                <li>Проектировал архитектуру продуктов совместно с владельцами и архитекторами</li>
-                <li>Разработал регламенты разработки, тестирования и сопровождения</li>
-                <li>Организовал наём, онбординг и обучение технических специалистов</li>
-                <li>Внедрил CI/CD-процессы и автоматизированное масштабирование инфраструктуры</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage">
-          <div class="stage-dot"></div>
-          <div class="stage-card" onclick="this.classList.toggle('open')">
-            <div class="stage-head">
-              <div>
-                <div class="stage-title">Lead DevOps</div>
-                <div class="stage-company">Иннотех (для Банка ВТБ, ПАО) · Москва</div>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div class="stage-ts">апр 2021 — июн 2023<br>2г 3м</div>
-                <div class="stage-toggle">+</div>
-              </div>
-            </div>
-            <div class="stage-text">
-              Руководил DevOps-направлением на двух крупных стримах.
-              <ul>
-                <li>Эквайринг для МСБ: 9 микросервисов, перенос инфраструктуры в VTB.Cloud</li>
-                <li>Госуслуги в банковских процессах: 12 микросервисов, миграция на DreamPipe CI/CD</li>
-                <li>Перевёл очереди сообщений с IBM MQ на Apache ActiveMQ Artemis</li>
-                <li>Наставничество Junior/Middle-специалистов, участие в подборе персонала</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage">
-          <div class="stage-dot"></div>
-          <div class="stage-card" onclick="this.classList.toggle('open')">
-            <div class="stage-head">
-              <div>
-                <div class="stage-title">Senior DevOps</div>
-                <div class="stage-company">DELL · Россия</div>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div class="stage-ts">дек 2018 — апр 2021<br>2г 5м</div>
-                <div class="stage-toggle">+</div>
-              </div>
-            </div>
-            <div class="stage-text">
-              Инфраструктура разработки и автоматизация в команде Pipelines.
-              <ul>
-                <li>Развернул кластеры Kubernetes «с нуля» на Azure + VMware ESXi</li>
-                <li>Администрировал Atlassian Stack, участвовал в миграции на GitHub Enterprise</li>
-                <li>Внедрил резервное копирование промышленного уровня (UrBackup)</li>
-                <li>Настроил мониторинг: Prometheus, Grafana, Alertmanager</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage">
-          <div class="stage-dot"></div>
-          <div class="stage-card" onclick="this.classList.toggle('open')">
-            <div class="stage-head">
-              <div>
-                <div class="stage-title">Middle DevOps</div>
-                <div class="stage-company">FINOM · Санкт-Петербург</div>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div class="stage-ts">фев 2018 — авг 2018<br>7м</div>
-                <div class="stage-toggle">+</div>
-              </div>
-            </div>
-            <div class="stage-text">
-              Строил DevOps-процессы с нуля для группы компаний из криптоотрасли.
-              <ul>
-                <li>Развернул сервис облачного майнинга, торговый терминал, портал компании</li>
-                <li>Выстроил CI/CD на GitLab, мониторинг на Nagios и Zabbix</li>
-                <li>Перенёс Jira/Confluence на собственные серверы с авторизацией через AD</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage">
-          <div class="stage-dot"></div>
-          <div class="stage-card" onclick="this.classList.toggle('open')">
-            <div class="stage-head">
-              <div>
-                <div class="stage-title">DevOps</div>
-                <div class="stage-company">ПрофИТ Солюшенз Нетворкинг Телеком · Санкт-Петербург</div>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div class="stage-ts">фев 2017 — авг 2017<br>7м</div>
-                <div class="stage-toggle">+</div>
-              </div>
-            </div>
-            <div class="stage-text">
-              <ul>
-                <li>Внедрил ITSM/ITIL на базе GLPI</li>
-                <li>CI/CD на Jenkins, администрирование Atlassian Stack</li>
-                <li>Администрирование VMware ESXi, Docker/Docker-compose + Portainer</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage">
-          <div class="stage-dot"></div>
-          <div class="stage-card" onclick="this.classList.toggle('open')">
-            <div class="stage-head">
-              <div>
-                <div class="stage-title">Основатель (CEO & CIO)</div>
-                <div class="stage-company">IThelperSPb · собственный проект, Санкт-Петербург</div>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div class="stage-ts">мар 2016 — фев 2017<br>1г</div>
-                <div class="stage-toggle">+</div>
-              </div>
-            </div>
-            <div class="stage-text">
-              Собственная IT-консалтинговая практика.
-              <ul>
-                <li>Облачные решения на Microsoft Azure для частных компаний</li>
-                <li>Внедрял ITSM/ITIL-процессы, автоматизированную инвентаризацию</li>
-                <li>Разрабатывал сайты, интернет-магазины, корпоративные порталы и CRM</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage">
-          <div class="stage-dot"></div>
-          <div class="stage-card" onclick="this.classList.toggle('open')">
-            <div class="stage-head">
-              <div>
-                <div class="stage-title">Ст. специалист по системному администрированию</div>
-                <div class="stage-company">Объединённая Вагонная Компания · Москва</div>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div class="stage-ts">дек 2014 — мар 2016<br>1г 4м</div>
-                <div class="stage-toggle">+</div>
-              </div>
-            </div>
-            <div class="stage-text">
-              Провёл аудит IT-инфраструктуры и реализовал модернизацию.
-              <ul>
-                <li>Реструктурировал Active Directory, настроил дополнительные базы MS Exchange</li>
-                <li>Внедрил виртуализацию VMware ESXi, развернул GLPI, мониторинг Nagios/Cacti/Zabbix</li>
-                <li>Запустил корпоративный портал ONLYOFFICE и ERP-систему Odoo</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage">
-          <div class="stage-dot"></div>
-          <div class="stage-card" onclick="this.classList.toggle('open')">
-            <div class="stage-head">
-              <div>
-                <div class="stage-title">Сооснователь (CEO & CIO)</div>
-                <div class="stage-company">ООО «Микрозаймфинанс» · Москва</div>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div class="stage-ts">янв 2012 — дек 2014<br>3г</div>
-                <div class="stage-toggle">+</div>
-              </div>
-            </div>
-            <div class="stage-text">
-              Построил бизнес с нуля — от регистрации юрлица до полного запуска операционной деятельности.
-              <ul>
-                <li>Разработал сайт с онлайн-заявками и калькулятором, настроил SEO-продвижение</li>
-                <li>Внедрил CRM, выстроил IT-инфраструктуру (хостинг, СУБД, почта)</li>
-                <li>Заключил договоры с бюро кредитных историй и коллекторским агентством</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage">
-          <div class="stage-dot"></div>
-          <div class="stage-card" onclick="this.classList.toggle('open')">
-            <div class="stage-head">
-              <div>
-                <div class="stage-title">Главный системный администратор</div>
-                <div class="stage-company">Т-Банк (Тинькофф) · Москва</div>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div class="stage-ts">янв 2011 — дек 2011<br>1г</div>
-                <div class="stage-toggle">+</div>
-              </div>
-            </div>
-            <div class="stage-text">
-              <ul>
-                <li>Системное администрирование IT-инфраструктуры на Windows/*Nix</li>
-                <li>Внедрял системы мониторинга и оповещения о сбоях</li>
-                <li>Масштаб: >250 серверов, >1200 пользователей, 4 ЦОД, команда 6 человек</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage">
-          <div class="stage-dot"></div>
-          <div class="stage-card" onclick="this.classList.toggle('open')">
-            <div class="stage-head">
-              <div>
-                <div class="stage-title">Заместитель директора департамента ИТ</div>
-                <div class="stage-company">ЛЕКСПРО, ООО · Москва</div>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div class="stage-ts">фев 2008 — янв 2011<br>3г</div>
-                <div class="stage-toggle">+</div>
-              </div>
-            </div>
-            <div class="stage-text">
-              <ul>
-                <li>Построил IT-инфраструктуру нового офиса (~50 ПК) с нуля</li>
-                <li>Внедрил виртуализацию MS Hyper-V, СХД и автоматизированное резервное копирование</li>
-                <li>Масштаб: 40 серверов, ~500 пользователей, 6 офисов, команда ~12 человек</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label">стек_навыков <span class="hint">— нажмите на тег, чтобы подсветить похожие</span></div>
-      <h2>Навыки и инструменты</h2>
-      <div class="skills-grid">
-        <div class="skill-panel tilt">
-          <div class="cat">Оркестрация</div>
-          <div class="tag-list">
-            <span class="tag" onclick="highlightTag(this)">Kubernetes</span>
-            <span class="tag" onclick="highlightTag(this)">OpenShift</span>
-            <span class="tag" onclick="highlightTag(this)">Docker</span>
-            <span class="tag" onclick="highlightTag(this)">Helm</span>
-            <span class="tag" onclick="highlightTag(this)">VMware ESXi</span>
-          </div>
-        </div>
-        <div class="skill-panel tilt">
-          <div class="cat">CI / CD</div>
-          <div class="tag-list">
-            <span class="tag" onclick="highlightTag(this)">TeamCity</span>
-            <span class="tag" onclick="highlightTag(this)">Jenkins</span>
-            <span class="tag" onclick="highlightTag(this)">GitLab CI</span>
-            <span class="tag" onclick="highlightTag(this)">GitHub</span>
-          </div>
-        </div>
-        <div class="skill-panel tilt">
-          <div class="cat">Автоматизация</div>
-          <div class="tag-list">
-            <span class="tag" onclick="highlightTag(this)">Ansible</span>
-            <span class="tag" onclick="highlightTag(this)">Bash</span>
-            <span class="tag" onclick="highlightTag(this)">Python</span>
-            <span class="tag" onclick="highlightTag(this)">PowerShell</span>
-          </div>
-        </div>
-        <div class="skill-panel tilt">
-          <div class="cat">Мониторинг</div>
-          <div class="tag-list">
-            <span class="tag" onclick="highlightTag(this)">Prometheus</span>
-            <span class="tag" onclick="highlightTag(this)">Grafana</span>
-            <span class="tag" onclick="highlightTag(this)">Zabbix</span>
-            <span class="tag" onclick="highlightTag(this)">Nagios</span>
-          </div>
-        </div>
-        <div class="skill-panel tilt">
-          <div class="cat">Данные</div>
-          <div class="tag-list">
-            <span class="tag" onclick="highlightTag(this)">PostgreSQL</span>
-            <span class="tag" onclick="highlightTag(this)">MySQL/MariaDB</span>
-            <span class="tag" onclick="highlightTag(this)">Kafka</span>
-            <span class="tag" onclick="highlightTag(this)">ActiveMQ</span>
-          </div>
-        </div>
-        <div class="skill-panel tilt">
-          <div class="cat">Управление</div>
-          <div class="tag-list">
-            <span class="tag" onclick="highlightTag(this)">ITIL/ITSM</span>
-            <span class="tag" onclick="highlightTag(this)">DevSecOps</span>
-            <span class="tag" onclick="highlightTag(this)">SRE</span>
-            <span class="tag" onclick="highlightTag(this)">Roadmap</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label">контакты</div>
-      <div class="contact-panel">
-        <div class="contact-links">
-          <div class="contact-row"><span class="k">linkedin</span><a href="https://www.linkedin.com/in/topdevops" target="_blank">linkedin.com/in/topdevops</a></div>
-          <div class="contact-row"><span class="k">telegram</span><a href="https://t.me/TopDevOps" target="_blank">t.me/TopDevOps</a></div>
-          <div class="contact-row"><span class="k">почта</span><a href="mailto:forestplus@ya.ru">forestplus@ya.ru</a><button class="copy-btn" onclick="copyText('forestplus@ya.ru', this)">копировать</button></div>
-          <div class="contact-row"><span class="k">телефон</span><a href="tel:+79319724546">+7 (931) 972-45-46</a><button class="copy-btn" onclick="copyText('+7 (931) 972-45-46', this)">копировать</button></div>
-        </div>
-        <div class="contact-ctas">
-          <a class="btn btn-primary" href="resume.pdf" download="Rezume_Paramonov_DevOps_Team_Lead.pdf">⬇ Скачать резюме</a>
-          <a class="btn btn-ghost" href="https://www.linkedin.com/in/topdevops" target="_blank">Написать в LinkedIn →</a>
-        </div>
-      </div>
-    </div>
-
-    <footer id="footer-text">
-      Дмитрий Парамонов · DevOps Team Lead · Санкт-Петербург / ОАЭ
-    </footer>
   </div>
 
-  <div id="to-top" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</div>
+  <!-- ABOUT -->
+  <section class="reveal">
+    <p class="eyebrow" data-lang-content="ru">кто_я</p>
+    <p class="eyebrow" data-lang-content="en">about_me</p>
+    <h2 data-lang-content="ru">О себе</h2>
+    <h2 data-lang-content="en">About</h2>
+    <p class="about-text" data-lang-content="ru">
+      Прошёл путь от инженера технической поддержки до CEO и CIO. Последние 9+ лет полностью сфокусирован на DevOps-методологии: контейнеризация приложений на Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах. Строю production-инфраструктуру с минимальным time-to-market и внедряю практики DevSecOps для повышения надёжности систем. Открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и ОАЭ.
+    </p>
+    <p class="about-text" data-lang-content="en">
+      I've gone from technical support engineer to business co-owner and CEO/CIO. For the past 9+ years I've been fully focused on DevOps practices: containerizing applications with Docker and orchestrating them on Kubernetes and OpenShift, mainly in fintech projects. I build production infrastructure with minimal time-to-market and apply DevSecOps practices to improve system reliability. Open to interesting projects and long-term collaboration — remote, hybrid, or on-site, in Russia and the UAE.
+    </p>
+
+    <div class="values">
+      <div class="value">
+        <b data-lang-content="ru">Надёжность</b><b data-lang-content="en">Reliability</b>
+        <p data-lang-content="ru">Проектирую инфраструктуру так, чтобы инциденты решались быстро, а не повторялись.</p>
+        <p data-lang-content="en">I design infrastructure so incidents get resolved fast — and don't repeat.</p>
+      </div>
+      <div class="value">
+        <b data-lang-content="ru">Скорость</b><b data-lang-content="en">Speed</b>
+        <p data-lang-content="ru">Выстраиваю CI/CD и автоматизацию, которые сокращают time-to-market.</p>
+        <p data-lang-content="en">I build CI/CD and automation that cut time-to-market.</p>
+      </div>
+      <div class="value">
+        <b data-lang-content="ru">Люди</b><b data-lang-content="en">People</b>
+        <p data-lang-content="ru">Нанимаю, обучаю и выращиваю сильные DevOps-команды.</p>
+        <p data-lang-content="en">I hire, train, and grow strong DevOps teams.</p>
+      </div>
+      <div class="value">
+        <b data-lang-content="ru">Безопасность</b><b data-lang-content="en">Security</b>
+        <p data-lang-content="ru">Внедряю DevSecOps как часть процесса, а не отдельный этап.</p>
+        <p data-lang-content="en">I build DevSecOps into the process, not as a bolt-on step.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="reveal">
+    <p class="eyebrow" data-lang-content="ru">журнал_опыта — нажмите на запись, чтобы раскрыть подробности</p>
+    <p class="eyebrow" data-lang-content="en">experience_log — click an entry to expand</p>
+    <h2><span data-lang-content="ru">Опыт работы (17 лет 3 мес.)</span><span data-lang-content="en">Work experience (17 years 3 months)</span></h2>
+
+    <div class="timeline-rail">
+    <!-- 1 -->
+    <details class="job current" open>
+      <summary>
+        <span>
+          <span class="role-title" data-lang-content="ru">DevOps Team Lead</span>
+          <span class="role-title" data-lang-content="en">DevOps Team Lead</span>
+          <span class="company"> · Crypto Industry International, ОАЭ</span>
+        </span>
+        <span class="dates">
+          <span data-lang-content="ru">июн 2023 — по наст. время</span>
+          <span data-lang-content="en">Jun 2023 — Present</span>
+          <span class="present-badge" data-lang-content="ru">сейчас</span>
+          <span class="present-badge" data-lang-content="en">current</span>
+        </span>
+      </summary>
+      <div class="body">
+        <p data-lang-content="ru">Организация, управление и развитие DevOps-процессов компании.</p>
+        <p data-lang-content="en">Organized, managed, and developed the company's DevOps processes.</p>
+        <ul data-lang-content="ru">
+          <li>Обеспечивал стабильную работу микросервисной инфраструктуры, вёл инцидент-менеджмент</li>
+          <li>Проектировал архитектуру продуктов совместно с владельцами и архитекторами</li>
+          <li>Разработал регламенты разработки, тестирования и сопровождения</li>
+          <li>Организовал наём, онбординг и обучение технических специалистов</li>
+          <li>Внедрил CI/CD-процессы и автоматизированное масштабирование инфраструктуры</li>
+        </ul>
+        <ul data-lang-content="en">
+          <li>Ensured stable operation of the microservices infrastructure; led incident management</li>
+          <li>Contributed to software architecture design together with product owners and architects</li>
+          <li>Developed development, testing, and maintenance guidelines</li>
+          <li>Organized hiring, onboarding, and training of technical specialists</li>
+          <li>Implemented CI/CD processes and automated infrastructure scaling</li>
+        </ul>
+      </div>
+    </details>
+
+    <!-- 2 -->
+    <details class="job">
+      <summary>
+        <span>
+          <span class="role-title" data-lang-content="ru">Lead DevOps</span>
+          <span class="role-title" data-lang-content="en">Lead DevOps</span>
+          <span class="company" data-lang-content="ru"> · Иннотех (для Банка ВТБ, ПАО) · Москва</span>
+          <span class="company" data-lang-content="en"> · Innotech Group (client: VTB Bank), Moscow</span>
+        </span>
+        <span class="dates">апр 2021 — июн 2023 <span data-lang-content="en" style="font-family:inherit"></span></span>
+      </summary>
+      <div class="body">
+        <ul data-lang-content="ru">
+          <li>Эквайринг для МСБ: 9 микросервисов, перенос инфраструктуры в VTB.Cloud</li>
+          <li>Госуслуги в банковских процессах: 12 микросервисов, миграция на DreamPipe CI/CD</li>
+          <li>Перевёл очереди сообщений с IBM MQ на Apache ActiveMQ Artemis</li>
+          <li>Наставничество Junior/Middle-специалистов, участие в подборе персонала</li>
+        </ul>
+        <ul data-lang-content="en">
+          <li>SMB acquiring: 9 microservices, migrated infrastructure to VTB.Cloud</li>
+          <li>Government services in banking: 12 microservices, migrated to DreamPipe CI/CD</li>
+          <li>Migrated messaging from IBM MQ to Apache ActiveMQ Artemis</li>
+          <li>Mentored Junior/Middle specialists, contributed to hiring</li>
+        </ul>
+        <p class="toolset">Docker · OpenShift/Kubernetes · TeamCity · SonarQube · Fortify · PostgreSQL · Kafka · VTB.Cloud</p>
+      </div>
+    </details>
+
+    <!-- 3 -->
+    <details class="job">
+      <summary>
+        <span>
+          <span class="role-title">Senior DevOps</span>
+          <span class="company" data-lang-content="ru"> · DELL · Россия</span>
+          <span class="company" data-lang-content="en"> · DELL, Russia</span>
+        </span>
+        <span class="dates">дек 2018 — апр 2021</span>
+      </summary>
+      <div class="body">
+        <ul data-lang-content="ru">
+          <li>Развернул кластеры Kubernetes «с нуля» на Azure + VMware ESXi</li>
+          <li>Администрировал Atlassian Stack, участвовал в миграции на GitHub Enterprise</li>
+          <li>Внедрил резервное копирование промышленного уровня (UrBackup)</li>
+          <li>Настроил мониторинг: Prometheus, Grafana, Alertmanager</li>
+        </ul>
+        <ul data-lang-content="en">
+          <li>Built Kubernetes clusters from scratch on hybrid Azure + VMware ESXi</li>
+          <li>Administered the Atlassian Stack; contributed to migration to GitHub Enterprise</li>
+          <li>Deployed enterprise-grade backup and disaster recovery (UrBackup)</li>
+          <li>Set up monitoring: Prometheus, Grafana, Alertmanager</li>
+        </ul>
+      </div>
+    </details>
+
+    <!-- 4 -->
+    <details class="job">
+      <summary>
+        <span>
+          <span class="role-title">Middle DevOps</span>
+          <span class="company" data-lang-content="ru"> · FINOM · Санкт-Петербург</span>
+          <span class="company" data-lang-content="en"> · FINOM, Saint Petersburg</span>
+        </span>
+        <span class="dates">фев 2018 — авг 2018</span>
+      </summary>
+      <div class="body">
+        <ul data-lang-content="ru">
+          <li>Развернул сервис облачного майнинга, торговый терминал, портал компании</li>
+          <li>Выстроил CI/CD на GitLab, мониторинг на Nagios и Zabbix</li>
+          <li>Перенёс Jira/Confluence на собственные серверы с авторизацией через AD</li>
+        </ul>
+        <ul data-lang-content="en">
+          <li>Deployed a cloud mining service, trading terminal, and company portal</li>
+          <li>Built CI/CD on GitLab; set up monitoring on Nagios and Zabbix</li>
+          <li>Migrated Jira/Confluence to self-hosted servers with AD authentication</li>
+        </ul>
+      </div>
+    </details>
+
+    <!-- 5 -->
+    <details class="job">
+      <summary>
+        <span>
+          <span class="role-title">DevOps</span>
+          <span class="company" data-lang-content="ru"> · ПрофИТ Солюшенз Нетворкинг Телеком · Санкт-Петербург</span>
+          <span class="company" data-lang-content="en"> · ProfIT Solutions Networking Telecom, Saint Petersburg</span>
+        </span>
+        <span class="dates">фев 2017 — авг 2017</span>
+      </summary>
+      <div class="body">
+        <ul data-lang-content="ru">
+          <li>Внедрил ITSM/ITIL на базе GLPI</li>
+          <li>CI/CD на Jenkins, администрирование Atlassian Stack</li>
+          <li>Администрирование VMware ESXi, Docker/Docker-compose + Portainer</li>
+        </ul>
+        <ul data-lang-content="en">
+          <li>Implemented ITSM/ITIL on GLPI</li>
+          <li>CI/CD on Jenkins; administered the Atlassian Stack</li>
+          <li>Administered VMware ESXi, Docker/Docker-compose + Portainer</li>
+        </ul>
+      </div>
+    </details>
+
+    <!-- 6 -->
+    <details class="job">
+      <summary>
+        <span>
+          <span class="role-title" data-lang-content="ru">Основатель (CEO &amp; CIO)</span>
+          <span class="role-title" data-lang-content="en">Founder (CEO &amp; CIO)</span>
+          <span class="company" data-lang-content="ru"> · IThelperSPb · собственный проект, Санкт-Петербург</span>
+          <span class="company" data-lang-content="en"> · IThelperSPb, own venture, Saint Petersburg</span>
+        </span>
+        <span class="dates">мар 2016 — фев 2017</span>
+      </summary>
+      <div class="body">
+        <ul data-lang-content="ru">
+          <li>Облачные решения на Microsoft Azure для частных компаний</li>
+          <li>Внедрял ITSM/ITIL-процессы, автоматизированную инвентаризацию</li>
+          <li>Разрабатывал сайты, интернет-магазины, корпоративные порталы и CRM</li>
+        </ul>
+        <ul data-lang-content="en">
+          <li>Delivered cloud IT solutions on Microsoft Azure for private companies</li>
+          <li>Implemented ITSM/ITIL processes and automated asset inventory</li>
+          <li>Built websites, online stores, corporate portals, and CRM systems</li>
+        </ul>
+      </div>
+    </details>
+
+    <!-- 7 -->
+    <details class="job">
+      <summary>
+        <span>
+          <span class="role-title" data-lang-content="ru">Ст. специалист по системному администрированию</span>
+          <span class="role-title" data-lang-content="en">Senior Systems Administrator</span>
+          <span class="company" data-lang-content="ru"> · Объединённая Вагонная Компания · Москва</span>
+          <span class="company" data-lang-content="en"> · United Wagon Company, Moscow</span>
+        </span>
+        <span class="dates">дек 2014 — мар 2016</span>
+      </summary>
+      <div class="body">
+        <ul data-lang-content="ru">
+          <li>Реструктурировал Active Directory, настроил дополнительные базы MS Exchange</li>
+          <li>Внедрил виртуализацию VMware ESXi, развернул GLPI, мониторинг Nagios/Cacti/Zabbix</li>
+          <li>Запустил корпоративный портал ONLYOFFICE и ERP-систему Odoo</li>
+        </ul>
+        <ul data-lang-content="en">
+          <li>Restructured Active Directory; configured additional MS Exchange databases</li>
+          <li>Implemented VMware ESXi virtualization; deployed GLPI, Nagios/Cacti/Zabbix</li>
+          <li>Launched an ONLYOFFICE corporate portal and Odoo ERP system</li>
+        </ul>
+      </div>
+    </details>
+
+    <!-- 8 -->
+    <details class="job">
+      <summary>
+        <span>
+          <span class="role-title" data-lang-content="ru">Сооснователь (CEO &amp; CIO)</span>
+          <span class="role-title" data-lang-content="en">Co-Founder (CEO &amp; CIO)</span>
+          <span class="company" data-lang-content="ru"> · ООО «Микрозаймфинанс» · Москва</span>
+          <span class="company" data-lang-content="en"> · Mikrozaymfinans LLC, Moscow</span>
+        </span>
+        <span class="dates">янв 2012 — дек 2014</span>
+      </summary>
+      <div class="body">
+        <ul data-lang-content="ru">
+          <li>Построил бизнес с нуля — от регистрации юрлица до полного запуска операционной деятельности</li>
+          <li>Разработал сайт с онлайн-заявками и калькулятором, настроил SEO-продвижение</li>
+          <li>Внедрил CRM, выстроил IT-инфраструктуру (хостинг, СУБД, почта)</li>
+        </ul>
+        <ul data-lang-content="en">
+          <li>Built the business from the ground up, from registration to full operational launch</li>
+          <li>Built the company website with an online application flow and calculator; SEO</li>
+          <li>Implemented a CRM system; built out IT infrastructure (hosting, databases, email)</li>
+        </ul>
+      </div>
+    </details>
+
+    <!-- 9 -->
+    <details class="job">
+      <summary>
+        <span>
+          <span class="role-title" data-lang-content="ru">Главный системный администратор</span>
+          <span class="role-title" data-lang-content="en">Chief Systems Administrator</span>
+          <span class="company" data-lang-content="ru"> · Т-Банк (Тинькофф) · Москва</span>
+          <span class="company" data-lang-content="en"> · T-Bank (Tinkoff), Moscow</span>
+        </span>
+        <span class="dates">янв 2011 — дек 2011</span>
+      </summary>
+      <div class="body">
+        <ul data-lang-content="ru">
+          <li>Системное администрирование IT-инфраструктуры на Windows/*Nix</li>
+          <li>Внедрял системы мониторинга и оповещения о сбоях</li>
+          <li>Масштаб: &gt;250 серверов, &gt;1200 пользователей, 4 ЦОД, команда 6 человек</li>
+        </ul>
+        <ul data-lang-content="en">
+          <li>Owned systems administration of the Windows/*Nix IT infrastructure</li>
+          <li>Implemented monitoring and alerting systems for outage detection</li>
+          <li>Scale: 250+ servers, 1,200+ users, 4 data centers, team of 6</li>
+        </ul>
+      </div>
+    </details>
+
+    <!-- 10 -->
+    <details class="job">
+      <summary>
+        <span>
+          <span class="role-title" data-lang-content="ru">Заместитель директора департамента ИТ</span>
+          <span class="role-title" data-lang-content="en">Deputy Head of IT Department</span>
+          <span class="company" data-lang-content="ru"> · ЛЕКСПРО, ООО · Москва</span>
+          <span class="company" data-lang-content="en"> · LEXPRO LLC, Moscow</span>
+        </span>
+        <span class="dates">фев 2008 — янв 2011</span>
+      </summary>
+      <div class="body">
+        <ul data-lang-content="ru">
+          <li>Построил IT-инфраструктуру нового офиса (~50 ПК) с нуля</li>
+          <li>Внедрил виртуализацию MS Hyper-V, СХД и автоматизированное резервное копирование</li>
+          <li>Масштаб: 40 серверов, ~500 пользователей, 6 офисов, команда ~12 человек</li>
+        </ul>
+        <ul data-lang-content="en">
+          <li>Built a new office's IT infrastructure from scratch (~50 PCs)</li>
+          <li>Implemented MS Hyper-V virtualization, storage, and automated backups</li>
+          <li>Scale: 40 servers, ~500 users, 6 offices, team of ~12</li>
+        </ul>
+      </div>
+    </details>
+    </div><!-- /timeline-rail -->
+
+  </section>
+
+  <!-- SKILLS -->
+  <section class="reveal">
+    <p class="eyebrow" data-lang-content="ru">стек_навыков</p>
+    <p class="eyebrow" data-lang-content="en">skills_stack</p>
+    <h2><span data-lang-content="ru">Навыки и инструменты</span><span data-lang-content="en">Skills &amp; tools</span></h2>
+
+    <div class="skill-group">
+      <h3 data-lang-content="ru">Оркестрация</h3><h3 data-lang-content="en">Orchestration</h3>
+      <div class="tags">
+        <span class="tag">Kubernetes</span><span class="tag">OpenShift</span><span class="tag">Docker</span><span class="tag">Helm</span><span class="tag">Kubespray</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <h3 data-lang-content="ru">Облака</h3><h3 data-lang-content="en">Cloud</h3>
+      <div class="tags">
+        <span class="tag">AWS</span><span class="tag">Microsoft Azure</span><span class="tag">Яндекс Облако</span><span class="tag">VTB.Cloud</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <h3 data-lang-content="ru">VPS / Bare metal</h3><h3 data-lang-content="en">VPS / Bare metal</h3>
+      <div class="tags">
+        <span class="tag">Hetzner</span><span class="tag">DigitalOcean</span><span class="tag">Scaleway</span><span class="tag">OVH</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <h3 data-lang-content="ru">Виртуализация</h3><h3 data-lang-content="en">Virtualization</h3>
+      <div class="tags">
+        <span class="tag">VMware ESXi</span><span class="tag">Microsoft Hyper-V</span><span class="tag">KVM</span><span class="tag">Proxmox</span><span class="tag">Vagrant</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <h3 data-lang-content="ru">CI / CD</h3><h3 data-lang-content="en">CI / CD</h3>
+      <div class="tags">
+        <span class="tag">TeamCity</span><span class="tag">Jenkins</span><span class="tag">GitLab CI</span><span class="tag">GitHub</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <h3 data-lang-content="ru">Автоматизация</h3><h3 data-lang-content="en">Automation</h3>
+      <div class="tags">
+        <span class="tag">Ansible</span><span class="tag">Bash</span><span class="tag">Python</span><span class="tag">PowerShell</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <h3 data-lang-content="ru">Мониторинг</h3><h3 data-lang-content="en">Monitoring</h3>
+      <div class="tags">
+        <span class="tag">Prometheus</span><span class="tag">Grafana</span><span class="tag">Zabbix</span><span class="tag">Nagios</span><span class="tag">Alertmanager</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <h3 data-lang-content="ru">Данные</h3><h3 data-lang-content="en">Data</h3>
+      <div class="tags">
+        <span class="tag">PostgreSQL</span><span class="tag">MySQL/MariaDB</span><span class="tag">Kafka</span><span class="tag">ActiveMQ</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <h3 data-lang-content="ru">Управление</h3><h3 data-lang-content="en">Management</h3>
+      <div class="tags">
+        <span class="tag">ITIL/ITSM</span><span class="tag">DevSecOps</span><span class="tag">SRE</span><span class="tag" data-lang-content="ru">Roadmap</span><span class="tag" data-lang-content="en">Roadmapping</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="reveal">
+    <p class="eyebrow" data-lang-content="ru">контакты</p>
+    <p class="eyebrow" data-lang-content="en">contact</p>
+    <h2><span data-lang-content="ru">Контакты</span><span data-lang-content="en">Contact</span></h2>
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div><span class="k">LinkedIn</span><br><a href="https://www.linkedin.com/in/topdevops" target="_blank" rel="noopener">linkedin.com/in/topdevops</a></div>
+      </div>
+      <div class="contact-card">
+        <div><span class="k">Telegram</span><br><a href="https://t.me/TopDevOps" target="_blank" rel="noopener">t.me/TopDevOps</a></div>
+      </div>
+      <div class="contact-card">
+        <div><span class="k" data-lang-content="ru">Почта</span><span class="k" data-lang-content="en">Email</span><br><span id="email-text">forestplus@ya.ru</span></div>
+        <button class="copy-btn" onclick="copyText('forestplus@ya.ru', this)">
+          <span data-lang-content="ru">копировать</span><span data-lang-content="en">copy</span>
+        </button>
+      </div>
+      <div class="contact-card">
+        <div><span class="k" data-lang-content="ru">Телефон</span><span class="k" data-lang-content="en">Phone</span><br><a href="tel:+79319724546">+7 (931) 972-45-46</a></div>
+        <button class="copy-btn" onclick="copyText('+79319724546', this)">
+          <span data-lang-content="ru">копировать</span><span data-lang-content="en">copy</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div>
+    <span data-lang-content="ru">Дмитрий Парамонов · DevOps Team Lead · Санкт-Петербург / ОАЭ</span>
+    <span data-lang-content="en">Dmitry Paramonov · DevOps Team Lead · Saint Petersburg / UAE</span>
+  </div>
+  <img id="visits-badge" src="https://visitor-badge.laobi.icu/badge?page_id=forestplus.TopDevOps" alt="visits" loading="lazy" onerror="this.style.display='none'">
+</footer>
+
 <script>
-/* ============================================================
-   Динамика страницы: время, стаж, статус, счётчик визитов —
-   всё считается в браузере (страница статическая, для GitHub Pages).
-   Плюс: скролл-прогресс, CI/CD-таймлайн, 3D-тилт, тикер, тайпинг.
-   ============================================================ */
-
-const CAREER_START = new Date('2008-02-01T00:00:00');
-
-function moscowNow(){
-  return new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));
+// ---------- language toggle ----------
+function setLang(lang){
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.setAttribute('lang', lang);
+  document.getElementById('btn-ru').setAttribute('aria-pressed', lang==='ru');
+  document.getElementById('btn-en').setAttribute('aria-pressed', lang==='en');
+  localStorage.setItem('site-lang', lang);
+  restartTyped();
 }
+(function(){
+  var saved = localStorage.getItem('site-lang');
+  if(saved) document.documentElement.setAttribute('data-lang', saved);
+  document.getElementById('btn-ru').setAttribute('aria-pressed', (saved||'ru')==='ru');
+  document.getElementById('btn-en').setAttribute('aria-pressed', saved==='en');
+})();
 
-function diffYearsMonths(from, to){
-  let years = to.getFullYear() - from.getFullYear();
-  let months = to.getMonth() - from.getMonth();
-  if (to.getDate() < from.getDate()) months--;
-  if (months < 0){ years--; months += 12; }
-  return { years, months };
-}
+// ---------- terminal typewriter ----------
+var TYPED_LINES = {
+  ru: ["whoami", "Дмитрий Парамонов — DevOps Team Lead", "cat status.txt", "17+ лет в IT · 9+ лет в DevOps/SRE · открыт к предложениям"],
+  en: ["whoami", "Dmitry Paramonov — DevOps Team Lead", "cat status.txt", "17+ years in IT · 9+ years in DevOps/SRE · open to offers"]
+};
+var typedTimer = null;
+function restartTyped(){
+  var el = document.getElementById('typed-line');
+  if(!el) return;
+  if(typedTimer) clearTimeout(typedTimer);
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var lang = document.documentElement.getAttribute('data-lang') || 'ru';
+  var seq = TYPED_LINES[lang]; // [command, response, command, response]
+  if(reduced){ el.textContent = seq[1] + '   ' + seq[3]; return; }
 
-function renderDynamic(){
-  const now = moscowNow();
+  var segIndex = 0;   // which of the 4 segments we're typing
+  var charIndex = 0;  // char position within the current segment
+  el.textContent = '';
 
-  const { years: expY, months: expM } = diffYearsMonths(CAREER_START, now);
-  document.getElementById('exp-years').textContent = expY;
-  document.getElementById('exp-months').textContent = expM;
-  document.getElementById('metric-experience').setAttribute('data-count', expY + '+');
-
-  const hour = now.getHours();
-  let greeting;
-  if (hour >= 5 && hour < 12) greeting = 'Доброе утро';
-  else if (hour >= 12 && hour < 18) greeting = 'Добрый день';
-  else if (hour >= 18 && hour < 23) greeting = 'Добрый вечер';
-  else greeting = 'Доброй ночи';
-  document.getElementById('greeting').textContent = greeting;
-
-  const weekday = now.getDay();
-  const isWorkingHours = (weekday !== 0 && weekday !== 6 && hour >= 10 && hour < 20);
-  document.getElementById('status-text').textContent = isWorkingHours
-    ? 'СИСТЕМА: НА СВЯЗИ, ОТКРЫТ К ПРЕДЛОЖЕНИЯМ'
-    : 'СИСТЕМА: РЕЖИМ ОЖИДАНИЯ (ОТВЕЧУ В РАБОЧЕЕ ВРЕМЯ)';
-  document.getElementById('status-short').textContent = isWorkingHours ? 'на связи' : 'отошёл';
-  document.getElementById('status-dot').classList.toggle('idle', !isWorkingHours);
-
-  let visits = parseInt(localStorage.getItem('td_visits') || '0', 10) + 1;
-  localStorage.setItem('td_visits', visits);
-  document.getElementById('metric-visits').setAttribute('data-count', '№' + visits);
-
-  const p = n => String(n).padStart(2,'0');
-  const stamp = p(now.getDate())+'.'+p(now.getMonth()+1)+'.'+now.getFullYear()+' '+p(now.getHours())+':'+p(now.getMinutes());
-  document.getElementById('footer-text').textContent =
-    'Дмитрий Парамонов · DevOps Team Lead · Санкт-Петербург / ОАЭ · страница сгенерирована ' + stamp + ' (визит №' + visits + ')';
-}
-renderDynamic();
-
-function tick(){
-  const d = moscowNow();
-  const p = n => String(n).padStart(2,'0');
-  document.getElementById('live-clock').textContent = p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())+' МСК';
-}
-setInterval(tick, 1000); tick();
-
-/* Скролл-прогресс бар */
-function updateScrollProgress(){
-  const doc = document.documentElement;
-  const scrolled = (doc.scrollTop) / (doc.scrollHeight - doc.clientHeight) * 100;
-  document.getElementById('scroll-progress').style.width = scrolled + '%';
-}
-window.addEventListener('scroll', updateScrollProgress);
-updateScrollProgress();
-
-/* Эффект печатной машинки для строки роли */
-const roleText = "От инженера технической поддержки до CEO и CIO — 18+ лет строю и стабилизирую инфраструктуру для банков, финтеха и криптопроектов.";
-let ti = 0;
-const roleEl = document.getElementById('typed-role');
-function typeStep(){
-  if(ti <= roleText.length){
-    roleEl.textContent = roleText.slice(0, ti);
-    ti++;
-    setTimeout(typeStep, 14);
-  } else {
-    startTicker();
-  }
-}
-typeStep();
-
-/* "Живой" терминальный тикер под заголовком */
-const tickerLines = [
-  'мониторинг > все системы в норме',
-  'ci/cd > пайплайн выполнен успешно, 0 ошибок',
-  'инцидент > устранён за 4 минуты',
-  'бэкап > завершён без сбоев',
-  'деплой > 12 микросервисов без даунтайма',
-  'аптайм > 99.98% за последний квартал',
-  'карьера > 10 этапов, 0 откатов'
-];
-let tIdx = 0;
-const tickerEl = document.getElementById('ticker-text');
-function startTicker(){
-  showTickerLine();
-  setInterval(showTickerLine, 3200);
-}
-function showTickerLine(){
-  tickerEl.style.opacity = 0;
-  setTimeout(() => {
-    tickerEl.textContent = tickerLines[tIdx % tickerLines.length];
-    tickerEl.style.opacity = 1;
-    tIdx++;
-  }, 250);
-}
-tickerEl.style.transition = 'opacity .25s';
-
-/* Анимация счёта метрик при появлении в зоне видимости */
-function animateCount(el){
-  const raw = el.getAttribute('data-count');
-  const match = raw.match(/[\d]+/);
-  if(!match){ el.textContent = raw; return; }
-  const target = parseInt(match[0], 10);
-  const before = raw.slice(0, raw.indexOf(match[0]));
-  const after = raw.slice(raw.indexOf(match[0]) + match[0].length);
-  let cur = 0;
-  const step = Math.max(1, Math.ceil(target / 40));
-  const iv = setInterval(() => {
-    cur += step;
-    if(cur >= target){ cur = target; clearInterval(iv); }
-    el.textContent = before + cur + after;
-  }, 25);
-}
-const counters = document.querySelectorAll('.metric .num');
-const counterObs = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if(e.isIntersecting){ animateCount(e.target); counterObs.unobserve(e.target); }
-  });
-}, {threshold:0.4});
-counters.forEach(c => counterObs.observe(c));
-
-/* Плавное появление секций при скролле, со staggered-задержкой для дочерних карточек */
-const sectionObs = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if(e.isIntersecting){
-      e.target.classList.add('visible');
-      const kids = e.target.querySelectorAll('.stage, .principle, .skill-panel');
-      kids.forEach((k, i) => {
-        k.style.transitionDelay = (i * 60) + 'ms';
-      });
+  function typeStep(){
+    if(segIndex >= seq.length){
+      typedTimer = setTimeout(function(){ segIndex = 0; charIndex = 0; el.textContent=''; typeStep(); }, 4000);
+      return;
     }
-  });
-}, {threshold:0.1});
-document.querySelectorAll('.section').forEach(s => sectionObs.observe(s));
-
-/* CI/CD-таймлайн: подсветка этапов и заливка линии по скроллу */
-const stages = Array.from(document.querySelectorAll('.stage'));
-const timelineFill = document.getElementById('timeline-fill');
-const timelineEl = document.getElementById('timeline');
-
-function updateTimeline(){
-  if(!timelineEl) return;
-  const rect = timelineEl.getBoundingClientRect();
-  const viewportCenter = window.innerHeight * 0.55;
-  const total = rect.height;
-  let progressPx = viewportCenter - rect.top;
-  progressPx = Math.max(0, Math.min(total, progressPx));
-  const pct = total > 0 ? (progressPx / total) * 100 : 0;
-  timelineFill.style.height = pct + '%';
-
-  stages.forEach(stage => {
-    const sRect = stage.getBoundingClientRect();
-    const stageMid = sRect.top + sRect.height / 2;
-    stage.classList.toggle('active', stageMid < viewportCenter + 40);
-  });
+    var segment = seq[segIndex];
+    var isCommand = segIndex % 2 === 0;
+    if(charIndex === 0 && isCommand && segIndex > 0){ el.textContent += '\n$ '; }
+    charIndex++;
+    el.textContent += segment.charAt(charIndex - 1);
+    if(charIndex < segment.length){
+      typedTimer = setTimeout(typeStep, isCommand ? 55 : 22);
+    } else {
+      segIndex++; charIndex = 0;
+      typedTimer = setTimeout(typeStep, isCommand ? 300 : 900);
+    }
+  }
+  typeStep();
 }
-window.addEventListener('scroll', updateTimeline);
-window.addEventListener('resize', updateTimeline);
-updateTimeline();
+window.addEventListener('load', restartTyped);
 
-/* Подсветка одинаковых тегов при клике */
-function highlightTag(el){
-  const name = el.textContent;
-  document.querySelectorAll('.tag').forEach(t => {
-    t.classList.toggle('active', t.textContent === name);
-  });
-}
-
-/* Копирование почты/телефона в буфер обмена */
-function copyText(value, btn){
-  navigator.clipboard?.writeText(value).then(() => {
-    const old = btn.textContent;
-    btn.textContent = 'скопировано ✓';
-    setTimeout(() => { btn.textContent = old; }, 1500);
-  });
-}
-
-/* Кнопка "наверх" */
-const toTop = document.getElementById('to-top');
-window.addEventListener('scroll', () => {
-  toTop.classList.toggle('show', window.scrollY > 500);
+// ---------- scroll progress ----------
+window.addEventListener('scroll', function(){
+  var h = document.documentElement;
+  var pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+  document.getElementById('progress').style.width = pct + '%';
 });
 
-/* 3D-тилт для карточек принципов и навыков */
-function initTilt(selector){
-  document.querySelectorAll(selector).forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const r = card.getBoundingClientRect();
-      const x = e.clientX - r.left;
-      const y = e.clientY - r.top;
-      const rx = ((y / r.height) - 0.5) * -10;
-      const ry = ((x / r.width) - 0.5) * 10;
-      card.style.transform = `perspective(600px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(4px)`;
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(600px) rotateX(0) rotateY(0) translateZ(0)';
-    });
-  });
+// ---------- count-up numbers (real values, no backend needed) ----------
+function animateCount(el){
+  var target = parseInt(el.getAttribute('data-count'), 10);
+  var suffix = el.getAttribute('data-suffix') || '';
+  var dur = 900, start = null;
+  function step(ts){
+    if(!start) start = ts;
+    var p = Math.min((ts - start) / dur, 1);
+    el.textContent = Math.floor(p * target) + (p >= 1 ? suffix : '');
+    if(p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
 }
-initTilt('.tilt');
+var counted = false;
+function maybeCount(){
+  if(counted) return;
+  var stats = document.querySelector('.stats');
+  if(!stats) return;
+  var r = stats.getBoundingClientRect();
+  if(r.top < window.innerHeight){
+    counted = true;
+    document.querySelectorAll('.stat .num').forEach(animateCount);
+  }
+}
+window.addEventListener('scroll', maybeCount);
+window.addEventListener('load', maybeCount);
 
-/* Легкий параллакс-тилт для аватара по движению мыши всей шапки */
-const avatarEl = document.getElementById('tilt-avatar');
-if(avatarEl){
-  document.querySelector('.hero').addEventListener('mousemove', (e) => {
-    const r = avatarEl.getBoundingClientRect();
-    const cx = r.left + r.width/2, cy = r.top + r.height/2;
-    const dx = (e.clientX - cx) / r.width;
-    const dy = (e.clientY - cy) / r.height;
-    avatarEl.style.transform = `rotate(${dx*4}deg) scale(1.02)`;
+// ---------- reveal on scroll ----------
+var io = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('in'); });
+}, {threshold:.12});
+document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+// ---------- tilt on hero photo ----------
+(function(){
+  var card = document.getElementById('tilt-card');
+  if(!card || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  card.addEventListener('mousemove', function(e){
+    var r = card.getBoundingClientRect();
+    var x = (e.clientX - r.left) / r.width - .5;
+    var y = (e.clientY - r.top) / r.height - .5;
+    card.style.transform = 'rotateY(' + (x*14) + 'deg) rotateX(' + (-y*14) + 'deg)';
   });
-  document.querySelector('.hero').addEventListener('mouseleave', () => {
-    avatarEl.style.transform = 'rotate(0) scale(1)';
+  card.addEventListener('mouseleave', function(){ card.style.transform = 'rotateY(0) rotateX(0)'; });
+})();
+
+// ---------- copy to clipboard ----------
+function copyText(text, btn){
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.innerHTML;
+    btn.textContent = document.documentElement.getAttribute('data-lang') === 'ru' ? 'скопировано' : 'copied';
+    setTimeout(function(){ btn.innerHTML = old; }, 1500);
   });
 }
 </script>
