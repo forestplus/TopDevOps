@@ -204,6 +204,8 @@
         .stat-card:hover::before { transform: scaleX(1); }
         .stat-card:hover { transform: translateY(-5px); border-color: var(--accent-cyan); box-shadow: 0 10px 40px rgba(0,212,255,0.1); }
         .stat-number { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-family: 'JetBrains Mono', monospace; }
+        .stat-number-row { display: flex; align-items: baseline; justify-content: center; gap: 0.05em; }
+        .stat-gt { font-size: 2.5rem; font-weight: 800; color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; }
         .stat-label { color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.3rem; }
         section { position: relative; z-index: 1; padding: 6rem 2rem; scroll-margin-top: 80px; }
         .section-title { font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 3rem; position: relative; display: inline-block; left: 50%; transform: translateX(-50%); }
@@ -214,6 +216,7 @@
             background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
             padding: 2rem; font-size: 1rem; line-height: 1.8; color: var(--text-secondary); position: relative;
         }
+        .about-text p { text-align: justify; text-indent: 2ch; }
         .about-text::before { content: '"'; position: absolute; top: -10px; left: 20px; font-size: 4rem; color: var(--accent-cyan); opacity: 0.3; font-family: serif; }
         .pillars { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 2rem; }
         .pillar {
@@ -285,6 +288,8 @@
             .skill-item::after, .skill-item::before { display: none; }
         }
         .contacts { text-align: center; max-width: 600px; margin: 0 auto; }
+        .contact-tagline { white-space: nowrap; }
+        @media (max-width: 560px) { .contact-tagline { font-size: 0.82rem; } }
         .contact-buttons { display: flex; justify-content: center; gap: 1.5rem; margin-top: 2rem; flex-wrap: wrap; }
         .contact-btn {
             display: inline-flex; align-items: center; gap: 0.7rem; padding: 1rem 2rem;
@@ -485,8 +490,8 @@
             <div class="stat-label" data-ru="лет опыта в IT" data-en="years in IT">лет опыта в IT</div>
         </div>
         <div class="stat-card fade-in">
-            <div class="stat-number" data-target="250">0</div>
-            <div class="stat-label" data-ru="серверов под управлением" data-en="servers managed">серверов под управлением</div>
+            <div class="stat-number-row"><span class="stat-gt">&gt;</span><div class="stat-number" data-target="250">0</div></div>
+            <div class="stat-label" data-ru="серверов" data-en="servers">серверов</div>
         </div>
         <div class="stat-card fade-in">
             <div class="stat-number" data-target="10">0</div>
@@ -504,14 +509,8 @@
         <p class="section-subtitle" data-ru="кто_я / about_me" data-en="who_am_i / about_me">кто_я / about_me</p>
         <div class="about">
             <div class="about-text fade-in">
-                <p data-ru="  Более 20 лет в IT — прошёл путь от инженера техподдержки до совладельца бизнеса и CEO/CIO. 
-                Последние 9 лет полностью сфокусирован на DevOps- и SRE-практиках: контейнеризация приложений в Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. 
-                Параллельно активно изучаю возможности искусственного интеллекта и нейросетей — тестирую и внедряю AI-инструменты (Claude Code, ChatGPT, DeepSeek, Kimi) для ускорения разработки, анализа кода и автоматизации рутинных DevOps-задач. 
-                Я открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и её пределами!"
-                   data-en="More than 20 years in IT — from technical support engineer to business co-owner and CEO/CIO. For the past 9+ years I have been fully focused on DevOps and SRE practices: containerizing applications with Docker and orchestrating them on Kubernetes and OpenShift, mainly in fintech projects and bank-grade highload systems. I build production infrastructure with minimal time-to-market, apply DevSecOps practices to improve system reliability, and set up transparent development, testing, and operations processes. Beyond the technical side, I hire, onboard, and mentor engineers, own the backlog, and coordinate developers, SRE, QA, and administrators. In parallel, I actively explore the capabilities of AI and neural networks — testing and adopting AI tools (Claude Code, ChatGPT, DeepSeek, Kimi) to speed up development, analyze code, and automate routine DevOps tasks. Open to interesting projects and long-term collaboration — remote, hybrid, or on-site, in Russia and the UAE.">  Более 20 лет в IT — прошёл путь от инженера техподдержки до совладельца бизнеса и CEO/CIO. 
-               Последние 9+ лет полностью сфокусирован на DevOps- и SRE-практиках: контейнеризация приложений в Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. 
-           Параллельно активно изучаю возможности искусственного интеллекта и нейросетей — тестирую и внедряю AI-инструменты (Claude Code, ChatGPT, DeepSeek, Kimi) для ускорения разработки, анализа кода и автоматизации рутинных DevOps-задач. 
-       Открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и за рубежом!</p>
+                <p data-ru="Более 20 лет в IT — прошёл путь от инженера технической поддержки до совладельца бизнеса и CEO/CIO. Последние 9 лет полностью сфокусирован на DevOps- и SRE-практиках: контейнеризация приложений в Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. Параллельно активно изучаю возможности искусственного интеллекта и нейросетей — тестирую и внедряю AI-инструменты (Claude Code, ChatGPT, DeepSeek, Kimi) для ускорения разработки, анализа кода и автоматизации рутинных DevOps-задач. Я открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и её пределами!"
+                   data-en="More than 20 years in IT — from technical support engineer to business co-owner and CEO/CIO. For the past 9 years I have been fully focused on DevOps and SRE practices: containerizing applications in Docker with orchestration in Kubernetes and OpenShift, mainly in fintech projects and bank-grade highload systems. I build production infrastructure with minimal time-to-market, apply DevSecOps practices to improve system reliability, and set up transparent development, testing, and operations processes. Beyond the technical side, I hire, onboard, and mentor engineers, own the backlog, and coordinate developers, SRE, QA, and administrators. In parallel, I actively explore the capabilities of AI and neural networks — testing and adopting AI tools (Claude Code, ChatGPT, DeepSeek, Kimi) to speed up development, analyze code, and automate routine DevOps tasks. I am open to interesting projects and long-term collaboration — remote, hybrid, or on-site, in Russia and beyond!">Более 20 лет в IT — прошёл путь от инженера технической поддержки до совладельца бизнеса и CEO/CIO. Последние 9 лет полностью сфокусирован на DevOps- и SRE-практиках: контейнеризация приложений в Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. Параллельно активно изучаю возможности искусственного интеллекта и нейросетей — тестирую и внедряю AI-инструменты (Claude Code, ChatGPT, DeepSeek, Kimi) для ускорения разработки, анализа кода и автоматизации рутинных DevOps-задач. Я открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и её пределами!</p>
             </div>
             <div class="pillars">
                 <div class="pillar fade-in">
@@ -564,7 +563,7 @@
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
                 <div class="timeline-content" onclick="toggleDetails(this)">
-                    <div class="timeline-date">апр 2021 — июн 2023</div>
+                    <div class="timeline-date" data-ru="апр 2021 — июн 2023" data-en="Apr 2021 — Jun 2023">апр 2021 — июн 2023</div>
                     <div class="timeline-role">Lead DevOps</div>
                     <div class="timeline-company" data-ru="Иннотех (для Банка ВТБ, ПАО), Москва" data-en="Innotech Group (client: VTB Bank), Moscow">Иннотех (для Банка ВТБ, ПАО), Москва</div>
                     <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
@@ -585,7 +584,7 @@
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
                 <div class="timeline-content" onclick="toggleDetails(this)">
-                    <div class="timeline-date">дек 2018 — апр 2021</div>
+                    <div class="timeline-date" data-ru="дек 2018 — апр 2021" data-en="Dec 2018 — Apr 2021">дек 2018 — апр 2021</div>
                     <div class="timeline-role">Senior DevOps</div>
                     <div class="timeline-company" data-ru="DELL, Россия" data-en="DELL, Russia">DELL, Россия</div>
                     <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
@@ -603,7 +602,7 @@
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
                 <div class="timeline-content" onclick="toggleDetails(this)">
-                    <div class="timeline-date">фев 2018 — авг 2018</div>
+                    <div class="timeline-date" data-ru="фев 2018 — авг 2018" data-en="Feb 2018 — Aug 2018">фев 2018 — авг 2018</div>
                     <div class="timeline-role">Middle DevOps</div>
                     <div class="timeline-company" data-ru="FINOM, Санкт-Петербург" data-en="FINOM, Saint Petersburg">FINOM, Санкт-Петербург</div>
                     <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
@@ -619,7 +618,7 @@
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
                 <div class="timeline-content" onclick="toggleDetails(this)">
-                    <div class="timeline-date">фев 2017 — авг 2017</div>
+                    <div class="timeline-date" data-ru="фев 2017 — авг 2017" data-en="Feb 2017 — Aug 2017">фев 2017 — авг 2017</div>
                     <div class="timeline-role">DevOps</div>
                     <div class="timeline-company" data-ru="ПрофИТ Солюшенз Нетворкинг Телеком, СПб" data-en="ProfIT Solutions Networking Telecom, Saint Petersburg">ПрофИТ Солюшенз Нетворкинг Телеком, СПб</div>
                     <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
@@ -635,7 +634,7 @@
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
                 <div class="timeline-content" onclick="toggleDetails(this)">
-                    <div class="timeline-date">мар 2016 — фев 2017</div>
+                    <div class="timeline-date" data-ru="мар 2016 — фев 2017" data-en="Mar 2016 — Feb 2017">мар 2016 — фев 2017</div>
                     <div class="timeline-role" data-ru="Основатель (CEO & CIO)" data-en="Owner (CEO & CIO)">Основатель (CEO & CIO)</div>
                     <div class="timeline-company" data-ru="IThelperSPb, собственный проект, СПб" data-en="IThelperSPb, own venture, Saint Petersburg">IThelperSPb, собственный проект, СПб</div>
                     <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
@@ -651,7 +650,7 @@
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
                 <div class="timeline-content" onclick="toggleDetails(this)">
-                    <div class="timeline-date">дек 2014 — мар 2016</div>
+                    <div class="timeline-date" data-ru="дек 2014 — мар 2016" data-en="Dec 2014 — Mar 2016">дек 2014 — мар 2016</div>
                     <div class="timeline-role" data-ru="Ст. специалист по системному администрированию" data-en="Head of System Administration">Ст. специалист по системному администрированию</div>
                     <div class="timeline-company" data-ru="Объединённая Вагонная Компания, Москва" data-en="United Wagon Company, Moscow">Объединённая Вагонная Компания, Москва</div>
                     <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
@@ -667,7 +666,7 @@
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
                 <div class="timeline-content" onclick="toggleDetails(this)">
-                    <div class="timeline-date">янв 2012 — дек 2014</div>
+                    <div class="timeline-date" data-ru="янв 2012 — дек 2014" data-en="Jan 2012 — Dec 2014">янв 2012 — дек 2014</div>
                     <div class="timeline-role" data-ru="Сооснователь (CEO & CIO)" data-en="Co-owner (CEO & CIO)">Сооснователь (CEO & CIO)</div>
                     <div class="timeline-company" data-ru="ООО «Микрозаймфинанс», Москва" data-en="Mikrozaymfinans LLC, Moscow">ООО «Микрозаймфинанс», Москва</div>
                     <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
@@ -683,7 +682,7 @@
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
                 <div class="timeline-content" onclick="toggleDetails(this)">
-                    <div class="timeline-date">янв 2011 — дек 2011</div>
+                    <div class="timeline-date" data-ru="янв 2011 — дек 2011" data-en="Jan 2011 — Dec 2011">янв 2011 — дек 2011</div>
                     <div class="timeline-role" data-ru="Главный системный администратор" data-en="Head of System Administrator">Главный системный администратор</div>
                     <div class="timeline-company" data-ru="Т-Банк (Тинькофф), Москва" data-en="T-Bank (Tinkoff), Moscow">Т-Банк (Тинькофф), Москва</div>
                     <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
@@ -699,7 +698,7 @@
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
                 <div class="timeline-content" onclick="toggleDetails(this)">
-                    <div class="timeline-date">фев 2008 — янв 2011</div>
+                    <div class="timeline-date" data-ru="фев 2008 — янв 2011" data-en="Feb 2008 — Jan 2011">фев 2008 — янв 2011</div>
                     <div class="timeline-role" data-ru="Заместитель директора департамента ИТ" data-en="Deputy CIO">Заместитель директора департамента ИТ</div>
                     <div class="timeline-company" data-ru="ЛЕКСПРО, ООО, Москва" data-en="LEXPRO LLC, Moscow">ЛЕКСПРО, ООО, Москва</div>
                     <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
@@ -735,7 +734,7 @@
                 <div class="skill-items">
                     <span class="skill-item" data-tip-ru="Облачная платформа Amazon" data-tip-en="Amazon's cloud platform">AWS</span>
                     <span class="skill-item" data-tip-ru="Облачная платформа Microsoft" data-tip-en="Microsoft's cloud platform">Microsoft Azure</span>
-                    <span class="skill-item" data-tip-ru="Российская облачная платформа" data-tip-en="Russian cloud platform">Яндекс Облако</span>
+                    <span class="skill-item" data-tip-ru="Российская облачная платформа" data-tip-en="Russian cloud platform">Яндекс Cloud</span>
                     <span class="skill-item" data-tip-ru="Приватное облако Банка ВТБ" data-tip-en="VTB Bank's private cloud">VTB.Cloud</span>
                     <span class="skill-item" data-tip-ru="Облачная платформа Google" data-tip-en="Google's cloud platform">GCP</span>
                 </div>
@@ -747,7 +746,7 @@
                     <span class="skill-item" data-tip-ru="Облачный провайдер для разработчиков" data-tip-en="Developer-friendly cloud provider">DigitalOcean</span>
                     <span class="skill-item" data-tip-ru="Европейский облачный провайдер" data-tip-en="European cloud provider">Scaleway</span>
                     <span class="skill-item" data-tip-ru="Европейский хостинг-провайдер" data-tip-en="European hosting provider">OVH</span>
-                    <span class="skill-item" data-tip-ru="Физические серверы по запросу" data-tip-en="On-demand physical servers">Bare Metal aaS</span>
+                    <span class="skill-item" data-tip-ru="Физические серверы по запросу" data-tip-en="On-demand physical servers">Bare Metal SaaS</span>
                 </div>
             </div>
             <div class="skill-category fade-in">
@@ -862,7 +861,7 @@
         <h2 class="section-title" data-ru="Контакты" data-en="Contact">Контакты</h2>
         <p class="section-subtitle" data-ru="контакты / contact" data-en="contacts / contact">контакты / contact</p>
         <div class="contacts">
-            <p data-ru="Открыт к интересным проектам и долгосрочному сотрудничеству. Напишите мне!" data-en="Open to interesting projects and long-term collaboration. Reach out to me!">Открыт к интересным проектам и долгосрочному сотрудничеству. Напишите мне!</p>
+            <p class="contact-tagline" data-ru="Открыт к интересным проектам и долгосрочному сотрудничеству." data-en="Open to interesting projects and long-term collaboration.">Открыт к интересным проектам и долгосрочному сотрудничеству.</p>
             <div class="contact-buttons">
                 <a href="resume.pdf" id="resume-btn" class="contact-btn resume" download>
                     <span class="contact-icon">⬇</span>
@@ -885,7 +884,7 @@
     <footer>
         <p class="footer-status">
             <span class="footer-dot"></span>
-            <span class="footer-tags">#DevOps #DevSecOps #MLOps #SRE #CTO #CIO #ITManager #ITTeamLead</span>
+            <span class="footer-tags">#DevOps #DevSecOps #MLOps #SRE #CTO #CIO #ITManager</span>
         </p>
         <p style="margin-top:0.5rem; font-size:0.7rem; color:#ffffff;" data-ru="© 2026 Дмитрий Парамонов" data-en="© 2026 Dmitriy Paramonov">© 2026 Дмитрий Парамонов</p>
         <p style="margin-top:0.8rem;">
