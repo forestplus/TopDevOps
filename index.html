@@ -187,6 +187,7 @@
             .hero-title { font-size: 1.3rem; letter-spacing: 0.06em; }
         }
         .hero-location { color: var(--text-secondary); font-size: 0.9rem; text-align: center; }
+        .hero-city { color: var(--text-muted); font-size: 0.8rem; text-align: center; margin-top: 0.2rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.03em; }
         .hero-cta { margin-top: 1rem; }
         .stats {
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;
@@ -220,15 +221,36 @@
         .about-text::before { content: '"'; position: absolute; top: -10px; left: 20px; font-size: 4rem; color: var(--accent-cyan); opacity: 0.3; font-family: serif; }
         .pillars { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 2rem; }
         .pillar {
-            background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-            padding: 1.5rem; transition: all 0.4s ease; position: relative; overflow: hidden;
+            background: linear-gradient(160deg, var(--bg-card), rgba(0,212,255,0.03));
+            border: 1px solid var(--border); border-radius: 18px;
+            padding: 2rem 1.5rem; transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+            position: relative; overflow: hidden;
+            text-align: center; display: flex; flex-direction: column; align-items: center;
         }
-        .pillar::after { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple)); transform: scaleY(0); transition: transform 0.4s ease; }
-        .pillar:hover::after { transform: scaleY(1); }
-        .pillar:hover { transform: translateX(5px); border-color: var(--accent-cyan); }
-        .pillar-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
-        .pillar-title { font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
-        .pillar-desc { font-size: 0.85rem; color: var(--text-secondary); }
+        .pillar::before {
+            content: ''; position: absolute; top: -40%; left: 50%; width: 140%; height: 140%;
+            transform: translateX(-50%); background: radial-gradient(circle, rgba(0,212,255,0.10), transparent 60%);
+            opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
+        }
+        .pillar:hover::before { opacity: 1; }
+        .pillar:hover { transform: translateY(-8px); border-color: var(--accent-cyan); box-shadow: 0 16px 40px -12px rgba(0,212,255,0.25); }
+        .pillar-icon-badge {
+            width: 3.4rem; height: 3.4rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,58,237,0.15));
+            border: 1px solid var(--border); margin-bottom: 1rem; position: relative; z-index: 1;
+            animation: pillarFloat 3.5s ease-in-out infinite;
+        }
+        .pillar:nth-child(2) .pillar-icon-badge { animation-delay: 0.3s; }
+        .pillar:nth-child(3) .pillar-icon-badge { animation-delay: 0.6s; }
+        .pillar:nth-child(4) .pillar-icon-badge { animation-delay: 0.9s; }
+        .pillar:hover .pillar-icon-badge { transform: scale(1.12) rotate(-6deg); border-color: var(--accent-cyan); }
+        @keyframes pillarFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        .pillar-icon { font-size: 1.5rem; }
+        .pillar-title { font-weight: 700; color: var(--text-primary); margin-bottom: 0.4rem; font-size: 1.05rem; letter-spacing: 0.02em; position: relative; z-index: 1; }
+        .pillar-desc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; position: relative; z-index: 1; }
+        @media (prefers-reduced-motion: reduce) {
+            .pillar-icon-badge { animation: none; }
+        }
         .timeline { max-width: 900px; margin: 0 auto; position: relative; }
         .timeline::before { content: ''; position: absolute; left: 50%; transform: translateX(-50%); width: 2px; height: 100%; background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink)); opacity: 0.3; }
         .timeline-item { display: flex; margin-bottom: 2rem; position: relative; opacity: 0; transform: translateY(30px); transition: all 0.6s ease; }
@@ -297,13 +319,31 @@
             color: var(--text-primary); text-decoration: none; font-weight: 600; font-size: 1rem;
             transition: all 0.4s ease; position: relative; overflow: hidden;
         }
-        .contact-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,212,255,0.1), transparent); transition: left 0.5s ease; }
+        .contact-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); transition: left 0.6s ease; }
         .contact-btn:hover::before { left: 100%; }
         .contact-btn:hover { border-color: var(--accent-cyan); box-shadow: 0 0 30px rgba(0,212,255,0.2); transform: translateY(-3px); }
-        .contact-btn.telegram:hover { border-color: #0088cc; box-shadow: 0 0 30px rgba(0,136,204,0.2); }
-        .contact-btn.email:hover { border-color: var(--accent-pink); box-shadow: 0 0 30px rgba(236,72,153,0.2); }
-        .contact-btn.resume:hover { border-color: var(--accent-green); box-shadow: 0 0 30px rgba(16,185,129,0.2); }
-        .contact-btn.linkedin:hover { border-color: var(--accent-purple); box-shadow: 0 0 30px rgba(124,58,237,0.2); }
+        .contact-btn.resume {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple) 55%, var(--accent-pink));
+            background-size: 200% 200%; color: #050508; border: none; border-radius: 50px;
+            font-weight: 700; padding: 1.05rem 2.4rem; letter-spacing: 0.01em;
+            box-shadow: 0 10px 34px -10px rgba(0,212,255,0.5);
+            animation: resumeGlow 4s ease-in-out infinite, resumeGradient 6s ease infinite;
+        }
+        .contact-btn.resume:hover {
+            transform: translateY(-4px) scale(1.035);
+            box-shadow: 0 16px 44px -8px rgba(124,58,237,0.55);
+            border-color: transparent;
+        }
+        .contact-btn.resume .contact-icon { display: inline-block; animation: resumeBounce 1.8s ease-in-out infinite; }
+        @keyframes resumeGlow {
+            0%, 100% { box-shadow: 0 10px 34px -10px rgba(0,212,255,0.5); }
+            50% { box-shadow: 0 10px 40px -6px rgba(236,72,153,0.55); }
+        }
+        @keyframes resumeGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes resumeBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+        @media (prefers-reduced-motion: reduce) {
+            .contact-btn.resume, .contact-btn.resume .contact-icon { animation: none; }
+        }
         .contact-icon { font-size: 1.3rem; }
         .social-icons { display: flex; justify-content: center; align-items: center; gap: 1.6rem; margin-top: 1.6rem; }
         .social-icon { color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.25s ease, color 0.25s ease; }
@@ -403,7 +443,8 @@
             </div>
             <h1 class="hero-name" data-ru="Дмитрий Парамонов" data-en="Dmitriy Paramonov">Дмитрий Парамонов</h1>
             <p class="hero-title">DevOps Team Lead</p>
-            <p class="hero-location" data-ru="СПб · Открыт к переезду и удалёнке в РФ и за её пределами" data-en="SPb · Open to relocation & remote work in Russia and beyond">СПб · Открыт к переезду и удалёнке в РФ и за её пределами</p>
+            <p class="hero-location" data-ru="Открыт для новых проектов в России и за её пределами." data-en="Open to new projects in Russia and beyond.">Открыт для новых проектов в России и за её пределами.</p>
+            <p class="hero-city" data-ru="г. Санкт-Петербург" data-en="Saint Petersburg, Russia">г. Санкт-Петербург</p>
 
             <div class="hero-specs" aria-label="Специализации">
                 <span class="hero-spec-tag">DevOps</span>
@@ -499,7 +540,7 @@
         </div>
         <div class="stat-card fade-in">
             <div class="stat-number" data-target="9">0</div>
-            <div class="stat-label" data-ru="лет в DevOps/SRE" data-en="years in DevOps/SRE">лет в DevOps/SRE</div>
+            <div class="stat-label" data-ru="лет в DevOps" data-en="years in DevOps">лет в DevOps</div>
         </div>
     </div>
 
@@ -509,30 +550,27 @@
         <p class="section-subtitle" data-ru="кто_я / about_me" data-en="who_am_i / about_me">кто_я / about_me</p>
         <div class="about">
             <div class="about-text fade-in">
-                <p data-ru="Более 20 лет в IT — прошёл путь от инженера техподдержки до совладельца бизнеса и CEO/CIO. 
-                Последние 9 лет полностью сфокусирован на DevOps-методологии: контейнеризация приложений в Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. 
-                Параллельно активно изучаю возможности искусственного интеллекта и нейросетей — тестирую и внедряю AI-инструменты (Claude Code, ChatGPT, DeepSeek, Kimi) для ускорения разработки, анализа кода и автоматизации рутинных DevOps-задач. 
-                Я открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и за её пределами!"
-                   data-en="More than 20 years in IT — from technical support engineer to business co-owner and CEO/CIO. For the past 9 years I have been fully focused on DevOps and SRE practices: containerizing applications in Docker with orchestration in Kubernetes and OpenShift, mainly in fintech projects and bank-grade highload systems. I build production infrastructure with minimal time-to-market, apply DevSecOps practices to improve system reliability, and set up transparent development, testing, and operations processes. Beyond the technical side, I hire, onboard, and mentor engineers, own the backlog, and coordinate developers, SRE, QA, and administrators. In parallel, I actively explore the capabilities of AI and neural networks — testing and adopting AI tools (Claude Code, ChatGPT, DeepSeek, Kimi) to speed up development, analyze code, and automate routine DevOps tasks. I am open to interesting projects and long-term collaboration — remote, hybrid, or on-site, in Russia and beyond!">Более 20 лет в IT — прошёл путь от инженера технической поддержки до совладельца бизнеса и CEO/CIO. Последние 9 лет полностью сфокусирован на DevOps- и SRE-практиках: контейнеризация приложений в Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. Параллельно активно изучаю возможности искусственного интеллекта и нейросетей — тестирую и внедряю AI-инструменты (Claude Code, ChatGPT, DeepSeek, Kimi) для ускорения разработки, анализа кода и автоматизации рутинных DevOps-задач. Я открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и её пределами!</p>
+                <p data-ru="Более 20 лет в IT — прошёл путь от инженера техподдержки до совладельца бизнеса и CEO/CIO. Последние 9 лет полностью сфокусирован на DevOps- и SRE-практиках: контейнеризация приложений в Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. Параллельно активно изучаю возможности искусственного интеллекта и нейросетей — тестирую и внедряю AI-инструменты (Claude Code, ChatGPT, DeepSeek, Kimi) для ускорения разработки, анализа кода и автоматизации рутинных DevOps-задач. Я открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и за её пределами!"
+                   data-en="More than 20 years in IT — from technical support engineer to business co-owner and CEO/CIO. For the past 9 years I have been fully focused on DevOps and SRE practices: containerizing applications in Docker with orchestration in Kubernetes and OpenShift, mainly in fintech projects and bank-grade highload systems. I build production infrastructure with minimal time-to-market, apply DevSecOps practices to improve system reliability, and set up transparent development, testing, and operations processes. Beyond the technical side, I hire, onboard, and mentor engineers, own the backlog, and coordinate developers, SRE, QA, and administrators. In parallel, I actively explore the capabilities of AI and neural networks — testing and adopting AI tools (Claude Code, ChatGPT, DeepSeek, Kimi) to speed up development, analyze code, and automate routine DevOps tasks. I am open to interesting projects and long-term collaboration — remote, hybrid, or on-site, in Russia and beyond!">Более 20 лет в IT — прошёл путь от инженера техподдержки до совладельца бизнеса и CEO/CIO. Последние 9 лет полностью сфокусирован на DevOps- и SRE-практиках: контейнеризация приложений в Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. Параллельно активно изучаю возможности искусственного интеллекта и нейросетей — тестирую и внедряю AI-инструменты (Claude Code, ChatGPT, DeepSeek, Kimi) для ускорения разработки, анализа кода и автоматизации рутинных DevOps-задач. Я открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и за её пределами!</p>
             </div>
             <div class="pillars">
                 <div class="pillar fade-in">
-                    <div class="pillar-icon">🛡️</div>
+                    <div class="pillar-icon-badge"><span class="pillar-icon">🛡️</span></div>
                     <div class="pillar-title" data-ru="Надёжность" data-en="Reliability">Надёжность</div>
                     <div class="pillar-desc" data-ru="Проектирую инфраструктуру так, чтобы инциденты решались быстро, а не повторялись." data-en="I design infrastructure so incidents get resolved fast — and do not repeat.">Проектирую инфраструктуру так, чтобы инциденты решались быстро, а не повторялись.</div>
                 </div>
                 <div class="pillar fade-in">
-                    <div class="pillar-icon">⚡</div>
+                    <div class="pillar-icon-badge"><span class="pillar-icon">⚡</span></div>
                     <div class="pillar-title" data-ru="Скорость" data-en="Speed">Скорость</div>
                     <div class="pillar-desc" data-ru="Выстраиваю CI/CD и автоматизацию, которые сокращают time-to-market." data-en="I build CI/CD and automation that cut time-to-market.">Выстраиваю CI/CD и автоматизацию, которые сокращают time-to-market.</div>
                 </div>
                 <div class="pillar fade-in">
-                    <div class="pillar-icon">👥</div>
+                    <div class="pillar-icon-badge"><span class="pillar-icon">👥</span></div>
                     <div class="pillar-title" data-ru="Люди" data-en="People">Люди</div>
                     <div class="pillar-desc" data-ru="Нанимаю, обучаю и выращиваю сильные DevOps-команды." data-en="I hire, train, and grow strong DevOps teams.">Нанимаю, обучаю и выращиваю сильные DevOps-команды.</div>
                 </div>
                 <div class="pillar fade-in">
-                    <div class="pillar-icon">🔒</div>
+                    <div class="pillar-icon-badge"><span class="pillar-icon">🔒</span></div>
                     <div class="pillar-title" data-ru="Безопасность" data-en="Security">Безопасность</div>
                     <div class="pillar-desc" data-ru="Внедряю DevSecOps как часть процесса, а не отдельный этап." data-en="I build DevSecOps into the process, not as a bolt-on step.">Внедряю DevSecOps как часть процесса, а не отдельный этап.</div>
                 </div>
@@ -1025,11 +1063,12 @@
             const details = el.querySelector('.timeline-details');
             const hint = el.querySelector('.expand-hint');
             details.classList.toggle('expanded');
-            if (details.classList.contains('expanded')) {
-                hint.textContent = hint.dataset.ru ? '▸ Свернуть' : '▸ Collapse';
-            } else {
-                hint.textContent = hint.dataset.ru ? '▸ Нажмите, чтобы раскрыть' : '▸ Click to expand';
-            }
+            const expanded = details.classList.contains('expanded');
+            const ruText = expanded ? '▸ Свернуть' : '▸ Нажмите, чтобы раскрыть';
+            const enText = expanded ? '▸ Collapse' : '▸ Click to expand';
+            hint.dataset.ru = ruText;
+            hint.dataset.en = enText;
+            hint.textContent = currentLang === 'en' ? enText : ruText;
         }
 
         // ========== LANGUAGE SWITCH ==========
