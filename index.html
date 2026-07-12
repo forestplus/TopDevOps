@@ -186,7 +186,7 @@
         @media (max-width: 640px) {
             .hero-title { font-size: 1.3rem; letter-spacing: 0.06em; }
         }
-        .hero-location { color: var(--text-secondary); font-size: 0.9rem; text-align: center; }
+        .hero-location { color: var(--text-secondary); font-size: clamp(0.66rem, 3.15vw, 0.9rem); text-align: center; white-space: nowrap; }
         .hero-city { color: var(--text-muted); font-size: 0.8rem; text-align: center; margin-top: 0.2rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.03em; }
         .hero-cta { margin-top: 1rem; }
         .stats {
@@ -212,6 +212,7 @@
         .section-title { font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 3rem; position: relative; display: inline-block; left: 50%; transform: translateX(-50%); }
         .section-title::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 3px; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple)); border-radius: 2px; }
         .section-subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 3rem; font-size: 0.9rem; }
+        .contact-email-line { text-align: center; margin-top: -2rem; margin-bottom: 2.5rem; font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: var(--accent-cyan); }
         .about { max-width: 900px; margin: 0 auto; }
         .about-text {
             background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
@@ -558,22 +559,22 @@
                 <div class="pillar fade-in">
                     <div class="pillar-icon-badge"><span class="pillar-icon">🛡️</span></div>
                     <div class="pillar-title" data-ru="Надёжность" data-en="Reliability">Надёжность</div>
-                    <div class="pillar-desc" data-ru="Проектирую инфраструктуру так, чтобы инциденты решались быстро, а не повторялись." data-en="I design infrastructure so incidents get resolved fast — and do not repeat.">Проектирую инфраструктуру так, чтобы инциденты решались быстро, а не повторялись.</div>
+                    <div class="pillar-desc" data-ru="Проектирую инфраструктуру так, чтобы инциденты решались быстро, а не повторялись" data-en="I design infrastructure so incidents get resolved fast — and do not repeat">Проектирую инфраструктуру так, чтобы инциденты решались быстро, а не повторялись</div>
                 </div>
                 <div class="pillar fade-in">
                     <div class="pillar-icon-badge"><span class="pillar-icon">⚡</span></div>
                     <div class="pillar-title" data-ru="Скорость" data-en="Speed">Скорость</div>
-                    <div class="pillar-desc" data-ru="Выстраиваю CI/CD и автоматизацию, которые сокращают time-to-market." data-en="I build CI/CD and automation that cut time-to-market.">Выстраиваю CI/CD и автоматизацию, которые сокращают time-to-market.</div>
+                    <div class="pillar-desc" data-ru="Выстраиваю CI/CD и автоматизацию, которые сокращают time-to-market" data-en="I build CI/CD and automation that cut time-to-market">Выстраиваю CI/CD и автоматизацию, которые сокращают time-to-market</div>
                 </div>
                 <div class="pillar fade-in">
                     <div class="pillar-icon-badge"><span class="pillar-icon">👥</span></div>
                     <div class="pillar-title" data-ru="Люди" data-en="People">Люди</div>
-                    <div class="pillar-desc" data-ru="Нанимаю, обучаю и выращиваю сильные DevOps-команды." data-en="I hire, train, and grow strong DevOps teams.">Нанимаю, обучаю и выращиваю сильные DevOps-команды.</div>
+                    <div class="pillar-desc" data-ru="Нанимаю, обучаю и выращиваю сильные DevOps-команды" data-en="I hire, train, and grow strong DevOps teams">Нанимаю, обучаю и выращиваю сильные DevOps-команды</div>
                 </div>
                 <div class="pillar fade-in">
                     <div class="pillar-icon-badge"><span class="pillar-icon">🔒</span></div>
                     <div class="pillar-title" data-ru="Безопасность" data-en="Security">Безопасность</div>
-                    <div class="pillar-desc" data-ru="Внедряю DevSecOps как часть процесса, а не отдельный этап." data-en="I build DevSecOps into the process, not as a bolt-on step.">Внедряю DevSecOps как часть процесса, а не отдельный этап.</div>
+                    <div class="pillar-desc" data-ru="Внедряю DevSecOps как часть процесса, а не отдельный этап" data-en="I build DevSecOps into the process, not as a bolt-on step">Внедряю DevSecOps как часть процесса, а не отдельный этап</div>
                 </div>
             </div>
         </div>
@@ -730,7 +731,7 @@
                     <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
                     <div class="timeline-details">
                         <ul>
-                            <li data-ru="Системное администрирование IT-инфраструктуры на Windows/*Nix" data-en="Owned systems administration of the Windows/*Nix IT infrastructure">Системное администрирование IT-инфраструктуры на Windows/*Nix</li>
+                            <li data-ru="Системное администрирование IT-инфраструктуры на Windows/Linux" data-en="Owned systems administration of the Windows/Linux IT infrastructure">Системное администрирование IT-инфраструктуры на Windows/Linux</li>
                             <li data-ru="Внедрял системы мониторинга и оповещения о сбоях" data-en="Implemented monitoring and alerting systems for outage detection">Внедрял системы мониторинга и оповещения о сбоях</li>
                             <li data-ru="Масштаб: >250 серверов, >1200 пользователей, 4 ЦОД, команда 6 человек" data-en="Scale: 250+ servers, 1,200+ users, 4 data centers, team of 6">Масштаб: >250 серверов, >1200 пользователей, 4 ЦОД, команда 6 человек</li>
                         </ul>
@@ -902,8 +903,9 @@
     <section id="contact">
         <h2 class="section-title" data-ru="Контакты" data-en="Contact">Контакты</h2>
         <p class="section-subtitle" data-ru="контакты / contact" data-en="contacts / contact">контакты / contact</p>
+        <p class="contact-email-line">forestplus@ya.ru</p>
         <div class="contacts">
-            <p class="contact-tagline" data-ru="Открыт к интересным проектам и долгосрочному сотрудничеству." data-en="Open to interesting projects and long-term collaboration.">Открыт к интересным проектам и долгосрочному сотрудничеству.</p>
+            <p class="contact-tagline" data-ru="Открыт к интересным проектам и долгосрочному сотрудничеству!" data-en="Open to interesting projects and long-term collaboration!">Открыт к интересным проектам и долгосрочному сотрудничеству!</p>
             <div class="contact-buttons">
                 <a href="resume.pdf" id="resume-btn" class="contact-btn resume" download>
                     <span class="contact-icon">⬇</span>
