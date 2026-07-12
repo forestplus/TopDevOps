@@ -121,7 +121,7 @@
             .ops-ticker-track, .spark span, .ops-dot { animation: none; }
         }
         .status-badge {
-            display: inline-flex; align-items: center; gap: 0.5rem;
+            display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;
             background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);
             padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 500;
             color: var(--accent-green); animation: pulse 2s infinite;
@@ -138,6 +138,7 @@
         /* full-width AI/ML news ticker */
         .news-ticker-bar {
             width: 100vw; margin-left: calc(50% - 50vw); position: relative; z-index: 1;
+            margin-top: 0.8rem; margin-bottom: 4.8rem;
             background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
             overflow: hidden;
         }
@@ -159,8 +160,8 @@
         .news-ticker-bar:hover .news-ticker-track { animation-play-state: paused; }
         @media (prefers-reduced-motion: reduce) { .news-ticker-track { animation: none; } }
         @media (max-width: 640px) { .news-ticker-label { font-size: 0.62rem; padding: 0 0.6rem; } }
-        .hero-specs { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 0.6rem; }
-        .hero-spec-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; padding: 0.25rem 0.7rem; border: 1px solid var(--border); border-radius: 20px; color: var(--text-secondary); }
+        .hero-specs { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; margin-top: 0.6rem; }
+        .hero-spec-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; padding: 0.22rem 0.6rem; border: 1px solid var(--border); border-radius: 20px; color: var(--text-secondary); white-space: nowrap; }
         .hero-name {
             font-size: 2.5rem; font-weight: 800; text-align: center;
             background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
@@ -278,6 +279,36 @@
         .contact-btn.resume:hover { border-color: var(--accent-green); box-shadow: 0 0 30px rgba(16,185,129,0.2); }
         .contact-btn.linkedin:hover { border-color: var(--accent-purple); box-shadow: 0 0 30px rgba(124,58,237,0.2); }
         .contact-icon { font-size: 1.3rem; }
+        .social-icons { display: flex; justify-content: center; align-items: center; gap: 1.6rem; margin-top: 1.6rem; }
+        .social-icon { color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.25s ease, color 0.25s ease; }
+        .social-icon svg { width: 26px; height: 26px; }
+        .social-icon:hover { transform: translateY(-3px); }
+        .social-icon.linkedin-icon:hover { color: #0A66C2; }
+        .social-icon.telegram-icon:hover { color: #229ED9; }
+        .social-icon.email-icon { color: #ffffff; font-family: 'JetBrains Mono', monospace; font-size: 1.9rem; font-weight: 700; line-height: 1; }
+        .social-icon.email-icon:hover { color: var(--accent-pink); }
+        /* hover tooltip "cloud" for social icons, same pattern as skill tags */
+        .social-icon { position: relative; }
+        .social-icon::after {
+            content: attr(data-tip-ru);
+            position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%) translateY(4px);
+            background: var(--bg-secondary); border: 1px solid var(--accent-cyan); color: var(--text-primary);
+            font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.72rem; line-height: 1.35;
+            white-space: nowrap; width: max-content; max-width: 220px; text-align: center;
+            padding: 0.5rem 0.7rem; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 14px rgba(0,212,255,0.15);
+            opacity: 0; visibility: hidden; pointer-events: none; z-index: 20;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        html[lang="en"] .social-icon::after { content: attr(data-tip-en); }
+        .social-icon::before {
+            content: ''; position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%);
+            border: 5px solid transparent; border-top-color: var(--accent-cyan);
+            opacity: 0; visibility: hidden; transition: opacity 0.2s ease; z-index: 20; pointer-events: none;
+        }
+        .social-icon:hover::after, .social-icon:hover::before { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        @media (max-width: 640px) {
+            .social-icon::after, .social-icon::before { display: none; }
+        }
         footer { text-align: center; padding: 3rem 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.8rem; position: relative; z-index: 1; }
         .footer-status { font-family: 'JetBrains Mono', monospace; display: inline-flex; align-items: center; gap: 0.5rem; letter-spacing: 0.02em; }
         .footer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); animation: pulse2 2s infinite; }
@@ -341,18 +372,19 @@
         <div class="hero-content">
             <div class="status-badge">
                 <span class="status-dot"></span>
-                <span data-ru="НА СВЯЗИ · " data-en="ONLINE · ">НА СВЯЗИ · </span><span class="status-alert" data-ru="ОТКРЫТ К НОВЫМ И ИНТЕРЕСНЫМ ПРОЕКТАМ" data-en="OPEN TO NEW & INTERESTING PROJECTS">ОТКРЫТ К НОВЫМ И ИНТЕРЕСНЫМ ПРОЕКТАМ</span>
+                <span data-ru="НА СВЯЗИ · " data-en="ONLINE · ">НА СВЯЗИ · </span><span class="status-alert">#OPENTOWORK</span>
             </div>
             <h1 class="hero-name" data-ru="Дмитрий Парамонов" data-en="Dmitriy Paramonov">Дмитрий Парамонов</h1>
             <p class="hero-title">DevOps Team Lead</p>
-            <p class="hero-location" data-ru="Санкт-Петербург · открыт к переезду и удалёнке · РФ / ОАЭ" data-en="Saint Petersburg · open to relocation & remote · RU / UAE work authorization">Санкт-Петербург · открыт к переезду и удалёнке · РФ / ОАЭ</p>
+            <p class="hero-location" data-ru="СПб · Открыт к переезду и удалёнке в РФ и за её пределами" data-en="SPb · Open to relocation & remote work in Russia and beyond">СПб · Открыт к переезду и удалёнке в РФ и за её пределами</p>
 
-            <div class="hero-specs" aria-label="Также рассматриваю">
-                <span class="hero-spec-tag" data-ru="DevOps-инженер" data-en="DevOps Engineer">DevOps-инженер</span>
-                <span class="hero-spec-tag">CIO</span>
+            <div class="hero-specs" aria-label="Специализации">
+                <span class="hero-spec-tag">DevOps</span>
+                <span class="hero-spec-tag">DevSecOps</span>
+                <span class="hero-spec-tag">MLOps</span>
+                <span class="hero-spec-tag">SRE</span>
                 <span class="hero-spec-tag">CTO</span>
-                <span class="hero-spec-tag" data-ru="Менеджер продукта" data-en="Product Manager">Менеджер продукта</span>
-                <span class="hero-spec-tag" data-ru="Методолог" data-en="Methodologist">Методолог</span>
+                <span class="hero-spec-tag">CIO</span>
             </div>
 
             <!-- Live ops dashboard — replaces photo + terminal -->
@@ -450,8 +482,8 @@
         <p class="section-subtitle" data-ru="кто_я / about_me" data-en="who_am_i / about_me">кто_я / about_me</p>
         <div class="about">
             <div class="about-text fade-in">
-                <p data-ru="Почти 20 лет в IT — прошёл путь от инженера технической поддержки до совладельца бизнеса и CEO/CIO. Последние 9+ лет полностью сфокусирован на DevOps- и SRE-практиках: контейнеризация приложений на Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. Параллельно активно изучаю возможности искусственного интеллекта и нейросетей — тестирую и внедряю AI-инструменты (Claude Code, ChatGPT, DeepSeek, Kimi) для ускорения разработки, анализа кода и автоматизации рутинных DevOps-задач. Открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и ОАЭ."
-                   data-en="Nearly 20 years in IT — from technical support engineer to business co-owner and CEO/CIO. For the past 9+ years I have been fully focused on DevOps and SRE practices: containerizing applications with Docker and orchestrating them on Kubernetes and OpenShift, mainly in fintech projects and bank-grade highload systems. I build production infrastructure with minimal time-to-market, apply DevSecOps practices to improve system reliability, and set up transparent development, testing, and operations processes. Beyond the technical side, I hire, onboard, and mentor engineers, own the backlog, and coordinate developers, SRE, QA, and administrators. In parallel, I actively explore the capabilities of AI and neural networks — testing and adopting AI tools (Claude Code, ChatGPT, DeepSeek, Kimi) to speed up development, analyze code, and automate routine DevOps tasks. Open to interesting projects and long-term collaboration — remote, hybrid, or on-site, in Russia and the UAE.">Почти 20 лет в IT — прошёл путь от инженера технической поддержки до совладельца бизнеса и CEO/CIO. Последние 9+ лет полностью сфокусирован на DevOps- и SRE-практиках: контейнеризация приложений на Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. Параллельно активно изучаю возможности искусственного интеллекта и нейросетей — тестирую и внедряю AI-инструменты (Claude Code, ChatGPT, DeepSeek, Kimi) для ускорения разработки, анализа кода и автоматизации рутинных DevOps-задач. Открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и ОАЭ.</p>
+                <p data-ru="Более 20 лет в IT — прошёл путь от инженера технической поддержки до совладельца бизнеса и CEO/CIO. Последние 9+ лет полностью сфокусирован на DevOps- и SRE-практиках: контейнеризация приложений на Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. Параллельно активно изучаю возможности искусственного интеллекта и нейросетей — тестирую и внедряю AI-инструменты (Claude Code, ChatGPT, DeepSeek, Kimi) для ускорения разработки, анализа кода и автоматизации рутинных DevOps-задач. Открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и ОАЭ."
+                   data-en="More than 20 years in IT — from technical support engineer to business co-owner and CEO/CIO. For the past 9+ years I have been fully focused on DevOps and SRE practices: containerizing applications with Docker and orchestrating them on Kubernetes and OpenShift, mainly in fintech projects and bank-grade highload systems. I build production infrastructure with minimal time-to-market, apply DevSecOps practices to improve system reliability, and set up transparent development, testing, and operations processes. Beyond the technical side, I hire, onboard, and mentor engineers, own the backlog, and coordinate developers, SRE, QA, and administrators. In parallel, I actively explore the capabilities of AI and neural networks — testing and adopting AI tools (Claude Code, ChatGPT, DeepSeek, Kimi) to speed up development, analyze code, and automate routine DevOps tasks. Open to interesting projects and long-term collaboration — remote, hybrid, or on-site, in Russia and the UAE.">Более 20 лет в IT — прошёл путь от инженера технической поддержки до совладельца бизнеса и CEO/CIO. Последние 9+ лет полностью сфокусирован на DevOps- и SRE-практиках: контейнеризация приложений на Docker с оркестрацией в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Строю production-инфраструктуру с минимальным time-to-market, внедряю практики DevSecOps для повышения надёжности систем и выстраиваю прозрачные процессы разработки, тестирования и эксплуатации. Помимо технической части — нанимаю, адаптирую и наставляю инженеров, веду бэклог и координирую работу разработчиков, SRE, QA и администраторов. Параллельно активно изучаю возможности искусственного интеллекта и нейросетей — тестирую и внедряю AI-инструменты (Claude Code, ChatGPT, DeepSeek, Kimi) для ускорения разработки, анализа кода и автоматизации рутинных DevOps-задач. Открыт к интересным проектам и долгосрочному сотрудничеству — удалённо, гибридно или на месте, в России и ОАЭ.</p>
             </div>
             <div class="pillars">
                 <div class="pillar fade-in">
@@ -677,6 +709,7 @@
                     <span class="skill-item" data-tip-ru="Облачная платформа Microsoft" data-tip-en="Microsoft's cloud platform">Microsoft Azure</span>
                     <span class="skill-item" data-tip-ru="Российская облачная платформа" data-tip-en="Russian cloud platform">Яндекс Облако</span>
                     <span class="skill-item" data-tip-ru="Приватное облако Банка ВТБ" data-tip-en="VTB Bank's private cloud">VTB.Cloud</span>
+                    <span class="skill-item" data-tip-ru="Облачная платформа Google" data-tip-en="Google's cloud platform">GCP</span>
                 </div>
             </div>
             <div class="skill-category fade-in">
@@ -729,6 +762,7 @@
                     <span class="skill-item" data-tip-ru="Защищённые VPN-туннели" data-tip-en="Secure VPN tunnels">OpenVPN</span>
                     <span class="skill-item" data-tip-ru="Каталог пользователей и аутентификация" data-tip-en="Directory & authentication service">LDAP</span>
                     <span class="skill-item" data-tip-ru="Бесплатные SSL-сертификаты" data-tip-en="Free SSL certificates">Let's Encrypt</span>
+                    <span class="skill-item" data-tip-ru="Каталог пользователей и групп Windows" data-tip-en="Windows user & group directory">Active Directory</span>
                 </div>
             </div>
             <div class="skill-category fade-in">
@@ -743,10 +777,19 @@
                 </div>
             </div>
             <div class="skill-category fade-in">
+                <div class="skill-category-title"><span class="icon">🌐</span> <span>WEB</span></div>
+                <div class="skill-items">
+                    <span class="skill-item" data-tip-ru="Популярный веб-сервер и обратный proxy" data-tip-en="Popular web server & reverse proxy">NGINX</span>
+                    <span class="skill-item" data-tip-ru="Классический веб-сервер" data-tip-en="Classic web server">Apache</span>
+                    <span class="skill-item" data-tip-ru="Веб-сервер Microsoft для Windows Server" data-tip-en="Microsoft's web server for Windows Server">IIS</span>
+                </div>
+            </div>
+            <div class="skill-category fade-in">
                 <div class="skill-category-title"><span class="icon">🗄️</span> <span data-ru="Данные" data-en="Data">Данные</span></div>
                 <div class="skill-items">
                     <span class="skill-item" data-tip-ru="Реляционная СУБД" data-tip-en="Relational database">PostgreSQL</span>
                     <span class="skill-item" data-tip-ru="Реляционные СУБД" data-tip-en="Relational databases">MySQL / MariaDB</span>
+                    <span class="skill-item" data-tip-ru="СУБД от Microsoft" data-tip-en="Microsoft's database engine">MS SQL</span>
                     <span class="skill-item" data-tip-ru="Потоковая передача событий" data-tip-en="Event streaming platform">Kafka</span>
                     <span class="skill-item" data-tip-ru="Брокер сообщений" data-tip-en="Message broker">ActiveMQ Artemis</span>
                 </div>
@@ -756,6 +799,7 @@
                 <div class="skill-items">
                     <span class="skill-item" data-tip-ru="ITSM-система: заявки, инциденты, лицензии, инвентаризация" data-tip-en="ITSM suite: tickets, incidents, licenses, inventory">GLPI</span>
                     <span class="skill-item" data-ru="ServiceDesk / HelpDesk" data-en="ServiceDesk / HelpDesk" data-tip-ru="Приём и обработка обращений пользователей" data-tip-en="User request intake & handling">ServiceDesk / HelpDesk</span>
+                    <span class="skill-item" data-ru="Управление заявками" data-en="Ticket management" data-tip-ru="Регистрация и обработка заявок пользователей" data-tip-en="Logging & handling user tickets">Управление заявками</span>
                     <span class="skill-item" data-ru="Управление инцидентами" data-en="Incident management" data-tip-ru="Быстрое восстановление сервиса после сбоя" data-tip-en="Fast service restoration after outages">Управление инцидентами</span>
                     <span class="skill-item" data-ru="Управление проблемами" data-en="Problem management" data-tip-ru="Поиск и устранение корневых причин" data-tip-en="Root-cause analysis & resolution">Управление проблемами</span>
                     <span class="skill-item" data-ru="Управление изменениями" data-en="Change management" data-tip-ru="Контролируемое внедрение изменений" data-tip-en="Controlled rollout of changes">Управление изменениями</span>
@@ -775,11 +819,11 @@
             <div class="skill-category fade-in">
                 <div class="skill-category-title"><span class="icon">📋</span> <span data-ru="Управление" data-en="Management">Управление</span></div>
                 <div class="skill-items">
-                    <span class="skill-item" data-tip-ru="Безопасность встроена в CI/CD" data-tip-en="Security built into CI/CD">DevSecOps</span>
-                    <span class="skill-item" data-tip-ru="Инженерная надёжность эксплуатации" data-tip-en="Engineering reliability for operations">SRE</span>
                     <span class="skill-item" data-tip-ru="Планирование развития продукта" data-tip-en="Product development planning">Roadmap</span>
-                    <span class="skill-item" data-ru="Управление бэклогом" data-en="Backlog management" data-tip-ru="Приоритизация задач команды" data-tip-en="Team task prioritization">Управление бэклогом</span>
-                    <span class="skill-item" data-ru="Наём и наставничество" data-en="Hiring & mentoring" data-tip-ru="Подбор и развитие специалистов" data-tip-en="Hiring & developing specialists">Наём и наставничество</span>
+                    <span class="skill-item" data-tip-ru="Визуализация потока задач по колонкам" data-tip-en="Visualizing task flow across columns">Kanban</span>
+                    <span class="skill-item" data-tip-ru="Итеративное управление разработкой" data-tip-en="Iterative development management">Scrum</span>
+                    <span class="skill-item" data-tip-ru="Программа наставничества над Junior/Middle" data-tip-en="Mentorship program for Junior/Middle specialists">Buddy</span>
+                    <span class="skill-item" data-tip-ru="Выстраивание рабочих процессов команды" data-tip-en="Designing team workflows">WorkFlow</span>
                 </div>
             </div>
         </div>
@@ -796,18 +840,15 @@
                     <span class="contact-icon">⬇</span>
                     <span id="resume-btn-text" data-ru="Скачать резюме" data-en="Download resume">Скачать резюме</span>
                 </a>
-                <a href="https://www.linkedin.com/in/topdevops" class="contact-btn linkedin" target="_blank" rel="noopener">
-                    <span class="contact-icon">in</span>
-                    <span>LinkedIn</span>
+            </div>
+            <div class="social-icons">
+                <a href="https://www.linkedin.com/in/topdevops" class="social-icon linkedin-icon" target="_blank" rel="noopener" aria-label="LinkedIn" data-tip-ru="Связаться со мной в LinkedIn" data-tip-en="Connect with me on LinkedIn">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM3.556 20.452h3.564V9H3.556v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
                 </a>
-                <a href="https://t.me/TopDevOps" class="contact-btn telegram" target="_blank" rel="noopener">
-                    <span class="contact-icon">✈️</span>
-                    <span>Telegram</span>
+                <a href="https://t.me/TopDevOps" class="social-icon telegram-icon" target="_blank" rel="noopener" aria-label="Telegram" data-tip-ru="Написать мне в Telegram" data-tip-en="Message me on Telegram">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.568 8.16c-.18 1.897-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.79-.417-1.225.258-1.932.177-.185 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212-.07-.062-.174-.041-.249-.024-.106.024-1.793 1.14-5.062 3.345-.479.329-.913.489-1.302.48-.428-.009-1.252-.242-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.014 3.332-1.362 4.025-1.598 4.476-1.606.099-.002.321.023.465.14.12.1.153.235.166.335.014.104.024.294.006.51z"/></svg>
                 </a>
-                <a href="mailto:forestplus@ya.ru" class="contact-btn email">
-                    <span class="contact-icon">📧</span>
-                    <span data-ru="Email" data-en="Email">Email</span>
-                </a>
+                <a href="mailto:forestplus@ya.ru" class="social-icon email-icon" aria-label="Email" data-tip-ru="Отправить мне письмо" data-tip-en="Send me an email">@</a>
             </div>
         </div>
     </section>
@@ -816,9 +857,9 @@
     <footer>
         <p class="footer-status">
             <span class="footer-dot"></span>
-            <span data-ru="Дмитрий Парамонов · DevOps Team Lead · Санкт-Петербург / ОАЭ" data-en="Dmitriy Paramonov · DevOps Team Lead · Saint Petersburg / UAE">Дмитрий Парамонов · DevOps Team Lead · Санкт-Петербург / ОАЭ</span>
+            <span data-ru="Дмитрий Парамонов · DevOps Team Lead" data-en="Dmitriy Paramonov · DevOps Team Lead">Дмитрий Парамонов · DevOps Team Lead</span>
         </p>
-        <p style="margin-top:0.5rem; font-size:0.7rem;" data-ru="© 2026 Дмитрий Парамонов" data-en="© 2026 Dmitriy Paramonov">© 2026 Дмитрий Парамонов</p>
+        <p style="margin-top:0.5rem; font-size:0.7rem; color:#ffffff;" data-ru="© 2026 Дмитрий Парамонов" data-en="© 2026 Dmitriy Paramonov">© 2026 Дмитрий Парамонов</p>
         <p style="margin-top:0.8rem;">
             <img src="https://visitor-badge.laobi.icu/badge?page_id=forestplus.TopDevOps&left_text=visitors" alt="visitors" loading="lazy" style="height:20px; opacity:0.85; vertical-align:middle;" onerror="this.style.display='none'">
         </p>
