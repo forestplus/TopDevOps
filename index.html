@@ -167,7 +167,25 @@
             background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-        .hero-title { font-size: 1.2rem; color: var(--accent-purple); font-weight: 600; text-align: center; }
+        .hero-title {
+            font-size: 1.9rem; font-weight: 800; text-align: center; text-transform: uppercase;
+            letter-spacing: 0.12em; font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink), var(--accent-orange), var(--accent-cyan));
+            background-size: 300% 100%;
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+            animation: titleGradient 5s linear infinite;
+            filter: drop-shadow(0 0 18px rgba(0,212,255,0.35));
+        }
+        @keyframes titleGradient {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .hero-title { animation: none; background-position: 0% 50%; }
+        }
+        @media (max-width: 640px) {
+            .hero-title { font-size: 1.3rem; letter-spacing: 0.06em; }
+        }
         .hero-location { color: var(--text-secondary); font-size: 0.9rem; text-align: center; }
         .hero-cta { margin-top: 1rem; }
         .stats {
