@@ -231,6 +231,9 @@
         .timeline-tag { font-size: 0.7rem; padding: 0.2rem 0.6rem; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); border-radius: 4px; color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; }
         .expand-hint { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic; }
         .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
+        @media (min-width: 960px) {
+            .skill-category:last-child { grid-column: 2; }
+        }
         .skill-category { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; transition: all 0.4s ease; }
         .skill-category:hover { border-color: var(--accent-cyan); box-shadow: 0 5px 30px rgba(0,212,255,0.08); }
         .skill-category-title { font-weight: 700; font-size: 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
@@ -310,7 +313,8 @@
             .social-icon::after, .social-icon::before { display: none; }
         }
         footer { text-align: center; padding: 3rem 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.8rem; position: relative; z-index: 1; }
-        .footer-status { font-family: 'JetBrains Mono', monospace; display: inline-flex; align-items: center; gap: 0.5rem; letter-spacing: 0.02em; }
+        .footer-status { font-family: 'JetBrains Mono', monospace; display: inline-flex; align-items: center; gap: 0.5rem; letter-spacing: 0.02em; flex-wrap: wrap; justify-content: center; max-width: 90vw; }
+        .footer-tags { font-size: 0.72rem; }
         .footer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); animation: pulse2 2s infinite; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { opacity: 0; transform: translateY(30px); transition: all 0.6s ease; }
@@ -857,7 +861,7 @@
     <footer>
         <p class="footer-status">
             <span class="footer-dot"></span>
-            <span data-ru="Дмитрий Парамонов · DevOps Team Lead" data-en="Dmitriy Paramonov · DevOps Team Lead">Дмитрий Парамонов · DevOps Team Lead</span>
+            <span class="footer-tags">#DevOps #DevSecOps #MLOps #SRE #CTO #CIO #ITManager #ITTeamLead</span>
         </p>
         <p style="margin-top:0.5rem; font-size:0.7rem; color:#ffffff;" data-ru="© 2026 Дмитрий Парамонов" data-en="© 2026 Dmitriy Paramonov">© 2026 Дмитрий Парамонов</p>
         <p style="margin-top:0.8rem;">
