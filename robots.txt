@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://forestplus.github.io/TopDevOps/sitemap.xml
