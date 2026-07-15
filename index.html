@@ -251,32 +251,6 @@
         .spotlight:hover::after { opacity: 1; }
         @media (pointer: coarse) { .spotlight::after { display: none; } }
 
-        /* Interactive terminal */
-        .interactive-terminal {
-            max-width: 720px; margin: 0 auto;
-            background: linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
-            backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%);
-            border: 1px solid rgba(255,255,255,0.09); border-radius: 14px; overflow: hidden;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 8px 32px rgba(0,0,0,0.3);
-        }
-        .iterm-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
-        .iterm-dot { width: 10px; height: 10px; border-radius: 50%; }
-        .iterm-dot.r { background: #ff5f56; } .iterm-dot.y { background: #ffbd2e; } .iterm-dot.g { background: #27c93f; }
-        .iterm-bar-title { margin-left: 0.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); }
-        .iterm-body { padding: 1.1rem 1.2rem; height: 220px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; line-height: 1.7; color: var(--text-secondary); position: relative; z-index: 1; }
-        .iterm-body b { color: var(--accent-cyan); }
-        .iterm-line { margin-bottom: 0.35rem; white-space: pre-wrap; word-break: break-word; }
-        .iterm-line.cmd { color: var(--accent-green); }
-        .iterm-line.err { color: var(--accent-pink); }
-        .iterm-input-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.8rem 1.2rem; border-top: 1px solid rgba(255,255,255,0.08); position: relative; z-index: 1; }
-        .iterm-prompt { color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; font-weight: 700; }
-        #iterm-input {
-            flex: 1; background: transparent; border: none; outline: none; color: var(--text-primary);
-            font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; caret-color: var(--accent-cyan);
-        }
-        #iterm-input::placeholder { color: var(--text-muted); }
-        .iterm-body::-webkit-scrollbar { width: 6px; }
-        .iterm-body::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 3px; }
 
         /* full-width AI/ML news ticker */
         .news-ticker-bar {
@@ -794,25 +768,6 @@
         </div>
     </section>
 
-    <!-- Interactive Terminal -->
-    <section id="terminal-playground">
-        <h2 class="section-title" data-ru="Терминал" data-en="Terminal">Терминал</h2>
-        <p class="section-subtitle" data-ru="попробуй сам //" data-en="try it yourself //">попробуй сам //</p>
-        <div class="interactive-terminal spotlight">
-            <div class="iterm-bar">
-                <span class="iterm-dot r"></span><span class="iterm-dot y"></span><span class="iterm-dot g"></span>
-                <span class="iterm-bar-title">guest@dmitriy-devops:~</span>
-            </div>
-            <div class="iterm-body" id="iterm-output">
-                <div class="iterm-line" data-ru="Добро пожаловать! Введите <b>help</b>, чтобы увидеть команды." data-en="Welcome! Type <b>help</b> to see available commands.">Добро пожаловать! Введите <b>help</b>, чтобы увидеть команды.</div>
-            </div>
-            <div class="iterm-input-row">
-                <span class="iterm-prompt">$</span>
-                <input type="text" id="iterm-input" autocomplete="off" spellcheck="false" data-ru-placeholder="введите команду…" data-en-placeholder="type a command…" placeholder="введите команду…">
-            </div>
-        </div>
-    </section>
-
     <!-- Experience -->
     <section id="experience">
         <h2 class="section-title" data-ru="Опыт работы" data-en="Work Experience">Опыт работы</h2>
@@ -1163,9 +1118,7 @@
             <span class="footer-tags">#DevOps #DevSecOps #MLOps #SRE #CTO #CIO #ITManager</span>
         </p>
         <p style="margin-top:0.5rem; font-size:0.7rem; color:#ffffff;" data-ru="© 2026 Дмитрий Парамонов" data-en="© 2026 Dmitriy Paramonov">© 2026 Дмитрий Парамонов</p>
-        <p style="margin-top:0.8rem;">
-            <img src="https://komarev.com/ghpvc/?username=forestplus-topdevops&label=visitors&color=0d9488&style=flat" alt="visitors" loading="lazy" style="height:20px; opacity:0.85; vertical-align:middle;" onerror="this.style.display='none'">
-        </p>
+        <p style="margin-top:0.8rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--text-muted);" id="visitor-count-line"></p>
     </footer>
 
     <script>
@@ -1308,8 +1261,14 @@
         function toggleDetails(el) {
             const details = el.querySelector('.timeline-details');
             const hint = el.querySelector('.expand-hint');
+            const expanding = !details.classList.contains('expanded');
             details.classList.toggle('expanded');
-            const expanded = details.classList.contains('expanded');
+            if (expanding) {
+                details.style.maxHeight = details.scrollHeight + 40 + 'px';
+            } else {
+                details.style.maxHeight = '';
+            }
+            const expanded = expanding;
             const ruText = expanded ? '▸ Свернуть' : '▸ Нажмите, чтобы раскрыть';
             const enText = expanded ? '▸ Collapse' : '▸ Click to expand';
             hint.dataset.ru = ruText;
@@ -1326,10 +1285,6 @@
             document.querySelectorAll('[data-ru]').forEach(el => {
                 el.textContent = el.dataset[lang];
             });
-            const itermInput = document.getElementById('iterm-input');
-            if (itermInput) {
-                itermInput.setAttribute('placeholder', itermInput.dataset[lang + 'Placeholder']);
-            }
             const resumeBtn = document.getElementById('resume-btn');
             const resumeBtnHero = document.getElementById('resume-btn-hero');
             const resumeHref = lang === 'en' ? 'resume_en.pdf' : 'resume.pdf';
@@ -1380,75 +1335,58 @@
                 .catch(() => renderTicker(FALLBACK_LINKS));
         })();
 
-        // ========== INTERACTIVE TERMINAL ==========
+        // ========== VISITOR COUNTER (fetch-based) ==========
         (function () {
-            const input = document.getElementById('iterm-input');
-            const output = document.getElementById('iterm-output');
-            if (!input || !output) return;
+            const lineEl = document.getElementById('visitor-count-line');
+            if (!lineEl) return;
+            fetch('https://api.counterapi.dev/v1/forestplus-topdevops/site-visits/up')
+                .then((r) => { if (!r.ok) throw new Error('bad response'); return r.json(); })
+                .then((data) => {
+                    const count = data && (data.count ?? data.value);
+                    if (typeof count === 'number') {
+                        lineEl.textContent = `visitors: ${count}`;
+                    }
+                })
+                .catch(() => { /* silently do nothing — many browsers/adblockers block this, that's fine */ });
+        })();
 
-            function line(text, cls) {
-                const d = document.createElement('div');
-                d.className = 'iterm-line' + (cls ? ' ' + cls : '');
-                d.innerHTML = text;
-                output.appendChild(d);
-                output.scrollTop = output.scrollHeight;
+        // ========== HOVER TICK SOUNDS ==========
+        (function () {
+            if (!window.matchMedia('(pointer: fine)').matches) return;
+            let actx = null;
+            function ensureCtx() {
+                if (!actx) {
+                    const AC = window.AudioContext || window.webkitAudioContext;
+                    if (AC) actx = new AC();
+                }
+                if (actx && actx.state === 'suspended') actx.resume();
+            }
+            window.addEventListener('pointerdown', ensureCtx, { once: true });
+
+            function tick() {
+                if (!actx) return;
+                const t0 = actx.currentTime;
+                const osc = actx.createOscillator();
+                const gain = actx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1400, t0);
+                osc.frequency.exponentialRampToValueAtTime(900, t0 + 0.035);
+                gain.gain.setValueAtTime(0, t0);
+                gain.gain.linearRampToValueAtTime(0.035, t0 + 0.004);
+                gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.05);
+                osc.connect(gain).connect(actx.destination);
+                osc.start(t0);
+                osc.stop(t0 + 0.06);
             }
 
-            const COMMANDS = {
-                help: {
-                    ru: 'Доступные команды: <b>whoami</b>, <b>skills</b>, <b>experience</b>, <b>contact</b>, <b>resume</b>, <b>clear</b>',
-                    en: 'Available commands: <b>whoami</b>, <b>skills</b>, <b>experience</b>, <b>contact</b>, <b>resume</b>, <b>clear</b>',
-                },
-                whoami: {
-                    ru: 'Дмитрий Парамонов — DevOps/SRE Team Lead. 20+ лет в IT, 9 лет в DevOps/SRE.',
-                    en: 'Dmitriy Paramonov — DevOps/SRE Team Lead. 20+ years in IT, 9 years in DevOps/SRE.',
-                },
-                skills: {
-                    ru: 'Kubernetes · Docker · OpenShift · CI/CD · Ansible · Terraform-style IaC · DevSecOps · ITSM/ITIL · AWS/Azure/GCP',
-                    en: 'Kubernetes · Docker · OpenShift · CI/CD · Ansible · IaC · DevSecOps · ITSM/ITIL · AWS/Azure/GCP',
-                },
-                experience: {
-                    ru: '10 компаний, 17+ лет опыта. Сейчас: DevOps Team Lead @ Crypto Industry International.',
-                    en: '10 companies, 17+ years of experience. Currently: DevOps Team Lead @ Crypto Industry International.',
-                },
-                contact: {
-                    ru: 'Email: forestplus@ya.ru · Telegram: t.me/TopDevOps · LinkedIn: linkedin.com/in/topdevops',
-                    en: 'Email: forestplus@ya.ru · Telegram: t.me/TopDevOps · LinkedIn: linkedin.com/in/topdevops',
-                },
-                resume: {
-                    ru: 'Открываю резюме…',
-                    en: 'Opening resume…',
-                },
-                sudo: {
-                    ru: 'Хорошая попытка \u{1F609}',
-                    en: 'Nice try \u{1F609}',
-                },
-            };
-
-            input.addEventListener('keydown', (e) => {
-                if (e.key !== 'Enter') return;
-                const raw = input.value.trim();
-                if (!raw) return;
-                const cmd = raw.toLowerCase();
-                line('<span class="iterm-prompt">$</span> ' + raw, 'cmd');
-                input.value = '';
-
-                if (cmd === 'clear') {
-                    output.innerHTML = '';
-                    return;
-                }
-                if (COMMANDS[cmd]) {
-                    line(COMMANDS[cmd][currentLang] || COMMANDS[cmd].ru);
-                    if (cmd === 'resume') {
-                        const href = currentLang === 'en' ? 'resume_en.pdf' : 'resume.pdf';
-                        setTimeout(() => { window.open(href, '_blank'); }, 400);
-                    }
-                    return;
-                }
-                const notFound = currentLang === 'en'
-                    ? `command not found: ${raw} — type <b>help</b>`
-                    : `команда не найдена: ${raw} — введите <b>help</b>`;
-                line(notFound, 'err');
+            let lastTick = 0;
+            document.querySelectorAll('.spotlight, .social-icon, .contact-btn, .skill-item').forEach((el) => {
+                el.addEventListener('mouseenter', () => {
+                    const now = performance.now();
+                    if (now - lastTick < 40) return; // debounce rapid re-triggers
+                    lastTick = now;
+                    tick();
+                });
             });
         })();
 
