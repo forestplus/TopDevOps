@@ -1166,7 +1166,7 @@
         }
 
         function particleCountFor(w, h) {
-            return Math.min(220, Math.max(80, Math.floor((w * h) / 9000)));
+            return Math.min(380, Math.max(90, Math.floor((w * h) / 5500)));
         }
         for (let i = 0; i < particleCountFor(canvas.width, canvas.height); i++) particles.push(new Particle());
         window.addEventListener('resize', () => {
@@ -1184,11 +1184,11 @@
                     const dx = particles[i].x - particles[j].x;
                     const dy = particles[i].y - particles[j].y;
                     const dist = Math.sqrt(dx*dx + dy*dy);
-                    if (dist < 120) {
+                    if (dist < 170) {
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = `rgba(0, 212, 255, ${0.1 * (1 - dist/120)})`;
+                        ctx.strokeStyle = `rgba(0, 212, 255, ${0.1 * (1 - dist/170)})`;
                         ctx.lineWidth = 0.5;
                         ctx.stroke();
                     }
