@@ -782,11 +782,11 @@
                     <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
                     <div class="timeline-details">
                         <ul>
-                            <li data-ru="Обеспечивал стабильную работу микросервисной инфраструктуры, вёл инцидент-менеджмент" data-en="Ensured stable operation of the microservices infrastructure; led incident management">Обеспечивал стабильную работу микросервисной инфраструктуры, вёл инцидент-менеджмент</li>
-                            <li data-ru="Проектировал архитектуру продуктов совместно с владельцами и архитекторами" data-en="Contributed to software architecture design together with product owners and architects">Проектировал архитектуру продуктов совместно с владельцами и архитекторами</li>
-                            <li data-ru="Разработал регламенты разработки, тестирования и сопровождения" data-en="Developed development, testing, and maintenance guidelines">Разработал регламенты разработки, тестирования и сопровождения</li>
-                            <li data-ru="Организовал наём, онбординг и обучение технических специалистов" data-en="Organized hiring, onboarding, and training of technical specialists">Организовал наём, онбординг и обучение технических специалистов</li>
-                            <li data-ru="Внедрил CI/CD-процессы и автоматизированное масштабирование инфраструктуры" data-en="Implemented CI/CD processes and automated infrastructure scaling">Внедрил CI/CD-процессы и автоматизированное масштабирование инфраструктуры</li>
+                            <li data-ru="Обеспечиваю стабильную работу микросервисной инфраструктуры, веду инцидент-менеджмент" data-en="Ensure stable operation of the microservices infrastructure; lead incident management">Обеспечиваю стабильную работу микросервисной инфраструктуры, веду инцидент-менеджмент</li>
+                            <li data-ru="Проектирую архитектуру продуктов совместно с владельцами и архитекторами" data-en="Contribute to software architecture design together with product owners and architects">Проектирую архитектуру продуктов совместно с владельцами и архитекторами</li>
+                            <li data-ru="Разрабатываю регламенты разработки, тестирования и сопровождения" data-en="Develop development, testing, and maintenance guidelines">Разрабатываю регламенты разработки, тестирования и сопровождения</li>
+                            <li data-ru="Организую наём, онбординг и обучение технических специалистов" data-en="Organize hiring, onboarding, and training of technical specialists">Организую наём, онбординг и обучение технических специалистов</li>
+                            <li data-ru="Внедряю CI/CD-процессы и автоматизированное масштабирование инфраструктуры" data-en="Implement CI/CD processes and automated infrastructure scaling">Внедряю CI/CD-процессы и автоматизированное масштабирование инфраструктуры</li>
                         </ul>
                     </div>
                 </div>
@@ -1339,12 +1339,11 @@
         (function () {
             const lineEl = document.getElementById('visitor-count-line');
             if (!lineEl) return;
-            fetch('https://api.counterapi.dev/v1/forestplus-topdevops/site-visits/up')
+            fetch('https://api.countapi.xyz/hit/forestplus-topdevops/site-visits')
                 .then((r) => { if (!r.ok) throw new Error('bad response'); return r.json(); })
                 .then((data) => {
-                    const count = data && (data.count ?? data.value);
-                    if (typeof count === 'number') {
-                        lineEl.textContent = `visitors: ${count}`;
+                    if (data && typeof data.value === 'number') {
+                        lineEl.textContent = `visitors: ${data.value}`;
                     }
                 })
                 .catch(() => { /* silently do nothing — many browsers/adblockers block this, that's fine */ });
