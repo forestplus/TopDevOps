@@ -54,17 +54,14 @@
             gap: 25px;
         }
 
-        .photo-placeholder {
+        /* Стиль для фото */
+        .profile-photo {
             width: 140px;
             height: 140px;
-            background-color: #334155;
             border-radius: 50%;
+            object-fit: cover; /* Чтобы фото не растягивалось */
             margin: 0 auto 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            color: #94a3b8;
+            display: block;
             border: 3px solid #475569;
         }
 
@@ -340,10 +337,9 @@
     <div class="resume-container">
         <!-- ЛЕВАЯ КОЛОНКА -->
         <div class="left-column">
-            <!-- Фото (замените ссылку на свое фото, если нужно) -->
-            <div class="photo-placeholder">
-                ФОТО
-            </div>
+            <!-- Фото -->
+            <!-- Убедитесь, что файл photo.jpg лежит в одной папке с этим html-файлом -->
+            <img src="photo.jpg" alt="Парамонов Дмитрий" class="profile-photo">
 
             <div class="left-section contact-info">
                 <h3>👤 Обо мне</h3>
