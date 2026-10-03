@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Резюме - Парамонов Дмитрий</title>
+    <style>
+        :root {
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #ffffff;
+            --main-bg: #ffffff;
+            --main-text: #333333;
+            --accent-color: #3b82f6;
+            --tag-bg: #e0f2fe;
+            --tag-text: #0369a1;
+            --border-color: #e2e8f0;
+            --secondary-text: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f1f5f9;
+            color: var(--main-text);
+            line-height: 1.5;
+            font-size: 13px;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .resume-container {
+            width: 210mm;
+            min-height: 297mm;
+            background-color: var(--main-bg);
+            display: flex;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* ЛЕВАЯ КОЛОНКА */
+        .left-column {
+            width: 32%;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .photo-placeholder {
+            width: 140px;
+            height: 140px;
+            background-color: #334155;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #94a3b8;
+            border: 3px solid #475569;
+        }
+
+        .left-section h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #475569;
+            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .left-section ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .left-section ul li {
+            position: relative;
+            padding-left: 15px;
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+
+        .left-section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #60a5fa;
+            font-weight: bold;
+        }
+
+        .contact-info p {
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ПРАВАЯ КОЛОНКА */
+        .right-column {
+            width: 68%;
+            padding: 35px 30px;
+            background-color: var(--main-bg);
+        }
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #0f172a;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        .header h2 {
+            font-size: 16px;
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .header-contacts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 12px;
+            color: var(--secondary-text);
+            margin-bottom: 15px;
+        }
+
+        .header-contacts span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .summary {
+            font-size: 13px;
+            color: #475569;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .tag {
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 16px;
+            color: #0f172a;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        /* ОПЫТ РАБОТЫ */
+        .job {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .job-dates {
+            width: 100px;
+            flex-shrink: 0;
+            font-size: 11px;
+            color: var(--secondary-text);
+            font-weight: 600;
+            padding-top: 2px;
+        }
+
+        .job-details {
+            flex-grow: 1;
+        }
+
+        .job-details h3 {
+            font-size: 14px;
+            color: #0f172a;
+            margin-bottom: 3px;
+        }
+
+        .company {
+            font-size: 12px;
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .job-description {
+            font-size: 12px;
+            color: #475569;
+            margin-bottom: 10px;
+        }
+
+        .tasks-results {
+            display: flex;
+            gap: 15px;
+            background-color: #f8fafc;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+
+        .tasks-results > div {
+            flex: 1;
+        }
+
+        .tasks-results h4 {
+            font-size: 11px;
+            color: #0f172a;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .tasks-results ul {
+            list-style: none;
+            font-size: 11px;
+            color: #475569;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .tasks-results ul li {
+            position: relative;
+            padding-left: 12px;
+        }
+
+        .tasks-results ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        /* ОБРАЗОВАНИЕ И ДОПОЛНИТЕЛЬНО */
+        .edu-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .edu-dates {
+            width: 100px;
+            flex-shrink: 0;
+            font-size: 11px;
+            color: var(--secondary-text);
+            font-weight: 600;
+        }
+
+        .edu-details h3 {
+            font-size: 13px;
+            color: #0f172a;
+        }
+
+        .edu-details p {
+            font-size: 12px;
+            color: var(--secondary-text);
+        }
+
+        .additional-list {
+            list-style: none;
+            font-size: 12px;
+            color: #475569;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .additional-list li {
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .additional-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        /* ПЕЧАТЬ */
+        @media print {
+            body {
+                background-color: #fff;
+                padding: 0;
+                margin: 0;
+            }
+            .resume-container {
+                box-shadow: none;
+                width: 100%;
+                min-height: 100%;
+            }
+            .left-column {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .tag, .tasks-results {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="resume-container">
+        <!-- ЛЕВАЯ КОЛОНКА -->
+        <div class="left-column">
+            <!-- Фото (замените ссылку на свое фото, если нужно) -->
+            <div class="photo-placeholder">
+                ФОТО
+            </div>
+
+            <div class="left-section contact-info">
+                <h3>👤 Обо мне</h3>
+                <p>📍 Возраст: 42 года</p>
+                <p>📍 Город: Санкт-Петербург</p>
+                <p>🇬🇧 Английский: B2</p>
+                <p>💼 Готов к переезду (Москва) и командировкам</p>
+                <p>💻 Формат: удаленно, гибрид, на месте</p>
+            </div>
+
+            <div class="left-section">
+                <h3>⚙️ Ключевые навыки</h3>
+                <ul>
+                    <li>DevOps / SRE</li>
+                    <li>Kubernetes / OpenShift</li>
+                    <li>Docker / Ansible</li>
+                    <li>CI/CD (GitLab, Jenkins)</li>
+                    <li>Облака (Azure, AWS, Yandex)</li>
+                    <li>Мониторинг (Prometheus, Zabbix)</li>
+                    <li>Управление командой</li>
+                    <li>ITIL / ITSM</li>
+                    <li>AI-инструменты (ChatGPT, Claude)</li>
+                </ul>
+            </div>
+
+            <div class="left-section">
+                <h3>⭐ Личные качества</h3>
+                <ul>
+                    <li>Системное мышление</li>
+                    <li>Ориентация на результат</li>
+                    <li>Лидерство и наставничество</li>
+                    <li>Стрессоустойчивость</li>
+                    <li>Быстрая обучаемость</li>
+                </ul>
+            </div>
+
+            <div class="left-section">
+                <h3>❤️ Интересы</h3>
+                <ul>
+                    <li>AI / ML и нейросети</li>
+                    <li>Криптовалюты и финтех</li>
+                    <li>Автомобили</li>
+                    <li>Спорт</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ПРАВАЯ КОЛОНКА -->
+        <div class="right-column">
+            <div class="header">
+                <h1>Парамонов Дмитрий</h1>
+                <h2>DevOps Team Lead | CTO | CIO</h2>
+                <div class="header-contacts">
+                    <span>📍 Санкт-Петербург</span>
+                    <span>✉️ forestplus@ya.ru</span>
+                    <span>📱 @TopDevOps</span>
+                    <span>🔗 linkedin.com/in/topdevops</span>
+                </div>
+            </div>
+
+            <div class="summary">
+                Прошёл путь от системного администратора до совладельца бизнеса и CEO/CIO. Последние 9+ лет сфокусирован на DevOps- и SRE-практиках: контейнеризация, оркестрация в Kubernetes и OpenShift, преимущественно в финтех-проектах и highload-системах банковского уровня. Стремлюсь обеспечивать минимальный time-to-market и внедряю DevSecOps. Активно внедряю AI-инструменты для автоматизации рутинных задач.
+            </div>
+
+            <div class="tags">
+                <span class="tag">DevOps</span>
+                <span class="tag">Kubernetes</span>
+                <span class="tag">Docker</span>
+                <span class="tag">CI/CD</span>
+                <span class="tag">Ansible</span>
+                <span class="tag">Cloud</span>
+                <span class="tag">SRE</span>
+                <span class="tag">DevSecOps</span>
+            </div>
+
+            <div class="section-title">💼 Опыт работы</div>
+
+            <!-- Job 1 -->
+            <div class="job">
+                <div class="job-dates">Июнь 2023 — наст. время<br>(1 год 4 мес.)</div>
+                <div class="job-details">
+                    <h3>DevOps Team Lead</h3>
+                    <div class="company">Crypto Industry International, ОАЭ</div>
+                    <div class="job-description">Организация, управление и развитие DevOps-процессов компании.</div>
+                    <div class="tasks-results">
+                        <div>
+                            <h4>Задачи:</h4>
+                            <ul>
+                                <li>Обеспечение стабильной работы микросервисной инфраструктуры</li>
+                                <li>Проектирование архитектуры программных продуктов</li>
+                                <li>Разработка регламентов разработки и тестирования</li>
+                                <li>Организация найма и обучение технических специалистов</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Результаты:</h4>
+                            <ul>
+                                <li>Выстроен производственный процесс для ИС</li>
+                                <li>Внедрены CI/CD-процессы и автомасштабирование</li>
+                                <li>Организован мониторинг производительности и доступности</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job 2 -->
+            <div class="job">
+                <div class="job-dates">Апр 2021 — Июнь 2023<br>(2 года 3 мес.)</div>
+                <div class="job-details">
+                    <h3>Lead DevOps</h3>
+                    <div class="company">Иннотех, Группа компаний, Москва (Клиент: Банк ВТБ)</div>
+                    <div class="tasks-results">
+                        <div>
+                            <h4>Задачи:</h4>
+                            <ul>
+                                <li>Руководство DevOps-направлением на двух крупных стримах</li>
+                                <li>Подготовка обучающих материалов и демо-сессий</li>
+                                <li>Участие в аудитах ИБ и приёмо-сдаточных испытаниях</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Результаты:</h4>
+                            <ul>
+                                <li>Мигрирован CI/CD-конвейер на DreamPipe (TeamCity + Helm)</li>
+                                <li>Переведены очереди сообщений с IBM MQ на ArtemisMQ</li>
+                                <li>Выстроен CI/CD-процесс DEV → ST → IFT → LT → Pre-Prod → PROD</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job 3 -->
+            <div class="job">
+                <div class="job-dates">Дек 2018 — Апр 2021<br>(2 года 5 мес.)</div>
+                <div class="job-details">
+                    <h3>Senior DevOps</h3>
+                    <div class="company">DELL, Россия, dell.com</div>
+                    <div class="tasks-results">
+                        <div>
+                            <h4>Задачи:</h4>
+                            <ul>
+                                <li>Администрирование Atlassian Stack (Jira, Confluence, Bitbucket)</li>
+                                <li>Проведение аудита legacy-инфраструктуры</li>
+                                <li>Разработка матрицы ответственности по стеку</li>
+                                <li>Настройка мониторинга (Prometheus, Grafana)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Результаты:</h4>
+                            <ul>
+                                <li>Подготовлена дорожная карта модернизации технологического стека</li>
+                                <li>Внедрена система резервного копирования (UrBackup)</li>
+                                <li>Развернуты кластеры Kubernetes «с нуля» в гибридном облаке</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job 4 -->
+            <div class="job">
+                <div class="job-dates">Фев 2018 — Авг 2018<br>(7 мес.)</div>
+                <div class="job-details">
+                    <h3>Middle DevOps</h3>
+                    <div class="company">FINOM, Санкт-Петербург, finom.io</div>
+                    <div class="tasks-results">
+                        <div>
+                            <h4>Задачи:</h4>
+                            <ul>
+                                <li>Построение DevOps-процессов с нуля для криптоотрасли</li>
+                                <li>Развертывание сервиса облачного майнинга и торгового терминала</li>
+                                <li>Перенос Jira и Confluence с облака на собственные серверы</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Результаты:</h4>
+                            <ul>
+                                <li>Выстроен CI/CD на базе GitLab (Test → Pre-Prod → Production)</li>
+                                <li>Настроен мониторинг на Nagios и Zabbix</li>
+                                <li>Настроено резервное копирование данных в Amazon S3</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ранний опыт (сокращенно) -->
+            <div class="job">
+                <div class="job-dates">2006 — 2018</div>
+                <div class="job-details">
+                    <h3>Ранний опыт (CEO, CIO, Senior SysAdmin)</h3>
+                    <div class="company">IThelperSPb, ОВК, Микрозаймфинанс, Т-Банк, ЛЕКСПРО</div>
+                    <div class="job-description">
+                        Управление IT-инфраструктурой, внедрение ITSM/ITIL, виртуализация (VMware, Hyper-V), администрирование Windows/Linux, разработка и внедрение CRM/ERP, построение бизнеса с нуля.
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">🎓 Образование</div>
+            <div class="edu-item">
+                <div class="edu-dates">2006</div>
+                <div class="edu-details">
+                    <h3>SOFTLINE</h3>
+                    <p>«Внедрение сетевой инфраструктуры Microsoft Windows Server 2003»</p>
+                </div>
+            </div>
+
+            <div class="section-title">📋 Дополнительно</div>
+            <ul class="additional-list">
+                <li>Опыт работы с нейросетями и AI-инструментами (Claude Code, ChatGPT, DeepSeek, Kimi) для ускорения разработки и анализа кода.</li>
+                <li>Права категории B, собственный автомобиль.</li>
+                <li>Рекомендации: ПрофИТ Солюшенз (IT Director), FINOM (HR Director).</li>
+            </ul>
+
+        </div>
+    </div>
+
+</body>
+</html>
