@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume - Dmitry Paramonov (LinkedIn Slides)</title>
+    <style>
+        :root {
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #ffffff;
+            --main-bg: #ffffff;
+            --main-text: #333333;
+            --accent-color: #3b82f6;
+            --tag-bg: #e0f2fe;
+            --tag-text: #0369a1;
+            --border-color: #e2e8f0;
+            --secondary-text: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #cbd5e1; /* Серый фон, чтобы видеть границы слайдов */
+            color: var(--main-text);
+            line-height: 1.4;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Стиль отдельного слайда (карточки) */
+        .slide {
+            width: 100%;
+            max-width: 450px; /* Ширина для iPhone */
+            aspect-ratio: 4 / 5; /* Идеальный формат для LinkedIn */
+            background-color: var(--main-bg);
+            display: grid;
+            grid-template-columns: 35% 65%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            overflow: hidden;
+            position: relative;
+            border-radius: 8px;
+        }
+
+        /* ЛЕВАЯ КОЛОНКА */
+        .left-column {
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .profile-photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 5px;
+            display: block;
+            border: 3px solid #475569;
+        }
+
+        .left-section h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #475569;
+            padding-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .left-section ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .left-section ul li {
+            position: relative;
+            padding-left: 12px;
+            font-size: 11px;
+            color: #cbd5e1;
+        }
+
+        .left-section ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #60a5fa;
+            font-weight: bold;
+        }
+
+        .contact-info p {
+            margin-bottom: 6px;
+            font-size: 11px;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ПРАВАЯ КОЛОНКА */
+        .right-column {
+            padding: 20px 15px;
+            background-color: var(--main-bg);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            color: #0f172a;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .header h2 {
+            font-size: 13px;
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .header-contacts {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 11px;
+            color: var(--secondary-text);
+            margin-bottom: 10px;
+        }
+
+        .summary {
+            font-size: 11.5px;
+            color: #475569;
+            line-height: 1.4;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .tag {
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 14px;
+            color: #0f172a;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        /* ОПЫТ РАБОТЫ */
+        .job {
+            margin-bottom: 12px;
+        }
+
+        .job-dates {
+            font-size: 10px;
+            color: var(--secondary-text);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .job-details h3 {
+            font-size: 13px;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+
+        .company {
+            font-size: 11px;
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .tasks-results {
+            background-color: #f8fafc;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 5px;
+        }
+
+        .tasks-results h4 {
+            font-size: 10px;
+            color: #0f172a;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .tasks-results ul {
+            list-style: none;
+            font-size: 10px;
+            color: #475569;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .tasks-results ul li {
+            position: relative;
+            padding-left: 10px;
+        }
+
+        .tasks-results ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        .edu-item {
+            margin-bottom: 10px;
+        }
+
+        .edu-item h3 {
+            font-size: 12px;
+            color: #0f172a;
+        }
+
+        .edu-item p {
+            font-size: 11px;
+            color: var(--secondary-text);
+        }
+
+        .additional-list {
+            list-style: none;
+            font-size: 11px;
+            color: #475569;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .additional-list li {
+            position: relative;
+            padding-left: 12px;
+        }
+
+        .additional-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        /* Навигация для печати/скриншотов */
+        .print-instruction {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 450px;
+            text-align: center;
+            font-size: 12px;
+            color: #475569;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Медиа-запрос для печати */
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+                gap: 0;
+            }
+            .print-instruction {
+                display: none;
+            }
+            .slide {
+                box-shadow: none;
+                border-radius: 0;
+                page-break-after: always;
+                width: 100%;
+                max-width: 100%;
+                height: 100vh;
+                aspect-ratio: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="print-instruction">
+        <strong>📸 Инструкция для iPhone:</strong><br>
+        1. Сделайте скриншот каждого слайда.<br>
+        2. В миниатюре скриншота нажмите "Обрезать" и уберите панели Safari.<br>
+        3. Сохраните. Теперь у вас 4 идеальные картинки 4:5!
+    </div>
+
+    <!-- SLIDE 1: Header & About Me -->
+    <div class="slide">
+        <div class="left-column">
+            <img src="IMG_1447.jpeg" alt="Dmitry Paramonov" class="profile-photo">
+            <div class="left-section contact-info">
+                <h3>👤 About Me</h3>
+                <p>📍 Age: 42</p>
+                <p>📍 Location: Saint Petersburg</p>
+                <p>🇬🇧 English: B2</p>
+                <p>💼 Willing to relocate (Moscow) and travel</p>
+                <p>💻 Format: remote, hybrid, on-site</p>
+            </div>
+            <div class="left-section">
+                <h3>⚙️ Key Skills</h3>
+                <ul>
+                    <li>DevOps / SRE</li>
+                    <li>Kubernetes / OpenShift</li>
+                    <li>Docker / Ansible</li>
+                    <li>CI/CD (GitLab, Jenkins)</li>
+                    <li>Cloud (Azure, AWS, Yandex)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="right-column">
+            <div class="header">
+                <h1>Dmitry Paramonov</h1>
+                <h2>DevOps Team Lead | CTO | CIO</h2>
+                <div class="header-contacts">
+                    <span>📍 Saint Petersburg</span>
+                    <span>✉️ forestplus@ya.ru</span>
+                    <span>📱 @TopDevOps</span>
+                    <span>🔗 linkedin.com/in/topdevops</span>
+                </div>
+            </div>
+            <div class="summary">
+                From System Administrator to business co-owner and CEO/CIO. For the last 9+ years, focused on DevOps and SRE practices: containerization, orchestration in Kubernetes and OpenShift, primarily in fintech projects and high-load banking systems. Strive to ensure minimal time-to-market and implement DevSecOps. Actively implement AI tools to automate routine tasks.
+            </div>
+            <div class="tags">
+                <span class="tag">DevOps</span>
+                <span class="tag">Kubernetes</span>
+                <span class="tag">Docker</span>
+                <span class="tag">CI/CD</span>
+                <span class="tag">Ansible</span>
+                <span class="tag">Cloud</span>
+                <span class="tag">SRE</span>
+                <span class="tag">DevSecOps</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 2: Work Experience (Part 1) -->
+    <div class="slide">
+        <div class="left-column">
+            <div class="left-section" style="margin-top: 20px;">
+                <h3>⭐ Personal Qualities</h3>
+                <ul>
+                    <li>Systems thinking</li>
+                    <li>Results-oriented</li>
+                    <li>Leadership and mentoring</li>
+                    <li>Stress tolerance</li>
+                    <li>Fast learner</li>
+                </ul>
+            </div>
+            <div class="left-section">
+                <h3>❤️ Interests</h3>
+                <ul>
+                    <li>AI / ML and neural networks</li>
+                    <li>Cryptocurrencies and fintech</li>
+                    <li>Cars</li>
+                    <li>Sports</li>
+                </ul>
+            </div>
+        </div>
+        <div class="right-column">
+            <div class="section-title">💼 Work Experience</div>
+            
+            <div class="job">
+                <div class="job-dates">June 2023 — Present (1 yr 4 mos)</div>
+                <div class="job-details">
+                    <h3>DevOps Team Lead</h3>
+                    <div class="company">Crypto Industry International, UAE</div>
+                    <div class="tasks-results">
+                        <h4>Tasks & Results:</h4>
+                        <ul>
+                            <li>Ensured stable operation of microservice infrastructure</li>
+                            <li>Designed software architecture</li>
+                            <li>Implemented CI/CD processes and autoscaling</li>
+                            <li>Organized performance and availability monitoring</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="job">
+                <div class="job-dates">Apr 2021 — June 2023 (2 yrs 3 mos)</div>
+                <div class="job-details">
+                    <h3>Lead DevOps</h3>
+                    <div class="company">Innotech, Group of Companies, Moscow (Client: VTB Bank)</div>
+                    <div class="tasks-results">
+                        <h4>Tasks & Results:</h4>
+                        <ul>
+                            <li>Led DevOps direction on two major streams</li>
+                            <li>Migrated CI/CD pipeline to DreamPipe (TeamCity + Helm)</li>
+                            <li>Migrated message queues from IBM MQ to ArtemisMQ</li>
+                            <li>Built CI/CD process DEV → ST → IFT → LT → Pre-Prod → PROD</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 3: Work Experience (Part 2) -->
+    <div class="slide">
+        <div class="left-column">
+            <div style="height: 100%; display: flex; align-items: center; justify-content: center; opacity: 0.3;">
+                <span style="font-size: 40px;">⚙️</span>
+            </div>
+        </div>
+        <div class="right-column">
+            <div class="section-title">💼 Work Experience (cont.)</div>
+            
+            <div class="job">
+                <div class="job-dates">Dec 2018 — Apr 2021 (2 yrs 5 mos)</div>
+                <div class="job-details">
+                    <h3>Senior DevOps</h3>
+                    <div class="company">DELL, Russia, dell.com</div>
+                    <div class="tasks-results">
+                        <h4>Tasks & Results:</h4>
+                        <ul>
+                            <li>Administered Atlassian Stack (Jira, Confluence, Bitbucket)</li>
+                            <li>Prepared roadmap for tech stack modernization</li>
+                            <li>Implemented backup system (UrBackup)</li>
+                            <li>Deployed Kubernetes clusters from scratch in hybrid cloud</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="job">
+                <div class="job-dates">Feb 2018 — Aug 2018 (7 mos)</div>
+                <div class="job-details">
+                    <h3>Middle DevOps</h3>
+                    <div class="company">FINOM, Saint Petersburg, finom.io</div>
+                    <div class="tasks-results">
+                        <h4>Tasks & Results:</h4>
+                        <ul>
+                            <li>Built DevOps processes from scratch for crypto industry</li>
+                            <li>Built CI/CD based on GitLab (Test → Pre-Prod → Production)</li>
+                            <li>Configured monitoring on Nagios and Zabbix</li>
+                            <li>Configured data backup to Amazon S3</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="job">
+                <div class="job-dates">2006 — 2018</div>
+                <div class="job-details">
+                    <h3>Early Experience (CEO, CIO, Senior SysAdmin)</h3>
+                    <div class="company">IThelperSPb, OVK, Microzaimfinance, T-Bank, LEXPRO</div>
+                    <div style="font-size: 10.5px; color: #475569; margin-top: 5px;">
+                        IT infrastructure management, ITSM/ITIL implementation, virtualization (VMware, Hyper-V), Windows/Linux administration, CRM/ERP development and implementation, building business from scratch.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 4: Education & Additional -->
+    <div class="slide">
+        <div class="left-column">
+            <div style="height: 100%; display: flex; align-items: center; justify-content: center; opacity: 0.3;">
+                <span style="font-size: 40px;">🎓</span>
+            </div>
+        </div>
+        <div class="right-column">
+            <div class="section-title">🎓 Education</div>
+            <div class="edu-item">
+                <div class="job-dates">2006</div>
+                <div class="edu-details">
+                    <h3>SOFTLINE</h3>
+                    <p>"Implementing Microsoft Windows Server 2003 Network Infrastructure"</p>
+                </div>
+            </div>
+
+            <div class="section-title" style="margin-top: 20px;">📋 Additional Info</div>
+            <ul class="additional-list">
+                <li>Experience with neural networks and AI tools (Claude Code, ChatGPT, DeepSeek, Kimi) to accelerate development and code analysis.</li>
+                <li>Driving license category B, own car.</li>
+                <li>References: ProfIT Solutions (IT Director), FINOM (HR Director).</li>
+            </ul>
+
+            <div style="margin-top: auto; padding-top: 20px; border-top: 2px solid var(--border-color);">
+                <div class="header-contacts" style="margin-bottom: 0;">
+                    <span>✉️ forestplus@ya.ru</span>
+                    <span>📱 @TopDevOps</span>
+                    <span>🔗 linkedin.com/in/topdevops</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
