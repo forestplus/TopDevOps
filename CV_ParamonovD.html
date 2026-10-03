@@ -38,38 +38,40 @@
             width: 210mm;
             min-height: 297mm;
             background-color: var(--main-bg);
-            display: flex;
+            display: grid; /* Используем Grid вместо Flex для лучшей печати */
+            grid-template-columns: 32% 68%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
         /* ЛЕВАЯ КОЛОНКА */
         .left-column {
-            width: 32%;
             background-color: var(--sidebar-bg);
             color: var(--sidebar-text);
             padding: 30px 20px;
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
         }
 
         /* Стиль для фото */
         .profile-photo {
-            width: 140px;
-            height: 140px;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
             object-fit: cover;
-            margin: 0 auto 10px;
+            margin: 0 auto 5px;
             display: block;
             border: 3px solid #475569;
         }
 
         .left-section h3 {
-            font-size: 14px;
+            font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             border-bottom: 1px solid #475569;
             padding-bottom: 5px;
             display: flex;
@@ -81,7 +83,7 @@
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .left-section ul li {
@@ -100,98 +102,99 @@
         }
 
         .contact-info p {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-size: 12px;
             color: #cbd5e1;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         /* ПРАВАЯ КОЛОНКА */
         .right-column {
-            width: 68%;
-            padding: 35px 30px;
+            padding: 30px 25px;
             background-color: var(--main-bg);
         }
 
         .header {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 26px;
             color: #0f172a;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             line-height: 1.2;
         }
 
         .header h2 {
-            font-size: 16px;
+            font-size: 15px;
             color: var(--accent-color);
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .header-contacts {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 12px;
             font-size: 12px;
             color: var(--secondary-text);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .header-contacts span {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
         .summary {
-            font-size: 13px;
+            font-size: 12.5px;
             color: #475569;
-            margin-bottom: 20px;
-            line-height: 1.6;
+            margin-bottom: 15px;
+            line-height: 1.5;
         }
 
         .tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 30px;
+            gap: 6px;
+            margin-bottom: 20px;
         }
 
         .tag {
             background-color: var(--tag-bg);
             color: var(--tag-text);
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 4px;
             font-size: 11px;
             font-weight: 600;
         }
 
         .section-title {
-            font-size: 16px;
+            font-size: 15px;
             color: #0f172a;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             border-bottom: 2px solid var(--border-color);
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
 
         /* ОПЫТ РАБОТЫ */
         .job {
             display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 12px;
+            margin-bottom: 18px;
+            break-inside: avoid; /* Запрет разрыва блока */
+            page-break-inside: avoid;
         }
 
         .job-dates {
-            width: 100px;
+            width: 90px;
             flex-shrink: 0;
             font-size: 11px;
             color: var(--secondary-text);
@@ -204,31 +207,33 @@
         }
 
         .job-details h3 {
-            font-size: 14px;
+            font-size: 13.5px;
             color: #0f172a;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .company {
             font-size: 12px;
             color: var(--accent-color);
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .job-description {
             font-size: 12px;
             color: #475569;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .tasks-results {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             background-color: #f8fafc;
-            padding: 10px;
+            padding: 8px 10px;
             border-radius: 6px;
-            margin-top: 8px;
+            margin-top: 6px;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
 
         .tasks-results > div {
@@ -238,7 +243,7 @@
         .tasks-results h4 {
             font-size: 11px;
             color: #0f172a;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             text-transform: uppercase;
         }
 
@@ -248,12 +253,12 @@
             color: #475569;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 3px;
         }
 
         .tasks-results ul li {
             position: relative;
-            padding-left: 12px;
+            padding-left: 10px;
         }
 
         .tasks-results ul li::before {
@@ -266,12 +271,14 @@
         /* ОБРАЗОВАНИЕ И ДОПОЛНИТЕЛЬНО */
         .edu-item {
             display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 12px;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
 
         .edu-dates {
-            width: 100px;
+            width: 90px;
             flex-shrink: 0;
             font-size: 11px;
             color: var(--secondary-text);
@@ -294,12 +301,14 @@
             color: #475569;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
         }
 
         .additional-list li {
             position: relative;
-            padding-left: 15px;
+            padding-left: 12px;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
 
         .additional-list li::before {
@@ -309,25 +318,56 @@
             color: var(--accent-color);
         }
 
-        /* ПЕЧАТЬ */
+        /* --- ПРАВИЛА ДЛЯ ПЕЧАТИ --- */
         @media print {
+            @page {
+                size: A4;
+                margin: 0; /* Убираем поля браузера */
+            }
             body {
                 background-color: #fff;
                 padding: 0;
                 margin: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
             .resume-container {
                 box-shadow: none;
                 width: 100%;
                 min-height: 100%;
+                display: block; /* Отключаем Grid при печати, чтобы избежать багов Safari */
+            }
+            /* Фиксируем темный фон слева для всех страниц */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 32%;
+                height: 100%;
+                background-color: var(--sidebar-bg);
+                z-index: -1;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
             .left-column {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                width: 32%;
+                float: left; /* Используем float для колонок при печати */
+                background-color: transparent; /* Фон теперь на body::before */
+                padding: 25px 15px;
             }
-            .tag, .tasks-results {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+            .right-column {
+                width: 68%;
+                float: right;
+                padding: 25px 20px;
+            }
+            .job, .tasks-results, .edu-item, .additional-list li {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            .section-title {
+                page-break-after: avoid;
+                break-after: avoid;
             }
         }
     </style>
@@ -338,7 +378,6 @@
         <!-- ЛЕВАЯ КОЛОНКА -->
         <div class="left-column">
             <!-- Фото -->
-            <!-- Теперь используется файл IMG_1447.jpeg -->
             <img src="IMG_1447.jpeg" alt="Парамонов Дмитрий" class="profile-photo">
 
             <div class="left-section contact-info">
