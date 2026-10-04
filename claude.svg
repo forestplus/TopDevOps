@@ -1,0 +1,202 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 850" width="100%" height="100%" style="background-color: #f7f9fc; font-family: Arial, sans-serif;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Заголовки -->
+  <text x="40" y="50" font-size="36" font-weight="900" fill="#d35400" letter-spacing="1">* CLAUDE CODE</text>
+  <text x="40" y="95" font-size="38" font-weight="900" fill="#2c3e50">СТРУКТУРА ПРОЕКТА</text>
+  <text x="510" y="85" font-size="20" font-weight="bold" fill="#7f8c8d">СТРУКТУРА</text>
+  <text x="510" y="110" font-size="20" font-weight="bold" fill="#7f8c8d">ПАПОК</text>
+  
+  <text x="40" y="130" font-size="14" fill="#7f8c8d">Ваасанкар Натараджан</text>
+  <text x="40" y="150" font-size="12" fill="#95a5a6" font-style="italic">Достигая лучших результатов с помощью ИИ, облачных технологий и данных</text>
+  
+  <line x1="40" y1="170" x2="800" y2="170" stroke="#bdc3c7" stroke-width="1.5" />
+
+  <!-- ЛЕВАЯ ЧАСТЬ: Дерево -->
+  <g transform="translate(40, 200)" font-size="15" font-weight="bold" fill="#2c3e50">
+    <!-- Корень -->
+    <rect x="0" y="0" width="140" height="25" rx="4" fill="#d35400" />
+    <text x="10" y="17" fill="#fff">📁 Ваш-проект/</text>
+    
+    <!-- Линии дерева -->
+    <line x1="20" y1="25" x2="20" y2="300" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="20" y1="45" x2="40" y2="45" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="20" y1="75" x2="40" y2="75" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="20" y1="105" x2="40" y2="105" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="20" y1="135" x2="40" y2="135" stroke="#7f8c8d" stroke-width="1.5" />
+    
+    <!-- Файлы в корне -->
+    <rect x="40" y="35" width="130" height="22" rx="3" fill="#e67e22" />
+    <text x="50" y="51" fill="#fff" font-size="13">📄 CLAUDE.md</text>
+    
+    <rect x="40" y="65" width="150" height="22" rx="3" fill="#e67e22" />
+    <text x="50" y="81" fill="#fff" font-size="13">📄 CLAUDE.local.md</text>
+    
+    <rect x="40" y="95" width="120" height="22" rx="3" fill="#e67e22" />
+    <text x="50" y="111" fill="#fff" font-size="13">📄 .mcp.json</text>
+    
+    <!-- .claude/ -->
+    <rect x="40" y="125" width="100" height="22" rx="3" fill="#d35400" />
+    <text x="50" y="141" fill="#fff" font-size="13">📁 .claude/</text>
+    
+    <!-- Вложенные линии .claude -->
+    <line x1="60" y1="147" x2="60" y2="700" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="60" y1="165" x2="80" y2="165" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="60" y1="195" x2="80" y2="195" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="60" y1="235" x2="80" y2="235" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="60" y1="330" x2="80" y2="330" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="60" y1="415" x2="80" y2="415" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="60" y1="530" x2="80" y2="530" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="60" y1="630" x2="80" y2="630" stroke="#7f8c8d" stroke-width="1.5" />
+
+    <!-- settings -->
+    <rect x="80" y="155" width="130" height="20" rx="2" fill="#e67e22" />
+    <text x="90" y="170" fill="#fff" font-size="12">📄 settings.json</text>
+    
+    <rect x="80" y="185" width="150" height="20" rx="2" fill="#e67e22" />
+    <text x="90" y="200" fill="#fff" font-size="12">📄 settings.local.json</text>
+    
+    <!-- Правила -->
+    <rect x="80" y="225" width="100" height="22" rx="3" fill="#c0392b" />
+    <text x="90" y="241" fill="#fff" font-size="13">📁 правила/</text>
+    
+    <line x1="100" y1="247" x2="100" y2="305" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="100" y1="265" x2="120" y2="265" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="100" y1="295" x2="120" y2="295" stroke="#7f8c8d" stroke-width="1.5" />
+    
+    <rect x="120" y="255" width="140" height="20" rx="2" fill="#e67e22" />
+    <text x="130" y="270" fill="#fff" font-size="12">📄 стиль-кода.md</text>
+    <rect x="120" y="285" width="140" height="20" rx="2" fill="#e67e22" />
+    <text x="130" y="300" fill="#fff" font-size="12">📄 тестирование.md</text>
+    <rect x="120" y="315" width="160" height="20" rx="2" fill="#e67e22" />
+    <text x="130" y="330" fill="#fff" font-size="12">📄 соглашения-api.md</text>
+    
+    <!-- Команды -->
+    <rect x="80" y="320" width="100" height="22" rx="3" fill="#27ae60" />
+    <text x="90" y="336" fill="#fff" font-size="13">📁 команды/</text>
+    
+    <line x1="100" y1="342" x2="100" y2="390" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="100" y1="360" x2="120" y2="360" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="100" y1="390" x2="120" y2="390" stroke="#7f8c8d" stroke-width="1.5" />
+    
+    <rect x="120" y="350" width="120" height="20" rx="2" fill="#e67e22" />
+    <text x="130" y="365" fill="#fff" font-size="12">📄 ревью.md</text>
+    <rect x="120" y="380" width="160" height="20" rx="2" fill="#e67e22" />
+    <text x="130" y="395" fill="#fff" font-size="12">📄 исправить-проблему.md</text>
+    
+    <!-- Навыки -->
+    <rect x="80" y="405" width="100" height="22" rx="3" fill="#2980b9" />
+    <text x="90" y="421" fill="#fff" font-size="13">📁 навыки/</text>
+    
+    <line x1="100" y1="427" x2="100" y2="505" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="100" y1="445" x2="120" y2="445" stroke="#7f8c8d" stroke-width="1.5" />
+    
+    <rect x="120" y="435" width="100" height="22" rx="3" fill="#2980b9" />
+    <text x="130" y="451" fill="#fff" font-size="13">📁 деплой/</text>
+    
+    <line x1="140" y1="457" x2="140" y2="500" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="140" y1="475" x2="160" y2="475" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="140" y1="505" x2="160" y2="505" stroke="#7f8c8d" stroke-width="1.5" />
+    
+    <rect x="160" y="465" width="130" height="20" rx="2" fill="#2980b9" />
+    <text x="170" y="480" fill="#fff" font-size="12">📄 НАВЫК.md</text>
+    <rect x="160" y="495" width="150" height="20" rx="2" fill="#2980b9" />
+    <text x="170" y="510" fill="#fff" font-size="12">📄 конфиг-деплоя.md</text>
+    
+    <!-- Агенты -->
+    <rect x="80" y="520" width="100" height="22" rx="3" fill="#d35400" />
+    <text x="90" y="536" fill="#fff" font-size="13">📁 агенты/</text>
+    
+    <line x1="100" y1="542" x2="100" y2="600" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="100" y1="560" x2="120" y2="560" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="100" y1="595" x2="120" y2="595" stroke="#7f8c8d" stroke-width="1.5" />
+    
+    <rect x="120" y="550" width="170" height="20" rx="2" fill="#e67e22" />
+    <text x="130" y="565" fill="#fff" font-size="12">📄 ревьюер-кода.md</text>
+    <rect x="120" y="585" width="180" height="20" rx="2" fill="#e67e22" />
+    <text x="130" y="600" fill="#fff" font-size="12">📄 аудитор-безопасности.md</text>
+    
+    <!-- Хуки -->
+    <rect x="80" y="620" width="100" height="22" rx="3" fill="#27ae60" />
+    <text x="90" y="636" fill="#fff" font-size="13">📁 хуки/</text>
+    
+    <line x1="100" y1="642" x2="100" y2="680" stroke="#7f8c8d" stroke-width="1.5" />
+    <line x1="100" y1="670" x2="120" y2="670" stroke="#7f8c8d" stroke-width="1.5" />
+    
+    <rect x="120" y="660" width="170" height="20" rx="2" fill="#27ae60" />
+    <text x="130" y="675" fill="#fff" font-size="12">📄 валидация-bash.sh</text>
+  </g>
+
+  <!-- ПРАВАЯ ЧАСТЬ: Описания -->
+  <g transform="translate(530, 200)" font-size="14" fill="#2c3e50">
+    
+    <!-- CLAUDE.MD -->
+    <rect x="0" y="0" width="620" height="75" rx="6" fill="#fff" stroke="#d35400" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="620" height="28" rx="6" fill="#d35400" />
+    <rect x="0" y="14" width="620" height="14" fill="#d35400" /> <!-- Прямые углы снизу заголовка -->
+    <text x="15" y="19" fill="#fff" font-weight="bold" font-size="15">CLAUDE.MD</text>
+    <text x="15" y="48" font-size="13" fill="#2c3e50">✅ Основной файл инструкций, загружаемый при запуске сессии.</text>
+    <text x="15" y="65" font-size="13" fill="#2c3e50">✅ Содержит обзор проекта, стек, команды и соглашения.</text>
+
+    <!-- .MCP.JSON -->
+    <rect x="0" y="90" width="620" height="75" rx="6" fill="#fff" stroke="#a0522d" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="90" width="620" height="28" rx="6" fill="#a0522d" />
+    <rect x="0" y="104" width="620" height="14" fill="#a0522d" />
+    <text x="15" y="109" fill="#fff" font-weight="bold" font-size="15">.MCP.JSON</text>
+    <text x="15" y="138" font-size="13" fill="#2c3e50">✅ Подключает внешние инструменты, такие как GitHub, JIRA, Slack, БД.</text>
+    <text x="15" y="155" font-size="13" fill="#2c3e50">✅ Общая конфигурация интеграции для всей команды.</text>
+
+    <!-- SETTINGS.JSON -->
+    <rect x="0" y="180" width="620" height="75" rx="6" fill="#fff" stroke="#d35400" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="180" width="620" height="28" rx="6" fill="#d35400" />
+    <rect x="0" y="194" width="620" height="14" fill="#d35400" />
+    <text x="15" y="199" fill="#fff" font-weight="bold" font-size="15">SETTINGS.JSON</text>
+    <text x="15" y="228" font-size="13" fill="#2c3e50">✅ Управляет правами доступа, моделями, инструментами и хуками.</text>
+    <text x="15" y="245" font-size="13" fill="#2c3e50">✅ Общая конфигурация с поддержкой локального переопределения.</text>
+
+    <!-- ПРАВИЛА -->
+    <rect x="0" y="270" width="620" height="75" rx="6" fill="#fff" stroke="#c0392b" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="270" width="620" height="28" rx="6" fill="#c0392b" />
+    <rect x="0" y="284" width="620" height="14" fill="#c0392b" />
+    <text x="15" y="289" fill="#fff" font-weight="bold" font-size="15">ПРАВИЛА (RULES/)</text>
+    <text x="15" y="318" font-size="13" fill="#2c3e50">✅ Модульные файлы правил для таких тем, как стиль или тестирование.</text>
+    <text x="15" y="335" font-size="13" fill="#2c3e50">✅ Могут применять правила только к определенным путям к файлам.</text>
+
+    <!-- КОМАНДЫ -->
+    <rect x="0" y="360" width="620" height="75" rx="6" fill="#fff" stroke="#27ae60" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="360" width="620" height="28" rx="6" fill="#27ae60" />
+    <rect x="0" y="374" width="620" height="14" fill="#27ae60" />
+    <text x="15" y="379" fill="#fff" font-weight="bold" font-size="15">КОМАНДЫ (COMMANDS/)</text>
+    <text x="15" y="408" font-size="13" fill="#2c3e50">✅ Пользовательские слэш-команды для повторяющихся рабочих процессов.</text>
+    <text x="15" y="425" font-size="13" fill="#2c3e50">✅ Поддерживает выполнение shell-команд и автоматизацию.</text>
+
+    <!-- НАВЫКИ -->
+    <rect x="0" y="450" width="620" height="75" rx="6" fill="#fff" stroke="#2980b9" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="450" width="620" height="28" rx="6" fill="#2980b9" />
+    <rect x="0" y="464" width="620" height="14" fill="#2980b9" />
+    <text x="15" y="469" fill="#fff" font-weight="bold" font-size="15">НАВЫКИ (SKILLS/)</text>
+    <text x="15" y="498" font-size="13" fill="#2c3e50">✅ Автоматически загружаемые рабочие процессы на основе сопоставления задач.</text>
+    <text x="15" y="515" font-size="13" fill="#2c3e50">✅ Поддерживает контекст легким и релевантным.</text>
+
+    <!-- АГЕНТЫ -->
+    <rect x="0" y="540" width="620" height="75" rx="6" fill="#fff" stroke="#d35400" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="540" width="620" height="28" rx="6" fill="#d35400" />
+    <rect x="0" y="554" width="620" height="14" fill="#d35400" />
+    <text x="15" y="559" fill="#fff" font-weight="bold" font-size="15">АГЕНТЫ (AGENTS/)</text>
+    <text x="15" y="588" font-size="13" fill="#2c3e50">✅ Специализированные субагенты с изолированными контекстами.</text>
+    <text x="15" y="605" font-size="13" fill="#2c3e50">✅ Используются для сфокусированных задач, таких как ревью или аудит.</text>
+
+    <!-- ХУКИ -->
+    <rect x="0" y="630" width="620" height="75" rx="6" fill="#fff" stroke="#27ae60" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="630" width="620" height="28" rx="6" fill="#27ae60" />
+    <rect x="0" y="644" width="620" height="14" fill="#27ae60" />
+    <text x="15" y="649" fill="#fff" font-weight="bold" font-size="15">ХУКИ (HOOKS/)</text>
+    <text x="15" y="678" font-size="13" fill="#2c3e50">✅ Скрипты, управляемые событиями, до/после выполнения инструмента.</text>
+    <text x="15" y="695" font-size="13" fill="#2c3e50">✅ Обрабатывает валидацию, линтинг, форматирование или блокирующие действия.</text>
+
+  </g>
+</svg>
