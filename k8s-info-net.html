@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kubernetes: диагностика сети, сервисов и хранилища</title>
+<style>
+  :root {
+    --paper: #fbfaf5;
+    --ink: #1f2a44;
+    --blue: #1e4fa3;
+    --red: #b5232b;
+    --green: #2e7d4f;
+    --line: #c9d3e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #1b1f27; --ink: #e6e9ef; --blue: #7fa8ff; --red: #ff7b7b; --green: #7fd6a0; --line: #3a4352; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  h1 { text-align: center; color: var(--blue); font-size: 26px; margin: 0 0 4px; }
+  .subtitle { text-align: center; color: var(--blue); margin: 0 0 20px; font-size: 16px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .card { border: 2px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+  .card h2 {
+    margin: -26px 0 10px;
+    display: inline-block;
+    background: var(--paper);
+    padding: 0 8px;
+    font-size: 16px;
+    color: var(--green);
+  }
+  .wide { grid-column: 1 / -1; }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    color: var(--red);
+    font-size: 13px;
+    background: rgba(127,127,127,0.12);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  .cmt { color: var(--ink); opacity: 0.75; font-size: 12.5px; }
+  ul.cmds { list-style: none; padding: 0; margin: 0; }
+  ul.cmds li { margin: 6px 0; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { border: 1px solid var(--line); padding: 6px 8px; vertical-align: top; text-align: left; }
+  th { color: var(--blue); }
+  td.issue { color: var(--red); font-weight: 600; }
+  td ul { margin: 0; padding-left: 16px; }
+  pre.code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    margin: 0;
+    white-space: pre-wrap;
+    color: var(--ink);
+  }
+  .k { color: var(--blue); }
+  .v { color: var(--red); }
+  .flow { list-style: none; padding: 0; margin: 0; counter-reset: step; }
+  .flow li { margin: 8px 0; padding-left: 4px; }
+  .flow .step { font-weight: 600; color: var(--blue); }
+  .flow .cmt { display: block; margin-left: 14px; }
+  ul.best { padding-left: 18px; margin: 0; }
+  ul.best li { margin: 6px 0; }
+</style>
+</head>
+<body>
+
+<h1>2. Kubernetes: диагностика сети, сервисов и хранилища</h1>
+<p class="subtitle">(Шпаргалка по типовым проблемам Service, DNS, Ingress и PVC)</p>
+
+<div class="grid">
+
+  <div class="card">
+    <h2>1. Порядок диагностики сетевой проблемы</h2>
+    <ul class="flow">
+      <li><span class="step">Проверить Service</span> <span class="cmt"><code>kubectl get svc -n &lt;ns&gt;</code></span></li>
+      <li><span class="step">Проверить Endpoints</span> <span class="cmt"><code>kubectl get endpoints &lt;svc&gt; -n &lt;ns&gt;</code></span></li>
+      <li><span class="step">Сверить selector и labels подов</span> <span class="cmt"><code>kubectl get pods --show-labels -n &lt;ns&gt;</code></span></li>
+      <li><span class="step">Проверить readiness подов</span> <span class="cmt"><code>kubectl get pods -o wide -n &lt;ns&gt;</code></span></li>
+      <li><span class="step">Проверить DNS изнутри кластера</span> <span class="cmt"><code>kubectl run tmp --rm -it --image=busybox:1.36 -- nslookup &lt;svc&gt;</code></span></li>
+      <li><span class="step">Проверить NetworkPolicy и Ingress</span> <span class="cmt"><code>kubectl get networkpolicy,ingress -n &lt;ns&gt;</code></span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>2. Полезные команды</h2>
+    <ul class="cmds">
+      <li><code>kubectl describe svc &lt;svc&gt; -n &lt;ns&gt;</code><br><span class="cmt">порты, selector и связанные endpoints</span></li>
+      <li><code>kubectl get endpointslices -l kubernetes.io/service-name=&lt;svc&gt;</code><br><span class="cmt">реальные IP подов за сервисом</span></li>
+      <li><code>kubectl port-forward svc/&lt;svc&gt; 8080:80 -n &lt;ns&gt;</code><br><span class="cmt">обойти Ingress и проверить сервис напрямую</span></li>
+      <li><code>kubectl get events -n &lt;ns&gt; --field-selector type=Warning</code><br><span class="cmt">только предупреждения</span></li>
+      <li><code>kubectl rollout status deployment/&lt;name&gt; -n &lt;ns&gt;</code><br><span class="cmt">статус обновления деплоя</span></li>
+      <li><code>kubectl rollout undo deployment/&lt;name&gt; -n &lt;ns&gt;</code><br><span class="cmt">откат к предыдущей версии</span></li>
+      <li><code>kubectl auth can-i list pods -n &lt;ns&gt; --as=&lt;user&gt;</code><br><span class="cmt">проверка прав RBAC</span></li>
+      <li><code>kubectl get pvc -n &lt;ns&gt;</code><br><span class="cmt">состояние заявок на хранилище</span></li>
+    </ul>
+  </div>
+
+  <div class="card wide">
+    <h2>3. Топ типовых проблем сети и хранилища</h2>
+    <table>
+      <thead>
+        <tr><th>Симптом</th><th>Возможные причины</th><th>Как проверить</th><th>Исправление</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="issue">Service не отвечает (connection refused, timeout)</td>
+          <td>Selector не совпадает с labels подов, неверный targetPort, под не готов</td>
+          <td><code>kubectl describe svc &lt;svc&gt;</code><br><code>kubectl get endpoints &lt;svc&gt;</code></td>
+          <td><ul><li>Исправить selector или labels</li><li>Проверить targetPort</li><li>Исправить readiness probe</li></ul></td>
+        </tr>
+        <tr>
+          <td class="issue">Endpoints пустые</td>
+          <td>Ни один под не прошёл readiness, либо labels не совпадают</td>
+          <td><code>kubectl get pods --show-labels</code><br><code>kubectl describe pod &lt;pod&gt;</code></td>
+          <td><ul><li>Сверить labels с selector</li><li>Проверить readiness probe</li></ul></td>
+        </tr>
+        <tr>
+          <td class="issue">DNS не резолвит имя сервиса</td>
+          <td>Упали поды CoreDNS, неверное имя, нестандартный dnsPolicy</td>
+          <td><code>kubectl get pods -n kube-system -l k8s-app=kube-dns</code><br><code>nslookup &lt;svc&gt;.&lt;ns&gt;.svc.cluster.local</code></td>
+          <td><ul><li>Перезапустить или восстановить CoreDNS</li><li>Использовать полное имя сервиса</li></ul></td>
+        </tr>
+        <tr>
+          <td class="issue">502 / 503 через Ingress</td>
+          <td>Сервис-бэкенд не найден, неверный порт, не тот ingressClassName</td>
+          <td><code>kubectl describe ingress &lt;name&gt;</code><br><code>kubectl get ingressclass</code></td>
+          <td><ul><li>Проверить имя и порт сервиса в Ingress</li><li>Указать корректный ingressClassName</li></ul></td>
+        </tr>
+        <tr>
+          <td class="issue">Трафик между подами блокируется</td>
+          <td>Политика NetworkPolicy запрещает входящий или исходящий трафик</td>
+          <td><code>kubectl get networkpolicy -n &lt;ns&gt;</code><br><code>kubectl describe networkpolicy &lt;name&gt;</code></td>
+          <td><ul><li>Добавить разрешающее правило</li><li>Проверить podSelector и namespaceSelector</li></ul></td>
+        </tr>
+        <tr>
+          <td class="issue">PVC застрял в Pending</td>
+          <td>Нет подходящего StorageClass или PV, либо не задан класс по умолчанию</td>
+          <td><code>kubectl describe pvc &lt;pvc&gt;</code><br><code>kubectl get storageclass</code></td>
+          <td><ul><li>Указать существующий StorageClass</li><li>Проверить объём и access mode</li></ul></td>
+        </tr>
+        <tr>
+          <td class="issue">Деплой завис, ProgressDeadlineExceeded</td>
+          <td>Новые поды не проходят readiness, не хватает ресурсов</td>
+          <td><code>kubectl rollout status deployment/&lt;name&gt;</code><br><code>kubectl describe deployment &lt;name&gt;</code></td>
+          <td><ul><li>Исправить новую версию</li><li>Откатить через <code>rollout undo</code></li></ul></td>
+        </tr>
+        <tr>
+          <td class="issue">Error from server (Forbidden)</td>
+          <td>Нет прав в RBAC для ServiceAccount или пользователя</td>
+          <td><code>kubectl auth can-i &lt;verb&gt; &lt;resource&gt; --as=&lt;user&gt;</code></td>
+          <td><ul><li>Добавить Role и RoleBinding с нужными правами</li></ul></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>4. Пример: корректная readiness probe</h2>
+    <pre class="code"><span class="k">readinessProbe:</span>
+  <span class="k">httpGet:</span>
+    <span class="k">path:</span> /healthz
+    <span class="k">port:</span> 8080
+  <span class="k">initialDelaySeconds:</span> 5
+  <span class="k">periodSeconds:</span> 10
+  <span class="k">failureThreshold:</span> 3</pre>
+    <p class="cmt">Под попадает в Endpoints только после успешной проверки. Если путь или порт указаны неверно, сервис будет пустым, даже когда приложение работает.</p>
+  </div>
+
+  <div class="card">
+    <h2>5. Лучшие практики</h2>
+    <ul class="best">
+      <li>Всегда задавайте readiness probe, иначе трафик пойдёт на неготовые поды</li>
+      <li>Используйте единые labels и проверяйте их в selector сервиса</li>
+      <li>Описывайте NetworkPolicy по принципу «запрещено всё, кроме нужного»</li>
+      <li>Для проверки сервиса используйте <code>port-forward</code>, чтобы отделить проблему Ingress от проблемы приложения</li>
+      <li>Перед релизом проверяйте, что <code>rollout status</code> завершается успешно</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
