@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux: команды и полезные приёмы</title>
+<style>
+  :root {
+    --paper: #fbfaf5;
+    --ink: #1f2a44;
+    --blue: #1e4fa3;
+    --green: #2e6b47;
+    --green-light: #e6f1ea;
+    --red: #b5232b;
+    --line: #c9d3e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #1b1f27; --ink: #e6e9ef; --blue: #7fa8ff; --green: #7fd6a0; --green-light: #242c28; --red: #ff7b7b; --line: #3a4352; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; }
+  h1 { text-align: center; color: var(--green); font-size: 30px; margin: 0 0 4px; letter-spacing: 1px; }
+  .subtitle { text-align: center; color: var(--ink); margin: 0 0 22px; font-size: 16px; opacity: 0.85; }
+  h2 {
+    background: var(--green-light);
+    color: var(--green);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 18px;
+    margin: 26px 0 10px;
+  }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+  thead th { background: var(--green); color: #fff; padding: 8px; text-align: left; }
+  th, td { border: 1px solid var(--line); padding: 6px 8px; vertical-align: top; text-align: left; }
+  td.num { width: 52px; text-align: center; font-weight: 600; }
+  td.cmd { width: 260px; font-family: Consolas, "Courier New", monospace; color: var(--blue); font-weight: 600; }
+  td.ex { font-family: Consolas, "Courier New", monospace; color: var(--blue); }
+  tbody tr:nth-child(even) { background: rgba(127,127,127,0.05); }
+  .intro { text-align: center; margin-bottom: 8px; }
+  ol.tricks { padding-left: 0; list-style: none; counter-reset: trick; }
+  ol.tricks li {
+    counter-increment: trick;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 14px 10px 52px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  ol.tricks li::before {
+    content: counter(trick);
+    position: absolute;
+    left: 14px;
+    top: 10px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
+    line-height: 26px;
+    font-size: 13px;
+  }
+  ol.tricks code {
+    font-family: Consolas, "Courier New", monospace;
+    color: var(--blue);
+    background: rgba(127,127,127,0.1);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  .note { font-size: 12.5px; opacity: 0.75; text-align: center; margin: 6px 0 14px; }
+  .warn {
+    border-left: 4px solid var(--red);
+    padding: 8px 12px;
+    background: rgba(181,35,43,0.07);
+    border-radius: 4px;
+    margin: 14px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>LINUX</h1>
+<p class="subtitle">Команды и полезные приёмы</p>
+
+<h2>Система и ресурсы</h2>
+<table>
+  <thead><tr><th>№</th><th>Команда</th><th>Назначение</th><th>Пример</th></tr></thead>
+  <tbody>
+    <tr><td class="num">1</td><td class="cmd">uname</td><td>Выводит версию ядра и архитектуру.</td><td class="ex">uname -a</td></tr>
+    <tr><td class="num">2</td><td class="cmd">hostnamectl</td><td>Показывает имя хоста, дистрибутив и версию ядра.</td><td class="ex">hostnamectl</td></tr>
+    <tr><td class="num">3</td><td class="cmd">uptime</td><td>Время работы системы и средняя нагрузка.</td><td class="ex">uptime</td></tr>
+    <tr><td class="num">4</td><td class="cmd">free</td><td>Использование оперативной памяти и swap.</td><td class="ex">free -h</td></tr>
+    <tr><td class="num">5</td><td class="cmd">df</td><td>Свободное место на файловых системах.</td><td class="ex">df -hT</td></tr>
+    <tr><td class="num">6</td><td class="cmd">du</td><td>Размер папок.</td><td class="ex">du -h --max-depth=1 /var | sort -h</td></tr>
+    <tr><td class="num">7</td><td class="cmd">lsblk</td><td>Дерево дисков и разделов.</td><td class="ex">lsblk -f</td></tr>
+    <tr><td class="num">8</td><td class="cmd">lscpu</td><td>Характеристики процессора.</td><td class="ex">lscpu</td></tr>
+    <tr><td class="num">9</td><td class="cmd">top / htop</td><td>Интерактивный монитор процессов.</td><td class="ex">htop</td></tr>
+  </tbody>
+</table>
+
+<h2>Процессы и службы</h2>
+<table>
+  <thead><tr><th>№</th><th>Команда</th><th>Назначение</th><th>Пример</th></tr></thead>
+  <tbody>
+    <tr><td class="num">10</td><td class="cmd">ps</td><td>Список процессов.</td><td class="ex">ps aux --sort=-%mem | head</td></tr>
+    <tr><td class="num">11</td><td class="cmd">pgrep / pkill</td><td>Найти или завершить процесс по имени.</td><td class="ex">pgrep -a nginx</td></tr>
+    <tr><td class="num">12</td><td class="cmd">kill</td><td>Отправить сигнал процессу по PID.</td><td class="ex">kill -15 4312</td></tr>
+    <tr><td class="num">13</td><td class="cmd">nohup</td><td>Запустить процесс так, чтобы он пережил выход из сессии.</td><td class="ex">nohup ./job.sh &amp;</td></tr>
+    <tr><td class="num">14</td><td class="cmd">systemctl</td><td>Управление службами systemd.</td><td class="ex">systemctl status nginx</td></tr>
+    <tr><td class="num">15</td><td class="cmd">journalctl</td><td>Просмотр журнала systemd.</td><td class="ex">journalctl -u nginx -f</td></tr>
+  </tbody>
+</table>
+
+<h2>Сеть</h2>
+<table>
+  <thead><tr><th>№</th><th>Команда</th><th>Назначение</th><th>Пример</th></tr></thead>
+  <tbody>
+    <tr><td class="num">16</td><td class="cmd">ip</td><td>Адреса интерфейсов и маршруты.</td><td class="ex">ip -br a</td></tr>
+    <tr><td class="num">17</td><td class="cmd">ip route</td><td>Таблица маршрутизации.</td><td class="ex">ip route show</td></tr>
+    <tr><td class="num">18</td><td class="cmd">ss</td><td>Открытые сокеты и слушающие порты.</td><td class="ex">ss -tulpn</td></tr>
+    <tr><td class="num">19</td><td class="cmd">lsof</td><td>Кто держит порт или файл.</td><td class="ex">lsof -i :8080</td></tr>
+    <tr><td class="num">20</td><td class="cmd">curl</td><td>Запросы по HTTP и другим протоколам.</td><td class="ex">curl -I https://example.com</td></tr>
+    <tr><td class="num">21</td><td class="cmd">dig</td><td>DNS-запросы.</td><td class="ex">dig +short example.com</td></tr>
+    <tr><td class="num">22</td><td class="cmd">traceroute</td><td>Маршрут до узла.</td><td class="ex">traceroute example.com</td></tr>
+    <tr><td class="num">23</td><td class="cmd">scp / rsync</td><td>Копирование файлов по сети.</td><td class="ex">rsync -avh --progress ./dir/ user@host:/backup/</td></tr>
+  </tbody>
+</table>
+
+<h2>Файлы и текст</h2>
+<table>
+  <thead><tr><th>№</th><th>Команда</th><th>Назначение</th><th>Пример</th></tr></thead>
+  <tbody>
+    <tr><td class="num">24</td><td class="cmd">ls</td><td>Список файлов с деталями, новые сверху.</td><td class="ex">ls -lahtr</td></tr>
+    <tr><td class="num">25</td><td class="cmd">find</td><td>Поиск файлов по условиям.</td><td class="ex">find /var/log -name "*.log" -mtime +7</td></tr>
+    <tr><td class="num">26</td><td class="cmd">grep</td><td>Поиск строк по шаблону.</td><td class="ex">grep -rn "ERROR" /var/log/app/</td></tr>
+    <tr><td class="num">27</td><td class="cmd">tar</td><td>Архивы: создание и распаковка.</td><td class="ex">tar -czf backup.tgz ./data</td></tr>
+    <tr><td class="num">28</td><td class="cmd">chmod / chown</td><td>Права и владелец файлов.</td><td class="ex">chmod 640 config.yml</td></tr>
+    <tr><td class="num">29</td><td class="cmd">tail</td><td>Конец файла, в том числе в реальном времени.</td><td class="ex">tail -f -n 100 app.log</td></tr>
+    <tr><td class="num">30</td><td class="cmd">sed</td><td>Потоковая замена текста.</td><td class="ex">sed -i 's/old/new/g' file.txt</td></tr>
+    <tr><td class="num">31</td><td class="cmd">awk</td><td>Обработка колонок в тексте.</td><td class="ex">awk '{print $1, $9}' access.log</td></tr>
+    <tr><td class="num">32</td><td class="cmd">sort / uniq</td><td>Сортировка и подсчёт повторов.</td><td class="ex">sort access.log | uniq -c | sort -rn | head</td></tr>
+    <tr><td class="num">33</td><td class="cmd">diff</td><td>Различия между файлами.</td><td class="ex">diff -u old.conf new.conf</td></tr>
+  </tbody>
+</table>
+
+<h2>Пользователи и пакеты</h2>
+<table>
+  <thead><tr><th>№</th><th>Команда</th><th>Назначение</th><th>Пример</th></tr></thead>
+  <tbody>
+    <tr><td class="num">34</td><td class="cmd">id</td><td>Пользователь, его группы и UID.</td><td class="ex">id deploy</td></tr>
+    <tr><td class="num">35</td><td class="cmd">sudo</td><td>Запуск команды от имени другого пользователя.</td><td class="ex">sudo -l</td></tr>
+    <tr><td class="num">36</td><td class="cmd">useradd / usermod</td><td>Создание и изменение пользователей.</td><td class="ex">useradd -m -s /bin/bash deploy</td></tr>
+    <tr><td class="num">37</td><td class="cmd">last</td><td>История входов в систему.</td><td class="ex">last -n 10</td></tr>
+    <tr><td class="num">38</td><td class="cmd">apt</td><td>Пакеты в Debian и Ubuntu.</td><td class="ex">apt update &amp;&amp; apt upgrade</td></tr>
+    <tr><td class="num">39</td><td class="cmd">dnf</td><td>Пакеты в RHEL, Fedora и производных.</td><td class="ex">dnf install htop</td></tr>
+  </tbody>
+</table>
+
+<h2>Лайфхаки и трюки</h2>
+<ol class="tricks">
+  <li><strong>Повторить прошлую команду.</strong> <code>!!</code> вставляет предыдущую команду, например <code>sudo !!</code>, если забыли sudo. <code>!$</code> подставляет последний аргумент предыдущей команды.</li>
+  <li><strong>Поиск по истории.</strong> Нажмите <code>Ctrl+R</code> и начните вводить часть команды. Повторное нажатие листает совпадения.</li>
+  <li><strong>Редактировать длинную команду в редакторе.</strong> <code>Ctrl+X</code> затем <code>Ctrl+E</code> открывает текущую строку в $EDITOR.</li>
+  <li><strong>Вернуться в предыдущую папку.</strong> <code>cd -</code> переключает на предыдущий каталог.</li>
+  <li><strong>Следить за изменением вывода.</strong> <code>watch -n 2 'df -h /'</code> обновляет команду каждые две секунды.</li>
+  <li><strong>Отправить процесс в фон и вернуть.</strong> <code>Ctrl+Z</code> приостанавливает, <code>bg</code> продолжает в фоне, <code>fg</code> возвращает на передний план.</li>
+  <li><strong>Не потерять сессию при обрыве SSH.</strong> Запускайте долгие задачи в <code>tmux</code> или <code>screen</code>, либо через <code>nohup</code>.</li>
+  <li><strong>Пробросить удалённый порт на локальную машину.</strong> <code>ssh -L 8080:localhost:80 user@server</code> открывает удалённый сервис на вашем localhost:8080.</li>
+  <li><strong>Найти самые тяжёлые папки.</strong> <code>du -h --max-depth=1 / 2&gt;/dev/null | sort -h | tail</code>.</li>
+  <li><strong>Безопасная проверка перед удалением.</strong> Сначала выполните <code>find ... -print</code>, и только потом замените <code>-print</code> на <code>-delete</code>.</li>
+  <li><strong>Красивая таблица из колонок.</strong> <code>mount | column -t</code> выравнивает вывод.</li>
+  <li><strong>Замерить время выполнения.</strong> Поставьте <code>time</code> перед командой.</li>
+  <li><strong>Псевдонимы для частых команд.</strong> В <code>~/.bashrc</code> добавьте <code>alias ll='ls -lah'</code>, затем выполните <code>source ~/.bashrc</code>.</li>
+  <li><strong>Строгий режим в скриптах.</strong> В начале bash-скрипта: <code>set -euo pipefail</code>. Скрипт остановится при первой ошибке и при обращении к неопределённой переменной.</li>
+  <li><strong>Переход между папками стеком.</strong> <code>pushd /etc</code> запоминает текущий каталог, <code>popd</code> возвращает назад.</li>
+  <li><strong>Сбросить кеш DNS в systemd-resolved.</strong> <code>resolvectl flush-caches</code>.</li>
+</ol>
+
+<div class="warn">
+  Команды <code>kill -9</code>, <code>rm -rf</code>, <code>chmod -R</code> и <code>find ... -delete</code> необратимы. Перед их запуском проверьте путь и условие, а для массовых операций сначала запустите то же самое без разрушающего действия.
+</div>
+
+<p class="note">Список рассчитан на Debian/Ubuntu и RHEL-подобные системы с systemd. Некоторые утилиты могут потребовать установки отдельно.</p>
+
+</div>
+</body>
+</html>
