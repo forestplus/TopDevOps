@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PostgreSQL: команды, лайфхаки и администрирование</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+  ol.tricks { padding-left:20px; }
+  ol.tricks li { margin:6px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>PostgreSQL: команды, лайфхаки и администрирование</h1>
+<p class="lead">Основные команды psql, SQL и администрирование, резервное копирование, роли, производительность и полезные приёмы на одной странице</p>
+
+<h2>Подключение</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">psql</td><td class="ex">psql -h localhost -p 5432 -U app -d appdb</td><td>Подключение с хостом, портом, пользователем и базой.</td></tr>
+    <tr><td class="cmd">psql URI</td><td class="ex">psql "postgresql://app@db.example.com:5432/appdb?sslmode=require"</td><td>Строка подключения целиком, с SSL.</td></tr>
+    <tr><td class="cmd">psql -c</td><td class="ex">psql -U postgres -c "SELECT version();"</td><td>Выполнить одну команду и выйти.</td></tr>
+    <tr><td class="cmd">psql -f</td><td class="ex">psql -d appdb -f migrate.sql</td><td>Выполнить SQL-файл.</td></tr>
+    <tr><td class="cmd">psql -v</td><td class="ex">psql -d appdb -v schema=prod -f report.sql</td><td>Передать переменную, в скрипте использовать :'schema'.</td></tr>
+    <tr><td class="cmd">psql -At</td><td class="ex">psql -At -c "SELECT count(*) FROM users;"</td><td>Чистый вывод без заголовков и рамок, удобно для скриптов.</td></tr>
+    <tr><td class="cmd">psql -X</td><td class="ex">psql -X -d appdb -f script.sql</td><td>Не читать ~/.psqlrc (поведение скриптов предсказуемо).</td></tr>
+    <tr><td class="cmd">psql -1</td><td class="ex">psql -1 -d appdb -f migrate.sql</td><td>Весь файл в одной транзакции: при ошибке откатится целиком.</td></tr>
+    <tr><td class="cmd">psql -q</td><td class="ex">psql -q -d appdb -f x.sql</td><td>Тихий режим, без служебных сообщений.</td></tr>
+  </tbody>
+</table>
+
+<h2>Метакоманды psql</h2>
+<p>Команды, начинающиеся с обратной косой черты, работают только в psql, а не в SQL.</p>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">\l</td><td class="ex">\l+</td><td>Список баз данных (с размером и описанием при +).</td></tr>
+    <tr><td class="cmd">\c</td><td class="ex">\c appdb app</td><td>Переключиться на базу и пользователя.</td></tr>
+    <tr><td class="cmd">\dt</td><td class="ex">\dt public.*</td><td>Таблицы в схеме.</td></tr>
+    <tr><td class="cmd">\dt+</td><td class="ex">\dt+ orders</td><td>Таблицы с размером и описанием.</td></tr>
+    <tr><td class="cmd">\d</td><td class="ex">\d orders</td><td>Структура таблицы: колонки, индексы, ограничения.</td></tr>
+    <tr><td class="cmd">\d+</td><td class="ex">\d+ orders</td><td>То же с размером, хранилищем и комментариями.</td></tr>
+    <tr><td class="cmd">\di</td><td class="ex">\di</td><td>Индексы.</td></tr>
+    <tr><td class="cmd">\dv / \dm</td><td class="ex">\dv ; \dm</td><td>Представления и материализованные представления.</td></tr>
+    <tr><td class="cmd">\df</td><td class="ex">\df+ my_func</td><td>Функции и их определение.</td></tr>
+    <tr><td class="cmd">\dn</td><td class="ex">\dn</td><td>Схемы.</td></tr>
+    <tr><td class="cmd">\du</td><td class="ex">\du</td><td>Роли и их атрибуты.</td></tr>
+    <tr><td class="cmd">\dp</td><td class="ex">\dp orders</td><td>Права доступа к таблице.</td></tr>
+    <tr><td class="cmd">\dx</td><td class="ex">\dx</td><td>Установленные расширения.</td></tr>
+    <tr><td class="cmd">\dT</td><td class="ex">\dT+</td><td>Пользовательские типы.</td></tr>
+    <tr><td class="cmd">\conninfo</td><td class="ex">\conninfo</td><td>Текущее подключение: база, пользователь, хост, порт, SSL.</td></tr>
+    <tr><td class="cmd">\x</td><td class="ex">\x auto</td><td>Расширенный вывод: широкие строки показываются столбиком.</td></tr>
+    <tr><td class="cmd">\timing</td><td class="ex">\timing on</td><td>Показывать время выполнения каждого запроса.</td></tr>
+    <tr><td class="cmd">\i</td><td class="ex">\i schema.sql</td><td>Выполнить файл из текущей сессии.</td></tr>
+    <tr><td class="cmd">\o</td><td class="ex">\o result.txt</td><td>Направить вывод в файл (\o без аргумента вернуть в терминал).</td></tr>
+    <tr><td class="cmd">\copy</td><td class="ex">\copy orders TO 'orders.csv' CSV HEADER</td><td>Копирование с клиента (не требует прав суперпользователя на сервере).</td></tr>
+    <tr><td class="cmd">\watch</td><td class="ex">SELECT count(*) FROM jobs; \watch 5</td><td>Повторять запрос каждые 5 секунд.</td></tr>
+    <tr><td class="cmd">\e</td><td class="ex">\e</td><td>Редактировать последний запрос во внешнем редакторе.</td></tr>
+    <tr><td class="cmd">\s</td><td class="ex">\s history.txt</td><td>Сохранить историю psql в файл.</td></tr>
+    <tr><td class="cmd">\set</td><td class="ex">\set ON_ERROR_STOP on</td><td>Остановить скрипт при первой ошибке (обязательно в миграциях).</td></tr>
+    <tr><td class="cmd">\gset</td><td class="ex">SELECT count(*) AS n FROM users \gset</td><td>Записать результат запроса в переменную psql.</td></tr>
+    <tr><td class="cmd">\q</td><td class="ex">\q</td><td>Выход.</td></tr>
+    <tr><td class="cmd">\?</td><td class="ex">\?</td><td>Список всех метакоманд.</td></tr>
+  </tbody>
+</table>
+
+<h2>Базы данных и схема</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">CREATE DATABASE</td><td class="ex">CREATE DATABASE appdb OWNER app ENCODING 'UTF8';</td><td>Создать базу с владельцем.</td></tr>
+    <tr><td class="cmd">DROP DATABASE</td><td class="ex">DROP DATABASE IF EXISTS appdb;</td><td>Удалить базу (к ней не должно быть подключений).</td></tr>
+    <tr><td class="cmd">CREATE SCHEMA</td><td class="ex">CREATE SCHEMA reporting AUTHORIZATION app;</td><td>Создать схему.</td></tr>
+    <tr><td class="cmd">CREATE TABLE</td><td class="ex">CREATE TABLE orders (id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, user_id bigint NOT NULL, total numeric(12,2) NOT NULL DEFAULT 0, created_at timestamptz NOT NULL DEFAULT now());</td><td>Таблица с идентити-ключом, ограничениями и значениями по умолчанию.</td></tr>
+    <tr><td class="cmd">ALTER TABLE</td><td class="ex">ALTER TABLE orders ADD COLUMN status text NOT NULL DEFAULT 'new';</td><td>Добавить колонку (с DEFAULT в PG 11+ не переписывает таблицу).</td></tr>
+    <tr><td class="cmd">ALTER TABLE ... ADD CONSTRAINT</td><td class="ex">ALTER TABLE orders ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id);</td><td>Внешний ключ.</td></tr>
+    <tr><td class="cmd">DROP TABLE</td><td class="ex">DROP TABLE IF EXISTS tmp_import CASCADE;</td><td>Удалить таблицу и зависимые объекты (CASCADE, осторожно).</td></tr>
+    <tr><td class="cmd">TRUNCATE</td><td class="ex">TRUNCATE TABLE logs RESTART IDENTITY;</td><td>Очистить таблицу быстро, сбросив счётчик идентити.</td></tr>
+    <tr><td class="cmd">COMMENT ON</td><td class="ex">COMMENT ON COLUMN orders.total IS 'Сумма в рублях';</td><td>Комментарий к объекту (виден в \d+).</td></tr>
+  </tbody>
+</table>
+
+<h2>Индексы</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">CREATE INDEX</td><td class="ex">CREATE INDEX idx_orders_user ON orders (user_id);</td><td>Обычный B-tree индекс. Блокирует запись на время создания.</td></tr>
+    <tr><td class="cmd">CREATE INDEX CONCURRENTLY</td><td class="ex">CREATE INDEX CONCURRENTLY idx_orders_user ON orders (user_id);</td><td>Создание без блокировки записи. Нельзя внутри транзакции.</td></tr>
+    <tr><td class="cmd">Частичный индекс</td><td class="ex">CREATE INDEX idx_open ON orders (created_at) WHERE status = 'open';</td><td>Индекс только по нужной части строк, меньше и быстрее.</td></tr>
+    <tr><td class="cmd">Индекс по выражению</td><td class="ex">CREATE INDEX idx_lower_email ON users (lower(email));</td><td>Для поиска без учёта регистра.</td></tr>
+    <tr><td class="cmd">GIN для jsonb</td><td class="ex">CREATE INDEX idx_payload ON events USING gin (payload jsonb_path_ops);</td><td>Быстрый поиск внутри JSON.</td></tr>
+    <tr><td class="cmd">DROP INDEX CONCURRENTLY</td><td class="ex">DROP INDEX CONCURRENTLY idx_old;</td><td>Удалить индекс без блокировки.</td></tr>
+    <tr><td class="cmd">REINDEX CONCURRENTLY</td><td class="ex">REINDEX INDEX CONCURRENTLY idx_orders_user;</td><td>Перестроить раздутый индекс без блокировки (PG 12+).</td></tr>
+  </tbody>
+</table>
+
+<h2>Данные: выборки, изменения, транзакции</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">INSERT ... RETURNING</td><td class="ex">INSERT INTO orders (user_id, total) VALUES (1, 990) RETURNING id;</td><td>Вернуть созданную строку, например её id.</td></tr>
+    <tr><td class="cmd">ON CONFLICT</td><td class="ex">INSERT INTO users (email) VALUES ('a@x.ru') ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email;</td><td>Upsert: вставить или обновить при конфликте.</td></tr>
+    <tr><td class="cmd">ON CONFLICT DO NOTHING</td><td class="ex">INSERT INTO tags (name) VALUES ('sql') ON CONFLICT DO NOTHING;</td><td>Пропустить дубликат без ошибки.</td></tr>
+    <tr><td class="cmd">UPDATE ... FROM</td><td class="ex">UPDATE orders o SET status = 'paid' FROM payments p WHERE p.order_id = o.id AND p.ok;</td><td>Обновление по данным из другой таблицы.</td></tr>
+    <tr><td class="cmd">DELETE ... USING</td><td class="ex">DELETE FROM cart c USING users u WHERE c.user_id = u.id AND u.blocked;</td><td>Удаление с join.</td></tr>
+    <tr><td class="cmd">FOR UPDATE SKIP LOCKED</td><td class="ex">SELECT * FROM jobs WHERE state = 'new' ORDER BY id LIMIT 1 FOR UPDATE SKIP LOCKED;</td><td>Очередь задач: несколько воркеров не берут одну задачу.</td></tr>
+    <tr><td class="cmd">BEGIN / COMMIT / ROLLBACK</td><td class="ex">BEGIN; UPDATE ...; ROLLBACK;</td><td>Транзакция. Сначала проверяйте изменения, затем фиксируйте.</td></tr>
+    <tr><td class="cmd">SAVEPOINT</td><td class="ex">SAVEPOINT s1; ...; ROLLBACK TO SAVEPOINT s1;</td><td>Откат части транзакции.</td></tr>
+    <tr><td class="cmd">COPY</td><td class="ex">COPY orders FROM '/tmp/orders.csv' CSV HEADER;</td><td>Массовая загрузка на сервере (нужны права; с клиента используйте \copy).</td></tr>
+    <tr><td class="cmd">generate_series</td><td class="ex">SELECT generate_series(1, 5);</td><td>Генерация последовательностей, даты через interval.</td></tr>
+    <tr><td class="cmd">EXPLAIN</td><td class="ex">EXPLAIN SELECT * FROM orders WHERE user_id = 1;</td><td>План запроса без выполнения.</td></tr>
+    <tr><td class="cmd">EXPLAIN ANALYZE</td><td class="ex">EXPLAIN (ANALYZE, BUFFERS) SELECT ...;</td><td>План с реальным выполнением и чтением страниц. Для UPDATE и DELETE оборачивайте в транзакцию с откатом.</td></tr>
+  </tbody>
+</table>
+
+<h2>Роли и права</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">CREATE ROLE</td><td class="ex">CREATE ROLE app LOGIN PASSWORD 'change-me';</td><td>Пользователь для приложения (LOGIN даёт право входить).</td></tr>
+    <tr><td class="cmd">CREATE ROLE группа</td><td class="ex">CREATE ROLE readonly NOLOGIN;</td><td>Роль-группа без входа, права выдаются ей.</td></tr>
+    <tr><td class="cmd">GRANT роль</td><td class="ex">GRANT readonly TO analyst;</td><td>Добавить пользователя в роль.</td></tr>
+    <tr><td class="cmd">ALTER ROLE</td><td class="ex">ALTER ROLE app PASSWORD 'new';</td><td>Сменить пароль или атрибуты.</td></tr>
+    <tr><td class="cmd">ALTER ROLE VALID UNTIL</td><td class="ex">ALTER ROLE analyst VALID UNTIL '2027-01-01';</td><td>Срок действия учётной записи.</td></tr>
+    <tr><td class="cmd">GRANT CONNECT</td><td class="ex">GRANT CONNECT ON DATABASE appdb TO readonly;</td><td>Право подключаться к базе.</td></tr>
+    <tr><td class="cmd">GRANT USAGE</td><td class="ex">GRANT USAGE ON SCHEMA public TO readonly;</td><td>Доступ к схеме (без него таблицы не видны).</td></tr>
+    <tr><td class="cmd">GRANT SELECT ON ALL TABLES</td><td class="ex">GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly;</td><td>Чтение всех существующих таблиц схемы.</td></tr>
+    <tr><td class="cmd">ALTER DEFAULT PRIVILEGES</td><td class="ex">ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO readonly;</td><td>Права на таблицы, которые появятся в будущем.</td></tr>
+    <tr><td class="cmd">REVOKE</td><td class="ex">REVOKE ALL ON orders FROM readonly;</td><td>Забрать права.</td></tr>
+    <tr><td class="cmd">DROP ROLE</td><td class="ex">DROP OWNED BY old_user; DROP ROLE old_user;</td><td>Удалить роль: сначала передать или удалить её объекты.</td></tr>
+    <tr><td class="cmd">\du</td><td class="ex">\du+ app</td><td>Проверка атрибутов роли в psql.</td></tr>
+  </tbody>
+</table>
+
+<h2>Резервное копирование и восстановление</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">pg_dump -Fc</td><td class="ex">pg_dump -Fc -f appdb.dump appdb</td><td>Бэкап в собственном сжатом формате (рекомендуемый).</td></tr>
+    <tr><td class="cmd">pg_dump -Fd -j</td><td class="ex">pg_dump -Fd -j 4 -f appdb_dir appdb</td><td>Каталог-формат, параллельный дамп на 4 процесса.</td></tr>
+    <tr><td class="cmd">pg_dump -Fp</td><td class="ex">pg_dump -Fp appdb &gt; appdb.sql</td><td>Обычный SQL-скрипт (читаемый, но большой).</td></tr>
+    <tr><td class="cmd">pg_dump -t</td><td class="ex">pg_dump -Fc -t orders -f orders.dump appdb</td><td>Одна таблица.</td></tr>
+    <tr><td class="cmd">pg_dump -n</td><td class="ex">pg_dump -Fc -n reporting -f reporting.dump appdb</td><td>Одна схема.</td></tr>
+    <tr><td class="cmd">pg_dump --schema-only</td><td class="ex">pg_dump --schema-only -f schema.sql appdb</td><td>Только структура без данных.</td></tr>
+    <tr><td class="cmd">pg_dump --data-only</td><td class="ex">pg_dump --data-only -Fc -f data.dump appdb</td><td>Только данные.</td></tr>
+    <tr><td class="cmd">pg_dumpall --globals-only</td><td class="ex">pg_dumpall --globals-only -f roles.sql</td><td>Роли и табличные пространства, которых нет в обычном дампе базы.</td></tr>
+    <tr><td class="cmd">pg_restore</td><td class="ex">pg_restore -d appdb_new -j 4 appdb.dump</td><td>Восстановление из формата -Fc или -Fd в существующую базу.</td></tr>
+    <tr><td class="cmd">pg_restore --clean</td><td class="ex">pg_restore --clean --if-exists -d appdb appdb.dump</td><td>Сначала удалить объекты, потом создать заново.</td></tr>
+    <tr><td class="cmd">pg_restore -l</td><td class="ex">pg_restore -l appdb.dump</td><td>Оглавление дампа без восстановления.</td></tr>
+    <tr><td class="cmd">psql -f (SQL-дамп)</td><td class="ex">psql -d appdb_new -f appdb.sql</td><td>Восстановление обычного SQL-дампа.</td></tr>
+    <tr><td class="cmd">CREATE DATABASE TEMPLATE</td><td class="ex">CREATE DATABASE test_copy TEMPLATE appdb;</td><td>Быстрая копия базы (к исходной не должно быть подключений).</td></tr>
+  </tbody>
+</table>
+
+<h3>Проверка резервной копии</h3>
+<pre># Восстановить в тестовую базу и проверить количество строк
+createdb appdb_check
+pg_restore -d appdb_check -j 4 appdb.dump
+psql -d appdb_check -At -c "SELECT count(*) FROM orders;"
+dropdb appdb_check</pre>
+
+<h2>Производительность и диагностика</h2>
+<table>
+  <thead><tr><th>Задача</th><th>SQL</th></tr></thead>
+  <tbody>
+    <tr><td>Активные запросы и их длительность</td><td class="ex">SELECT pid, usename, state, now() - query_start AS duration, left(query, 80) FROM pg_stat_activity WHERE state &lt;&gt; 'idle' ORDER BY duration DESC;</td></tr>
+    <tr><td>Завершить запрос мягко</td><td class="ex">SELECT pg_cancel_backend(12345);</td></tr>
+    <tr><td>Разорвать сессию</td><td class="ex">SELECT pg_terminate_backend(12345);</td></tr>
+    <tr><td>Кто кого блокирует</td><td class="ex">SELECT pid, pg_blocking_pids(pid) AS blocked_by, left(query, 80) FROM pg_stat_activity WHERE cardinality(pg_blocking_pids(pid)) &gt; 0;</td></tr>
+    <tr><td>Размер базы</td><td class="ex">SELECT pg_size_pretty(pg_database_size('appdb'));</td></tr>
+    <tr><td>Самые большие таблицы</td><td class="ex">SELECT relname, pg_size_pretty(pg_total_relation_size(relid)) FROM pg_stat_user_tables ORDER BY pg_total_relation_size(relid) DESC LIMIT 10;</td></tr>
+    <tr><td>Неиспользуемые индексы</td><td class="ex">SELECT relname, indexrelname, idx_scan FROM pg_stat_user_indexes WHERE idx_scan = 0 ORDER BY relname;</td></tr>
+    <tr><td>Обновить статистику</td><td class="ex">ANALYZE orders;</td></tr>
+    <tr><td>Очистка мёртвых строк</td><td class="ex">VACUUM (VERBOSE, ANALYZE) orders;</td></tr>
+    <tr><td>Кеш-попадания</td><td class="ex">SELECT sum(blks_hit)::float / nullif(sum(blks_hit + blks_read), 0) FROM pg_stat_database;</td></tr>
+    <tr><td>Самые медленные запросы</td><td class="ex">SELECT calls, mean_exec_time, left(query, 80) FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 10;</td></tr>
+  </tbody>
+</table>
+<p>Для последнего запроса нужно расширение <code>pg_stat_statements</code>: добавьте его в <code>shared_preload_libraries</code>, перезапустите сервер и выполните <code>CREATE EXTENSION pg_stat_statements;</code>.</p>
+
+<h2>Настройки сервера</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">SHOW</td><td class="ex">SHOW work_mem;</td><td>Текущее значение параметра.</td></tr>
+    <tr><td class="cmd">SHOW config_file</td><td class="ex">SHOW config_file;</td><td>Путь к postgresql.conf.</td></tr>
+    <tr><td class="cmd">SHOW ALL</td><td class="ex">SHOW ALL;</td><td>Все параметры и их источники.</td></tr>
+    <tr><td class="cmd">pg_settings</td><td class="ex">SELECT name, setting, source FROM pg_settings WHERE source &lt;&gt; 'default';</td><td>Что переопределено вручную.</td></tr>
+    <tr><td class="cmd">ALTER SYSTEM</td><td class="ex">ALTER SYSTEM SET work_mem = '64MB';</td><td>Записать в postgresql.auto.conf.</td></tr>
+    <tr><td class="cmd">pg_reload_conf</td><td class="ex">SELECT pg_reload_conf();</td><td>Применить параметры, которые не требуют перезапуска.</td></tr>
+    <tr><td class="cmd">SET (сессия)</td><td class="ex">SET statement_timeout = '30s';</td><td>Параметр только для текущей сессии.</td></tr>
+    <tr><td class="cmd">pg_hba.conf</td><td class="ex">host appdb app 10.0.0.0/24 scram-sha-256</td><td>Кто, откуда и каким способом может подключиться.</td></tr>
+  </tbody>
+</table>
+
+<h2>Полезные параметры</h2>
+<table>
+  <thead><tr><th>Параметр</th><th>Для чего</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">statement_timeout</td><td>Убивать запрос, который идёт дольше заданного времени.</td></tr>
+    <tr><td class="cmd">lock_timeout</td><td>Не ждать блокировку дольше заданного времени (полезно перед миграциями).</td></tr>
+    <tr><td class="cmd">idle_in_transaction_session_timeout</td><td>Разрывать сессии, которые держат открытую транзакцию без работы.</td></tr>
+    <tr><td class="cmd">work_mem</td><td>Память на операции сортировки и хеширования в одном узле запроса.</td></tr>
+    <tr><td class="cmd">maintenance_work_mem</td><td>Память для VACUUM и CREATE INDEX.</td></tr>
+    <tr><td class="cmd">log_min_duration_statement</td><td>Логировать запросы дольше заданного времени (например, 500 мс).</td></tr>
+    <tr><td class="cmd">shared_buffers</td><td>Общий кеш страниц сервера (обычно около четверти RAM).</td></tr>
+  </tbody>
+</table>
+
+<h2>Лайфхаки</h2>
+<ol class="tricks">
+  <li><strong>Пароль без истории.</strong> Вместо <code>PGPASSWORD</code> в команде используйте файл <code>~/.pgpass</code> в формате <code>host:port:db:user:password</code> с правами <code>chmod 600</code>.</li>
+  <li><strong>Проверить миграцию в транзакции.</strong> Оберните скрипт в <code>BEGIN;</code> и в конце выполните <code>ROLLBACK;</code>, пока не убедитесь, что всё работает. Или используйте <code>psql -1</code>.</li>
+  <li><strong>Остановиться при ошибке.</strong> В начале скрипта: <code>\set ON_ERROR_STOP on</code>. Иначе psql продолжит выполнять после сбоя.</li>
+  <li><strong>Удобная запись в .psqlrc.</strong> Строка <code>\x auto</code> и <code>\timing on</code> в ~/.psqlrc сразу делают вывод читаемее и показывают время запросов.</li>
+  <li><strong>Выгрузить CSV с клиента.</strong> <code>\copy (SELECT ...) TO 'out.csv' CSV HEADER</code>. Запрос в скобках, а не просто имя таблицы.</li>
+  <li><strong>Быстрая проверка количества без блокировок.</strong> Для больших таблиц точный <code>count(*)</code> медленный. Оценка: <code>SELECT reltuples::bigint FROM pg_class WHERE relname = 'orders';</code>.</li>
+  <li><strong>Идентификаторы без лишних расширений.</strong> Начиная с PostgreSQL 13, <code>gen_random_uuid()</code> встроен в ядро.</li>
+  <li><strong>Пакетная вставка.</strong> Одна инструкция <code>INSERT ... VALUES (...), (...), (...)</code> на тысячи строк быстрее тысяч отдельных INSERT.</li>
+  <li><strong>Очередь без дублей.</strong> <code>FOR UPDATE SKIP LOCKED</code> позволяет нескольким воркерам брать задачи параллельно.</li>
+  <li><strong>Порог для сложных запросов.</strong> Если <code>EXPLAIN ANALYZE</code> показывает Seq Scan по большой таблице с редким условием, проверьте индекс и актуальность статистики через <code>ANALYZE</code>.</li>
+  <li><strong>Сохранить вывод команды в переменную shell.</strong> <code>COUNT=$(psql -At -d appdb -c "SELECT count(*) FROM orders;")</code>.</li>
+  <li><strong>Список подключений по приложениям.</strong> <code>SELECT application_name, count(*) FROM pg_stat_activity GROUP BY 1;</code>. Задайте имя приложения в строке подключения, чтобы его было видно.</li>
+  <li><strong>Не используйте OFFSET для глубокой пагинации.</strong> При больших смещениях запрос читает и отбрасывает строки. Используйте курсорную пагинацию по индексированному ключу: <code>WHERE id &gt; :last_id ORDER BY id LIMIT 50</code>.</li>
+  <li><strong>Округление времени.</strong> <code>date_trunc('day', created_at)</code> группирует по суткам, <code>date_trunc('hour', ...)</code> по часам.</li>
+</ol>
+
+<h2>Работа с JSON</h2>
+<pre>-- Значение по ключу как текст
+SELECT payload-&gt;&gt;'email' FROM events;
+
+-- Вложенный путь
+SELECT payload#&gt;&gt;'{address,city}' FROM events;
+
+-- Фильтр по содержимому (с GIN-индексом)
+SELECT * FROM events WHERE payload @&gt; '{"type": "signup"}';
+
+-- Развернуть массив в строки
+SELECT jsonb_array_elements_text(tags) FROM posts;</pre>
+
+<h2>Типичные задачи одной командой</h2>
+<pre># Создать пользователя и базу для приложения
+psql -U postgres -c "CREATE ROLE app LOGIN PASSWORD 'secret';"
+psql -U postgres -c "CREATE DATABASE appdb OWNER app;"
+
+# Ежедневный бэкап с датой и проверкой
+pg_dump -Fc -f /backup/appdb-$(date +%F).dump appdb && echo "backup ok"
+
+# Сколько активных подключений и лимит
+psql -At -U postgres -c "SELECT count(*) FROM pg_stat_activity;" \
+  -c "SHOW max_connections;"
+
+# Выполнить SQL из файла с выводом времени
+psql -d appdb -v ON_ERROR_STOP=1 -c "\timing on" -f report.sql</pre>
+
+<div class="warn">
+  <code>DROP DATABASE</code>, <code>DROP TABLE ... CASCADE</code>, <code>TRUNCATE</code> и <code>DELETE</code> без <code>WHERE</code> необратимы. Перед опасными операциями сделайте бэкап, выполните в транзакции и проверьте результат. Команды <code>pg_terminate_backend</code> прерывают чужие сессии: сначала пробуйте <code>pg_cancel_backend</code>.
+</div>
+
+<div class="tip">
+  Миграции схемы лучше выполнять с <code>SET lock_timeout = '5s';</code>. Тогда если таблица занята долгой транзакцией, миграция упадёт с ошибкой, а не встанет в очередь и не заблокирует все запросы приложения.
+</div>
+
+</div>
+</body>
+</html>
