@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K8S-Windows: команды Windows</title>
+<style>
+  :root {
+    --paper: #fbfaf5;
+    --ink: #1f2a44;
+    --green: #2e6b47;
+    --green-light: #e6f1ea;
+    --line: #c9d3e6;
+    --code: #1e4fa3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #1b1f27; --ink: #e6e9ef; --green: #7fd6a0; --green-light: #242c28; --line: #3a4352; --code: #7fa8ff; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  h1 { text-align: center; color: var(--green); font-size: 32px; margin: 0 0 4px; letter-spacing: 1px; }
+  .subtitle { text-align: center; margin: 0 0 24px; font-size: 16px; }
+  h2 {
+    background: var(--green-light);
+    color: var(--green);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 18px;
+    margin: 28px 0 10px;
+  }
+  .intro { text-align: center; font-size: 15px; margin-bottom: 8px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+  thead th {
+    background: var(--green);
+    color: #fff;
+    padding: 8px;
+    text-align: left;
+  }
+  th, td { border: 1px solid var(--line); padding: 6px 8px; vertical-align: top; text-align: left; }
+  td.num { width: 56px; text-align: center; font-weight: 600; }
+  td.cmd { width: 180px; font-family: Consolas, "Courier New", monospace; color: var(--code); font-weight: 600; }
+  td.ex { font-family: Consolas, "Courier New", monospace; color: var(--code); }
+  tbody tr:nth-child(even) { background: rgba(127,127,127,0.05); }
+  .note { font-size: 12.5px; opacity: 0.75; text-align: center; margin: 6px 0 14px; }
+  .ps-box { background: var(--green-light); border-radius: 8px; padding: 12px; margin-top: 24px; }
+  .ps-box h3 { text-align: center; color: var(--green); margin: 0 0 8px; font-size: 16px; }
+  .ps-box td { background: var(--paper); }
+  .footer { text-align: center; font-size: 12.5px; opacity: 0.7; margin-top: 24px; }
+</style>
+</head>
+<body>
+
+<h1>K8S-WINDOWS</h1>
+<p class="subtitle">Команды Windows</p>
+
+<h2>Сетевые и системные основы</h2>
+<p class="intro">Открыть командную строку: Win + R → cmd → Enter.</p>
+<table>
+  <thead><tr><th>№</th><th>Команда</th><th>Назначение</th><th>Пример</th></tr></thead>
+  <tbody>
+    <tr><td class="num">1</td><td class="cmd">ipconfig</td><td>Выводит информацию о настройках IP.</td><td class="ex">ipconfig /all</td></tr>
+    <tr><td class="num">2</td><td class="cmd">systeminfo</td><td>Выводит сведения о системе.</td><td class="ex">systeminfo</td></tr>
+    <tr><td class="num">3</td><td class="cmd">netstat</td><td>Выводит сетевую статистику.</td><td class="ex">netstat -ano</td></tr>
+    <tr><td class="num">4</td><td class="cmd">whoami</td><td>Выводит текущего пользователя.</td><td class="ex">whoami</td></tr>
+    <tr><td class="num">5</td><td class="cmd">getmac</td><td>Выводит MAC-адрес. Ключ /v добавляет подробный вывод.</td><td class="ex">getmac /v</td></tr>
+    <tr><td class="num">6</td><td class="cmd">hostname</td><td>Выводит имя компьютера.</td><td class="ex">hostname</td></tr>
+    <tr><td class="num">7</td><td class="cmd">ver</td><td>Выводит версию Windows.</td><td class="ex">ver</td></tr>
+    <tr><td class="num">8</td><td class="cmd">winver</td><td>Выводит версию и сборку Windows.</td><td class="ex">winver</td></tr>
+    <tr><td class="num">9</td><td class="cmd">ping</td><td>Проверяет сетевую доступность узла.</td><td class="ex">ping -n 4 example.com</td></tr>
+    <tr><td class="num">10</td><td class="cmd">tracert</td><td>Показывает маршрут до узла.</td><td class="ex">tracert example.com</td></tr>
+    <tr><td class="num">11</td><td class="cmd">nslookup</td><td>Запрашивает DNS-серверы.</td><td class="ex">nslookup example.com</td></tr>
+    <tr><td class="num">12</td><td class="cmd">tasklist</td><td>Выводит список запущенных процессов.</td><td class="ex">tasklist</td></tr>
+    <tr><td class="num">13</td><td class="cmd">taskkill</td><td>Завершает процесс. /IM задаёт имя образа, /F принудительно завершает процесс.</td><td class="ex">taskkill /IM notepad.exe</td></tr>
+  </tbody>
+</table>
+
+<h2>Файлы, папки и диски</h2>
+<table>
+  <thead><tr><th>№</th><th>Команда</th><th>Назначение</th><th>Пример</th></tr></thead>
+  <tbody>
+    <tr><td class="num">14</td><td class="cmd">sfc</td><td>Проверяет и восстанавливает системные файлы.</td><td class="ex">sfc /scannow</td></tr>
+    <tr><td class="num">15</td><td class="cmd">chkdsk</td><td>Проверяет диск на ошибки.</td><td class="ex">chkdsk C:</td></tr>
+    <tr><td class="num">16</td><td class="cmd">diskpart</td><td>Управление дисками и разделами.</td><td class="ex">diskpart, затем list disk</td></tr>
+    <tr><td class="num">17</td><td class="cmd">format</td><td>Форматирует диск.</td><td class="ex">format /?</td></tr>
+    <tr><td class="num">18</td><td class="cmd">xcopy</td><td>Копирует файлы и папки.</td><td class="ex">xcopy C:\source D:\dest /E</td></tr>
+    <tr><td class="num">19</td><td class="cmd">robocopy</td><td>Расширенная утилита копирования файлов.</td><td class="ex">robocopy C:\source D:\dest /E</td></tr>
+    <tr><td class="num">20</td><td class="cmd">dir</td><td>Выводит список файлов и папок.</td><td class="ex">dir C:\</td></tr>
+    <tr><td class="num">21</td><td class="cmd">cd</td><td>Меняет текущую папку.</td><td class="ex">cd C:\Users</td></tr>
+    <tr><td class="num">22</td><td class="cmd">md</td><td>Создаёт новую папку.</td><td class="ex">md NewFolder</td></tr>
+    <tr><td class="num">23</td><td class="cmd">rd</td><td>Удаляет папку.</td><td class="ex">rd OldFolder</td></tr>
+    <tr><td class="num">24</td><td class="cmd">del</td><td>Удаляет файлы.</td><td class="ex">del C:\file.txt</td></tr>
+    <tr><td class="num">25</td><td class="cmd">copy</td><td>Копирует файлы.</td><td class="ex">copy C:\file.txt D:\</td></tr>
+    <tr><td class="num">26</td><td class="cmd">move</td><td>Перемещает файлы.</td><td class="ex">move C:\file.txt D:\</td></tr>
+    <tr><td class="num">27</td><td class="cmd">ren</td><td>Переименовывает файлы или папки.</td><td class="ex">ren oldname.txt newname.txt</td></tr>
+    <tr><td class="num">28</td><td class="cmd">type</td><td>Выводит содержимое текстового файла.</td><td class="ex">type C:\file.txt</td></tr>
+    <tr><td class="num">29</td><td class="cmd">find</td><td>Ищет текстовую строку в файлах.</td><td class="ex">find "error" C:\log.txt</td></tr>
+    <tr><td class="num">30</td><td class="cmd">findstr</td><td>Ищет строки в файлах.</td><td class="ex">ipconfig /all | findstr DNS</td></tr>
+    <tr><td class="num">31</td><td class="cmd">sort</td><td>Сортирует содержимое файла (здесь names.txt) по алфавиту.</td><td class="ex">sort &lt; names.txt</td></tr>
+    <tr><td class="num">32</td><td class="cmd">comp</td><td>Сравнивает содержимое двух файлов.</td><td class="ex">comp file1.txt file2.txt</td></tr>
+    <tr><td class="num">33</td><td class="cmd">fc</td><td>Сравнивает файлы и показывает различия.</td><td class="ex">fc file1.txt file2.txt</td></tr>
+  </tbody>
+</table>
+
+<h2>Администрирование и службы</h2>
+<table>
+  <thead><tr><th>№</th><th>Команда</th><th>Назначение</th><th>Пример</th></tr></thead>
+  <tbody>
+    <tr><td class="num">34</td><td class="cmd">tree</td><td>Выводит структуру папок в виде дерева.</td><td class="ex">tree C:\</td></tr>
+    <tr><td class="num">35</td><td class="cmd">attrib</td><td>Изменяет атрибуты файлов.</td><td class="ex">attrib +r C:\file.txt</td></tr>
+    <tr><td class="num">36</td><td class="cmd">cipher</td><td>Выводит или меняет шифрование файлов.</td><td class="ex">cipher /e C:\SecretFolder</td></tr>
+    <tr><td class="num">37</td><td class="cmd">compact</td><td>Выводит или меняет сжатие файлов.</td><td class="ex">compact /c C:\folder</td></tr>
+    <tr><td class="num">38</td><td class="cmd">powercfg</td><td>Управляет параметрами питания.</td><td class="ex">powercfg /energy</td></tr>
+    <tr><td class="num">39</td><td class="cmd">shutdown</td><td>Выключает или перезагружает компьютер.</td><td class="ex">shutdown /? (параметры выключения)</td></tr>
+    <tr><td class="num">40</td><td class="cmd">gpupdate</td><td>Обновляет параметры групповых политик.</td><td class="ex">gpupdate /force</td></tr>
+    <tr><td class="num">41</td><td class="cmd">gpresult</td><td>Выводит результаты групповых политик.</td><td class="ex">gpresult /r</td></tr>
+    <tr><td class="num">42</td><td class="cmd">net user</td><td>Управляет учётными записями пользователей.</td><td class="ex">net user (список учётных записей)</td></tr>
+    <tr><td class="num">43</td><td class="cmd">net localgroup</td><td>Управляет локальными группами.</td><td class="ex">net localgroup Administrators</td></tr>
+    <tr><td class="num">44</td><td class="cmd">net start</td><td>Запускает сетевую службу.</td><td class="ex">net start "Print Spooler" (запуск службы)</td></tr>
+    <tr><td class="num">45</td><td class="cmd">net stop</td><td>Останавливает сетевую службу.</td><td class="ex">net stop "Print Spooler" (остановка службы)</td></tr>
+    <tr><td class="num">46</td><td class="cmd">netsh</td><td>Утилита настройки сети.</td><td class="ex">netsh wlan show profiles</td></tr>
+    <tr><td class="num">47</td><td class="cmd">sc</td><td>Управляет службами Windows.</td><td class="ex">sc query</td></tr>
+    <tr><td class="num">48</td><td class="cmd">reg</td><td>Управляет реестром.</td><td class="ex">reg query HKLM\Software</td></tr>
+    <tr><td class="num">49</td><td class="cmd">runas</td><td>Запускает программу от имени другого пользователя.</td><td class="ex">runas /user:Admin cmd</td></tr>
+    <tr><td class="num">50</td><td class="cmd">schtasks</td><td>Планирует команды и программы.</td><td class="ex">schtasks /query (список задач)</td></tr>
+  </tbody>
+</table>
+
+<h2>Системная информация и управление</h2>
+<table>
+  <thead><tr><th>№</th><th>Команда</th><th>Назначение</th><th>Пример</th></tr></thead>
+  <tbody>
+    <tr><td class="num">51</td><td class="cmd">wmic</td><td>Устаревший инструмент командной строки WMI. Устарел, используйте командлеты CIM в PowerShell.</td><td class="ex">wmic os get Caption,Version</td></tr>
+    <tr><td class="num">52</td><td class="cmd">assoc</td><td>Выводит или меняет сопоставления расширений файлов.</td><td class="ex">assoc .txt</td></tr>
+    <tr><td class="num">53</td><td class="cmd">ftype</td><td>Выводит или меняет типы файлов.</td><td class="ex">ftype txtfile</td></tr>
+    <tr><td class="num">54</td><td class="cmd">driverquery</td><td>Выводит установленные драйверы устройств.</td><td class="ex">driverquery</td></tr>
+    <tr><td class="num">55</td><td class="cmd">msinfo32</td><td>Выводит сведения о системе.</td><td class="ex">msinfo32</td></tr>
+    <tr><td class="num">56</td><td class="cmd">mmc</td><td>Открывает Microsoft Management Console.</td><td class="ex">mmc</td></tr>
+    <tr><td class="num">57</td><td class="cmd">eventvwr</td><td>Открывает Просмотр событий.</td><td class="ex">eventvwr</td></tr>
+    <tr><td class="num">58</td><td class="cmd">services.msc</td><td>Открывает консоль управления службами.</td><td class="ex">services.msc</td></tr>
+  </tbody>
+</table>
+
+<div class="ps-box">
+  <h3>Современные альтернативы в PowerShell</h3>
+  <table>
+    <tbody>
+      <tr><td class="ex">Get-CimInstance Win32_OperatingSystem</td><td>Сведения об ОС.</td></tr>
+      <tr><td class="ex">Get-CimInstance Win32_BIOS</td><td>Сведения о BIOS.</td></tr>
+      <tr><td class="ex">Get-CimInstance Win32_ComputerSystem</td><td>Сведения о компьютере.</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Примеры CIM выполняются в PowerShell, остальные — в командной строке или в окне «Выполнить».</p>
+</div>
+
+<h2>Инструменты Windows и основы командной строки</h2>
+<table>
+  <thead><tr><th>№</th><th>Команда</th><th>Назначение</th><th>Пример</th></tr></thead>
+  <tbody>
+    <tr><td class="num">59</td><td class="cmd">devmgmt.msc</td><td>Открывает Диспетчер устройств.</td><td class="ex">devmgmt.msc</td></tr>
+    <tr><td class="num">60</td><td class="cmd">diskmgmt.msc</td><td>Открывает Управление дисками.</td><td class="ex">diskmgmt.msc</td></tr>
+    <tr><td class="num">61</td><td class="cmd">taskmgr</td><td>Открывает Диспетчер задач.</td><td class="ex">taskmgr</td></tr>
+    <tr><td class="num">62</td><td class="cmd">perfmon</td><td>Открывает Монитор производительности.</td><td class="ex">perfmon</td></tr>
+    <tr><td class="num">63</td><td class="cmd">resmon</td><td>Открывает Монитор ресурсов.</td><td class="ex">resmon</td></tr>
+    <tr><td class="num">64</td><td class="cmd">msconfig</td><td>Открывает Конфигурацию системы.</td><td class="ex">msconfig</td></tr>
+    <tr><td class="num">65</td><td class="cmd">control</td><td>Открывает Панель управления.</td><td class="ex">control</td></tr>
+    <tr><td class="num">66</td><td class="cmd">mstsc</td><td>Открывает подключение к удалённому рабочему столу.</td><td class="ex">mstsc</td></tr>
+    <tr><td class="num">67</td><td class="cmd">cleanmgr</td><td>Открывает Очистку диска.</td><td class="ex">cleanmgr</td></tr>
+    <tr><td class="num">68</td><td class="cmd">defrag</td><td>Анализирует фрагментацию диска.</td><td class="ex">defrag C: /A</td></tr>
+    <tr><td class="num">69</td><td class="cmd">fsutil</td><td>Выводит список дисков.</td><td class="ex">fsutil fsinfo drives</td></tr>
+    <tr><td class="num">70</td><td class="cmd">path</td><td>Выводит или задаёт переменную PATH.</td><td class="ex">path</td></tr>
+    <tr><td class="num">71</td><td class="cmd">set</td><td>Выводит, задаёт или удаляет переменные окружения.</td><td class="ex">set</td></tr>
+    <tr><td class="num">72</td><td class="cmd">echo</td><td>Выводит текст или включает и выключает отображение команд.</td><td class="ex">echo Hello World</td></tr>
+    <tr><td class="num">73</td><td class="cmd">cls</td><td>Очищает экран.</td><td class="ex">cls</td></tr>
+    <tr><td class="num">74</td><td class="cmd">query</td><td>Выводит процессы узла сеансов.</td><td class="ex">query process *</td></tr>
+  </tbody>
+</table>
+<p class="note">Доступность команд и права зависят от версии (редакции) Windows.</p>
+
+</body>
+</html>
