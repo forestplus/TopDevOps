@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux: сведения о системе, окружение, время и журналы</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Linux: сведения о системе, окружение, время и журналы</h1>
+<p class="lead">Версия системы и ядра, железо, переменные окружения, история команд, дата и время, журнал ядра</p>
+
+<h2>Система и ядро</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">uname -a</td><td class="ex">uname -a</td><td>Всё сразу: имя хоста, версия ядра, архитектура.</td></tr>
+    <tr><td class="cmd">uname -r</td><td class="ex">uname -r</td><td>Только версия ядра.</td></tr>
+    <tr><td class="cmd">uname -m</td><td class="ex">uname -m</td><td>Архитектура процессора (x86_64, aarch64).</td></tr>
+    <tr><td class="cmd">cat /etc/os-release</td><td class="ex">cat /etc/os-release</td><td>Название и версия дистрибутива.</td></tr>
+    <tr><td class="cmd">lsb_release</td><td class="ex">lsb_release -a</td><td>Версия дистрибутива (если установлен пакет lsb-release).</td></tr>
+    <tr><td class="cmd">hostnamectl</td><td class="ex">hostnamectl</td><td>Имя, ОС, ядро, виртуализация, тип шасси.</td></tr>
+    <tr><td class="cmd">uptime</td><td class="ex">uptime -p</td><td>Время работы в читаемом виде.</td></tr>
+    <tr><td class="cmd">who -b</td><td class="ex">who -b</td><td>Время последней загрузки.</td></tr>
+    <tr><td class="cmd">systemd-detect-virt</td><td class="ex">systemd-detect-virt</td><td>Работает ли система в виртуальной машине или контейнере.</td></tr>
+    <tr><td class="cmd">getconf</td><td class="ex">getconf PAGESIZE ; getconf LONG_BIT</td><td>Системные константы (размер страницы, разрядность).</td></tr>
+  </tbody>
+</table>
+
+<h2>Железо</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">lscpu</td><td class="ex">lscpu</td><td>Процессор: ядра, потоки, частоты, кеши.</td></tr>
+    <tr><td class="cmd">nproc</td><td class="ex">nproc</td><td>Количество доступных ядер (удобно для make -j$(nproc)).</td></tr>
+    <tr><td class="cmd">free -h</td><td class="ex">free -h</td><td>Оперативная память и swap.</td></tr>
+    <tr><td class="cmd">cat /proc/meminfo</td><td class="ex">grep -E "MemTotal|MemAvailable" /proc/meminfo</td><td>Подробная статистика памяти.</td></tr>
+    <tr><td class="cmd">lspci</td><td class="ex">lspci | grep -i ethernet</td><td>PCI-устройства: сетевые карты, видео, контроллеры.</td></tr>
+    <tr><td class="cmd">lsusb</td><td class="ex">lsusb -t</td><td>USB-устройства в виде дерева.</td></tr>
+    <tr><td class="cmd">dmidecode</td><td class="ex">sudo dmidecode -t memory</td><td>Данные BIOS и DIMM-модули (нужен root).</td></tr>
+    <tr><td class="cmd">sensors</td><td class="ex">sensors</td><td>Температуры и напряжения (пакет lm-sensors).</td></tr>
+    <tr><td class="cmd">lshw</td><td class="ex">sudo lshw -short</td><td>Краткая сводка всего оборудования.</td></tr>
+    <tr><td class="cmd">vmstat</td><td class="ex">vmstat 2 5</td><td>Загрузка процессора, памяти и ввода-вывода каждые 2 секунды, 5 раз.</td></tr>
+    <tr><td class="cmd">iostat</td><td class="ex">iostat -xz 2 3</td><td>Нагрузка на диски (пакет sysstat).</td></tr>
+    <tr><td class="cmd">iotop</td><td class="ex">sudo iotop -o</td><td>Процессы, которые сейчас пишут и читают диск.</td></tr>
+  </tbody>
+</table>
+
+<h2>Модули ядра и dmesg</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">lsmod</td><td class="ex">lsmod | grep kvm</td><td>Загруженные модули ядра.</td></tr>
+    <tr><td class="cmd">modinfo</td><td class="ex">modinfo ext4</td><td>Описание модуля и его параметры.</td></tr>
+    <tr><td class="cmd">modprobe</td><td class="ex">sudo modprobe br_netfilter</td><td>Загрузить модуль (с зависимостями).</td></tr>
+    <tr><td class="cmd">modprobe -r</td><td class="ex">sudo modprobe -r floppy</td><td>Выгрузить модуль.</td></tr>
+    <tr><td class="cmd">sysctl</td><td class="ex">sysctl net.ipv4.ip_forward</td><td>Текущее значение параметра ядра.</td></tr>
+    <tr><td class="cmd">sysctl -w</td><td class="ex">sudo sysctl -w net.ipv4.ip_forward=1</td><td>Изменить на время работы.</td></tr>
+    <tr><td class="cmd">sysctl --system</td><td class="ex">sudo sysctl --system</td><td>Применить все файлы из /etc/sysctl.d/.</td></tr>
+    <tr><td class="cmd">dmesg -T</td><td class="ex">sudo dmesg -T | tail -n 50</td><td>Журнал ядра с человеческим временем.</td></tr>
+    <tr><td class="cmd">dmesg -l</td><td class="ex">sudo dmesg -l err,warn</td><td>Только ошибки и предупреждения.</td></tr>
+    <tr><td class="cmd">dmesg -w</td><td class="ex">sudo dmesg -w</td><td>Следить за новыми сообщениями ядра.</td></tr>
+  </tbody>
+</table>
+
+<h2>Переменные окружения и оболочка</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">env</td><td class="ex">env | sort</td><td>Все переменные окружения, по алфавиту.</td></tr>
+    <tr><td class="cmd">printenv</td><td class="ex">printenv PATH</td><td>Значение конкретной переменной.</td></tr>
+    <tr><td class="cmd">echo $VAR</td><td class="ex">echo "$HOME $USER $SHELL"</td><td>Вывести значение переменной (кавычки защищают от разбивки).</td></tr>
+    <tr><td class="cmd">export</td><td class="ex">export APP_ENV=prod</td><td>Задать переменную для текущей сессии и её дочерних процессов.</td></tr>
+    <tr><td class="cmd">VAR=value cmd</td><td class="ex">LANG=C sort file</td><td>Переменная только для одной команды.</td></tr>
+    <tr><td class="cmd">unset</td><td class="ex">unset APP_ENV</td><td>Удалить переменную.</td></tr>
+    <tr><td class="cmd">set</td><td class="ex">set | grep ^PS1</td><td>Все переменные оболочки, включая локальные.</td></tr>
+    <tr><td class="cmd">$?</td><td class="ex">grep -q root /etc/passwd; echo $?</td><td>Код возврата последней команды (0 — успех).</td></tr>
+    <tr><td class="cmd">$!</td><td class="ex">sleep 10 &amp; echo $!</td><td>PID последнего фонового процесса.</td></tr>
+    <tr><td class="cmd">$$</td><td class="ex">echo $$</td><td>PID текущей оболочки.</td></tr>
+    <tr><td class="cmd">which</td><td class="ex">which -a python3</td><td>Путь к исполняемому файлу в PATH (все совпадения с -a).</td></tr>
+    <tr><td class="cmd">whereis</td><td class="ex">whereis nginx</td><td>Бинарник, исходники и man-страницы.</td></tr>
+    <tr><td class="cmd">type</td><td class="ex">type ll</td><td>Что такое команда: алиас, функция, встроенная или бинарник.</td></tr>
+    <tr><td class="cmd">source</td><td class="ex">source ~/.bashrc</td><td>Перечитать файл настроек в текущей сессии.</td></tr>
+    <tr><td class="cmd">alias</td><td class="ex">alias ll='ls -lah'</td><td>Короткое имя для команды.</td></tr>
+    <tr><td class="cmd">unalias</td><td class="ex">unalias ll</td><td>Убрать алиас.</td></tr>
+    <tr><td class="cmd">PATH=</td><td class="ex">export PATH="$HOME/bin:$PATH"</td><td>Добавить папку в начало поиска команд.</td></tr>
+  </tbody>
+</table>
+
+<h2>История команд</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">history</td><td class="ex">history | tail -n 30</td><td>Последние 30 команд с номерами.</td></tr>
+    <tr><td class="cmd">history | grep</td><td class="ex">history | grep docker</td><td>Поиск по истории.</td></tr>
+    <tr><td class="cmd">!n</td><td class="ex">!245</td><td>Повторить команду с номером 245.</td></tr>
+    <tr><td class="cmd">!string</td><td class="ex">!ssh</td><td>Повторить последнюю команду, начинающуюся с ssh.</td></tr>
+    <tr><td class="cmd">!!</td><td class="ex">sudo !!</td><td>Повторить предыдущую команду с sudo.</td></tr>
+    <tr><td class="cmd">!$</td><td class="ex">cp conf.yml !$.bak</td><td>Последний аргумент предыдущей команды.</td></tr>
+    <tr><td class="cmd">history -c</td><td class="ex">history -c</td><td>Очистить историю текущей сессии.</td></tr>
+    <tr><td class="cmd">HISTCONTROL</td><td class="ex">export HISTCONTROL=ignoreboth</td><td>Не сохранять команды с пробела и повторы.</td></tr>
+    <tr><td class="cmd">Ctrl+R</td><td class="ex">Ctrl+R</td><td>Поиск по истории в реальном времени.</td></tr>
+  </tbody>
+</table>
+
+<h2>Дата, время и календарь</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">date</td><td class="ex">date</td><td>Текущие дата и время.</td></tr>
+    <tr><td class="cmd">date +%F</td><td class="ex">date +%F_%H-%M</td><td>Формат для имён файлов.</td></tr>
+    <tr><td class="cmd">date -u</td><td class="ex">date -u</td><td>Время UTC.</td></tr>
+    <tr><td class="cmd">date -d</td><td class="ex">date -d "2 days ago" +%F</td><td>Относительная дата.</td></tr>
+    <tr><td class="cmd">date -d @</td><td class="ex">date -d @1700000000</td><td>Перевод Unix-времени в дату.</td></tr>
+    <tr><td class="cmd">timedatectl</td><td class="ex">timedatectl status</td><td>Часовой пояс, синхронизация NTP.</td></tr>
+    <tr><td class="cmd">timedatectl set</td><td class="ex">sudo timedatectl set-timezone Europe/Moscow</td><td>Сменить часовой пояс.</td></tr>
+    <tr><td class="cmd">timedatectl ntp</td><td class="ex">sudo timedatectl set-ntp true</td><td>Включить синхронизацию времени.</td></tr>
+    <tr><td class="cmd">cal</td><td class="ex">cal -3</td><td>Календарь на три месяца.</td></tr>
+    <tr><td class="cmd">time</td><td class="ex">time ./job.sh</td><td>Замерить время выполнения команды.</td></tr>
+    <tr><td class="cmd">sleep</td><td class="ex">sleep 30</td><td>Пауза.</td></tr>
+    <tr><td class="cmd">watch</td><td class="ex">watch -n 2 'df -h /'</td><td>Повторять команду каждые 2 секунды.</td></tr>
+  </tbody>
+</table>
+
+<h2>Пользователи в системе и загрузка</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">w</td><td class="ex">w</td><td>Кто в системе и что делает, средняя нагрузка.</td></tr>
+    <tr><td class="cmd">top -bn1</td><td class="ex">top -bn1 | head -15</td><td>Снимок загрузки без интерактивного режима.</td></tr>
+    <tr><td class="cmd">loadavg</td><td class="ex">cat /proc/loadavg</td><td>Средняя нагрузка за 1, 5 и 15 минут.</td></tr>
+    <tr><td class="cmd">journalctl --list-boots</td><td class="ex">journalctl --list-boots</td><td>Список загрузок, для анализа падений.</td></tr>
+    <tr><td class="cmd">last reboot</td><td class="ex">last reboot | head -5</td><td>История перезагрузок.</td></tr>
+  </tbody>
+</table>
+
+<h2>Перенаправление и вывод</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">&gt;</td><td class="ex">cmd &gt; out.txt</td><td>Вывод в файл с перезаписью.</td></tr>
+    <tr><td class="cmd">&gt;&gt;</td><td class="ex">cmd &gt;&gt; out.txt</td><td>Дописать в конец файла.</td></tr>
+    <tr><td class="cmd">2&gt;</td><td class="ex">cmd 2&gt; errors.txt</td><td>Только ошибки (stderr) в файл.</td></tr>
+    <tr><td class="cmd">2&gt;&amp;1</td><td class="ex">cmd &gt; all.log 2&gt;&amp;1</td><td>Ошибки и вывод в один файл.</td></tr>
+    <tr><td class="cmd">&amp;&gt;</td><td class="ex">cmd &amp;&gt; all.log</td><td>То же, короткая запись в bash.</td></tr>
+    <tr><td class="cmd">/dev/null</td><td class="ex">cmd &gt; /dev/null 2&gt;&amp;1</td><td>Выбросить вывод.</td></tr>
+    <tr><td class="cmd">&lt;</td><td class="ex">sort &lt; names.txt</td><td>Взять ввод из файла.</td></tr>
+    <tr><td class="cmd">&lt;&lt;EOF</td><td class="ex">cat &lt;&lt;EOF &gt; conf.txt ...</td><td>Многострочный ввод прямо в команде (heredoc).</td></tr>
+    <tr><td class="cmd">|</td><td class="ex">ps aux | grep nginx</td><td>Передать вывод в другую команду.</td></tr>
+    <tr><td class="cmd">&gt;(</td><td class="ex">diff &lt;(sort a) &lt;(sort b)</td><td>Подстановка процесса: вывод как файл.</td></tr>
+  </tbody>
+</table>
+
+<h2>Пример: быстрый отчёт о сервере</h2>
+<pre>echo "== Система =="; hostnamectl | head -6
+echo "== Ядро =="; uname -r
+echo "== Память =="; free -h | head -2
+echo "== Диски =="; df -hT -x tmpfs -x devtmpfs
+echo "== Нагрузка =="; uptime
+echo "== Упавшие службы =="; systemctl --failed --no-pager
+echo "== Ошибки ядра за сутки =="; sudo journalctl -k -p err --since "24 hours ago" --no-pager | tail -n 20</pre>
+
+<div class="warn">
+  Переменные окружения с паролями и токенами нельзя передавать в командной строке: они видны в <code>ps aux</code> и в истории. Используйте файлы с ограниченными правами (<code>chmod 600</code>) или менеджер секретов. Команда <code>history -c</code> не удаляет уже записанный файл истории, для этого существует ~/.bash_history.
+</div>
+
+<div class="tip">
+  Чтобы не потерять полезные команды, добавьте в ~/.bashrc строку <code>shopt -s histappend</code>. Тогда история дописывается в файл, а не перезаписывается при закрытии каждой сессии.
+</div>
+
+</div>
+</body>
+</html>

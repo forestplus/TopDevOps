@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux: сеть, интерфейсы, DNS и HTTP</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Linux: сеть, интерфейсы, DNS и HTTP</h1>
+<p class="lead">Диагностика сети от интерфейсов до HTTP-запросов, DNS, портов и правил файрвола</p>
+
+<h2>Интерфейсы и адреса (ip)</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">ip a</td><td class="ex">ip a</td><td>Все интерфейсы и адреса.</td></tr>
+    <tr><td class="cmd">ip -br a</td><td class="ex">ip -br a</td><td>Кратко: одна строка на интерфейс.</td></tr>
+    <tr><td class="cmd">ip a show</td><td class="ex">ip a show dev eth0</td><td>Один интерфейс.</td></tr>
+    <tr><td class="cmd">ip link</td><td class="ex">ip link show</td><td>Состояние интерфейсов, MAC и MTU.</td></tr>
+    <tr><td class="cmd">ip link set up/down</td><td class="ex">ip link set eth0 down</td><td>Выключить или включить интерфейс (до перезагрузки).</td></tr>
+    <tr><td class="cmd">ip link set mtu</td><td class="ex">ip link set eth0 mtu 1400</td><td>Изменить MTU (полезно за VPN или туннелем).</td></tr>
+    <tr><td class="cmd">ip addr add</td><td class="ex">ip addr add 10.0.0.5/24 dev eth0</td><td>Временно добавить адрес (до перезагрузки).</td></tr>
+    <tr><td class="cmd">ip addr del</td><td class="ex">ip addr del 10.0.0.5/24 dev eth0</td><td>Удалить адрес.</td></tr>
+    <tr><td class="cmd">ip route</td><td class="ex">ip route show</td><td>Таблица маршрутов.</td></tr>
+    <tr><td class="cmd">ip route get</td><td class="ex">ip route get 8.8.8.8</td><td>Через какой интерфейс и шлюз уйдёт пакет.</td></tr>
+    <tr><td class="cmd">ip route add</td><td class="ex">ip route add 10.20.0.0/16 via 10.0.0.1</td><td>Добавить маршрут (временно).</td></tr>
+    <tr><td class="cmd">ip route add default</td><td class="ex">ip route add default via 10.0.0.1 dev eth0</td><td>Маршрут по умолчанию.</td></tr>
+    <tr><td class="cmd">ip route del</td><td class="ex">ip route del 10.20.0.0/16</td><td>Удалить маршрут.</td></tr>
+    <tr><td class="cmd">ip neigh</td><td class="ex">ip neigh show</td><td>ARP-таблица: соседи в локальной сети и их MAC.</td></tr>
+    <tr><td class="cmd">ip -s link</td><td class="ex">ip -s link show eth0</td><td>Счётчики ошибок и пакетов на интерфейсе.</td></tr>
+    <tr><td class="cmd">hostname -I</td><td class="ex">hostname -I</td><td>Все IP-адреса хоста.</td></tr>
+    <tr><td class="cmd">hostname</td><td class="ex">hostnamectl set-hostname web01</td><td>Сменить имя хоста постоянно.</td></tr>
+  </tbody>
+</table>
+
+<h2>Сокеты и порты (ss, lsof)</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">ss -tulpn</td><td class="ex">ss -tulpn</td><td>Слушающие TCP и UDP порты с процессами.</td></tr>
+    <tr><td class="cmd">ss -t</td><td class="ex">ss -t state established</td><td>Установленные TCP-соединения.</td></tr>
+    <tr><td class="cmd">ss -tn</td><td class="ex">ss -tn dst 10.0.0.9</td><td>Соединения к конкретному адресу.</td></tr>
+    <tr><td class="cmd">ss sport</td><td class="ex">ss -tn sport = :443</td><td>Фильтр по порту источника.</td></tr>
+    <tr><td class="cmd">ss dport</td><td class="ex">ss -tn dport = :5432</td><td>Соединения к порту назначения.</td></tr>
+    <tr><td class="cmd">ss -s</td><td class="ex">ss -s</td><td>Сводка по сокетам.</td></tr>
+    <tr><td class="cmd">ss -o</td><td class="ex">ss -tno state established</td><td>Таймеры соединения.</td></tr>
+    <tr><td class="cmd">netstat -tulpn</td><td class="ex">netstat -tulpn</td><td>То же, что ss, из старого пакета net-tools.</td></tr>
+    <tr><td class="cmd">lsof -i</td><td class="ex">lsof -i :8080</td><td>Кто держит порт.</td></tr>
+    <tr><td class="cmd">lsof -i TCP</td><td class="ex">lsof -iTCP -sTCP:LISTEN</td><td>Все слушающие TCP-сокеты.</td></tr>
+    <tr><td class="cmd">lsof -u</td><td class="ex">lsof -u ivan -i</td><td>Сетевые соединения пользователя.</td></tr>
+  </tbody>
+</table>
+
+<h2>Проверка связи</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">ping</td><td class="ex">ping -c 4 8.8.8.8</td><td>Четыре пакета и выход.</td></tr>
+    <tr><td class="cmd">ping -i</td><td class="ex">ping -i 0.2 -c 20 gw</td><td>Интервал 0.2 с (нужны права root для интервала меньше 0.2).</td></tr>
+    <tr><td class="cmd">ping -s</td><td class="ex">ping -M do -s 1372 -c 3 host</td><td>Проверить MTU: не фрагментировать, размер полезной нагрузки.</td></tr>
+    <tr><td class="cmd">ping -W</td><td class="ex">ping -W 2 -c 1 host</td><td>Таймаут ожидания ответа 2 секунды.</td></tr>
+    <tr><td class="cmd">traceroute</td><td class="ex">traceroute -n example.com</td><td>Маршрут без DNS-имён (быстрее).</td></tr>
+    <tr><td class="cmd">tracepath</td><td class="ex">tracepath example.com</td><td>Маршрут и определение MTU без root.</td></tr>
+    <tr><td class="cmd">mtr</td><td class="ex">mtr -rwbc 10 example.com</td><td>Непрерывная трассировка с потерями и задержками (отчёт).</td></tr>
+    <tr><td class="cmd">nc -zv</td><td class="ex">nc -zv db.local 5432</td><td>Проверить, открыт ли TCP-порт (без отправки данных).</td></tr>
+    <tr><td class="cmd">nc -zvu</td><td class="ex">nc -zvu dns.local 53</td><td>Проверка UDP (менее надёжна).</td></tr>
+    <tr><td class="cmd">nc -l</td><td class="ex">nc -l 9000</td><td>Слушать порт 9000 (тест входящих соединений).</td></tr>
+    <tr><td class="cmd">timeout + bash</td><td class="ex">timeout 3 bash -c '&lt;/dev/tcp/host/443' &amp;&amp; echo open</td><td>Проверка порта без nc, встроенными средствами bash.</td></tr>
+    <tr><td class="cmd">tcpdump</td><td class="ex">sudo tcpdump -i any -nn port 80</td><td>Перехват трафика по порту, без DNS (-nn).</td></tr>
+    <tr><td class="cmd">tcpdump -w</td><td class="ex">sudo tcpdump -i eth0 -w cap.pcap host 10.0.0.9</td><td>Записать трафик в файл для Wireshark.</td></tr>
+    <tr><td class="cmd">tcpdump -r</td><td class="ex">tcpdump -nr cap.pcap</td><td>Прочитать записанный файл.</td></tr>
+  </tbody>
+</table>
+
+<h2>DNS</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">dig</td><td class="ex">dig example.com A</td><td>Запись A с подробностями.</td></tr>
+    <tr><td class="cmd">dig +short</td><td class="ex">dig +short example.com</td><td>Только ответ.</td></tr>
+    <tr><td class="cmd">dig MX</td><td class="ex">dig +short MX example.com</td><td>Почтовые серверы домена.</td></tr>
+    <tr><td class="cmd">dig TXT</td><td class="ex">dig +short TXT example.com</td><td>TXT-записи (SPF, DKIM, верификации).</td></tr>
+    <tr><td class="cmd">dig NS</td><td class="ex">dig +short NS example.com</td><td>Серверы имён домена.</td></tr>
+    <tr><td class="cmd">dig @</td><td class="ex">dig @8.8.8.8 example.com</td><td>Запрос к конкретному DNS-серверу.</td></tr>
+    <tr><td class="cmd">dig -x</td><td class="ex">dig -x 8.8.8.8 +short</td><td>Обратный запрос: PTR по IP.</td></tr>
+    <tr><td class="cmd">dig +trace</td><td class="ex">dig +trace example.com</td><td>Путь от корневых серверов до ответа.</td></tr>
+    <tr><td class="cmd">dig +noall +answer</td><td class="ex">dig +noall +answer example.com</td><td>Вывод только секции ответа.</td></tr>
+    <tr><td class="cmd">host</td><td class="ex">host example.com</td><td>Простой запрос имени.</td></tr>
+    <tr><td class="cmd">nslookup</td><td class="ex">nslookup example.com 8.8.8.8</td><td>Запрос через указанный сервер (интерактивный режим тоже есть).</td></tr>
+    <tr><td class="cmd">resolvectl</td><td class="ex">resolvectl query example.com</td><td>Через systemd-resolved, с учётом локальных настроек.</td></tr>
+    <tr><td class="cmd">resolvectl flush</td><td class="ex">resolvectl flush-caches</td><td>Сбросить кеш DNS.</td></tr>
+    <tr><td class="cmd">getent hosts</td><td class="ex">getent hosts example.com</td><td>Имя так, как его видит система (учитывает /etc/hosts и NSS).</td></tr>
+  </tbody>
+</table>
+
+<h2>HTTP: curl и wget</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">curl</td><td class="ex">curl https://example.com</td><td>Получить тело ответа.</td></tr>
+    <tr><td class="cmd">curl -I</td><td class="ex">curl -I https://example.com</td><td>Только заголовки (HEAD).</td></tr>
+    <tr><td class="cmd">curl -i</td><td class="ex">curl -i https://example.com</td><td>Заголовки и тело вместе.</td></tr>
+    <tr><td class="cmd">curl -s -o /dev/null -w</td><td class="ex">curl -s -o /dev/null -w "%{http_code} %{time_total}\n" URL</td><td>Только код ответа и время (для мониторинга).</td></tr>
+    <tr><td class="cmd">curl -L</td><td class="ex">curl -L http://example.com</td><td>Следовать редиректам.</td></tr>
+    <tr><td class="cmd">curl -v</td><td class="ex">curl -v https://example.com</td><td>Подробный вывод, включая TLS-рукопожатие.</td></tr>
+    <tr><td class="cmd">curl -o</td><td class="ex">curl -o page.html URL</td><td>Сохранить в файл с заданным именем.</td></tr>
+    <tr><td class="cmd">curl -O</td><td class="ex">curl -O URL</td><td>Сохранить с именем из URL.</td></tr>
+    <tr><td class="cmd">curl -C -</td><td class="ex">curl -C - -O URL</td><td>Продолжить прерванную загрузку.</td></tr>
+    <tr><td class="cmd">curl -X POST</td><td class="ex">curl -X POST -H "Content-Type: application/json" -d '{"a":1}' URL</td><td>Отправить JSON.</td></tr>
+    <tr><td class="cmd">curl -F</td><td class="ex">curl -F "file=@report.pdf" URL</td><td>Отправить файл как multipart-форму.</td></tr>
+    <tr><td class="cmd">curl -H</td><td class="ex">curl -H "Authorization: Bearer $TOKEN" URL</td><td>Добавить заголовок (токен, Accept и др.).</td></tr>
+    <tr><td class="cmd">curl -u</td><td class="ex">curl -u ivan:pass URL</td><td>Базовая аутентификация (пароль лучше из переменной или ~/.netrc).</td></tr>
+    <tr><td class="cmd">curl --resolve</td><td class="ex">curl --resolve site.com:443:10.0.0.5 https://site.com/</td><td>Подменить DNS для проверки конкретного сервера.</td></tr>
+    <tr><td class="cmd">curl -x</td><td class="ex">curl -x http://proxy:3128 URL</td><td>Через HTTP-прокси.</td></tr>
+    <tr><td class="cmd">curl --max-time</td><td class="ex">curl --max-time 5 URL</td><td>Таймаут всей операции.</td></tr>
+    <tr><td class="cmd">curl -k</td><td class="ex">curl -k https://self-signed.local</td><td>Не проверять сертификат. Только для тестов, не для продакшена.</td></tr>
+    <tr><td class="cmd">wget -O</td><td class="ex">wget -O file.tgz URL</td><td>Сохранить в файл.</td></tr>
+    <tr><td class="cmd">wget -c</td><td class="ex">wget -c URL</td><td>Продолжить загрузку.</td></tr>
+    <tr><td class="cmd">wget -q</td><td class="ex">wget -qO- URL</td><td>Тихий режим и вывод в stdout.</td></tr>
+    <tr><td class="cmd">wget -r -np</td><td class="ex">wget -r -np -l 2 URL</td><td>Рекурсивно, не подниматься выше, глубина 2 (осторожно с нагрузкой).</td></tr>
+  </tbody>
+</table>
+
+<h2>Файрвол</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">ufw status</td><td class="ex">sudo ufw status verbose</td><td>Состояние и правила (Ubuntu и Debian).</td></tr>
+    <tr><td class="cmd">ufw allow</td><td class="ex">sudo ufw allow 22/tcp</td><td>Разрешить порт.</td></tr>
+    <tr><td class="cmd">ufw allow from</td><td class="ex">sudo ufw allow from 10.0.0.0/24 to any port 5432</td><td>Разрешить порт только из подсети.</td></tr>
+    <tr><td class="cmd">ufw deny</td><td class="ex">sudo ufw deny 3306</td><td>Запретить порт.</td></tr>
+    <tr><td class="cmd">ufw delete</td><td class="ex">sudo ufw delete allow 8080</td><td>Удалить правило.</td></tr>
+    <tr><td class="cmd">ufw enable</td><td class="ex">sudo ufw enable</td><td>Включить файрвол (сначала разрешите SSH, иначе отрежете себя).</td></tr>
+    <tr><td class="cmd">firewall-cmd</td><td class="ex">sudo firewall-cmd --list-all</td><td>Firewalld в RHEL-семействе.</td></tr>
+    <tr><td class="cmd">firewall-cmd --add</td><td class="ex">sudo firewall-cmd --permanent --add-port=8080/tcp &amp;&amp; sudo firewall-cmd --reload</td><td>Открыть порт постоянно.</td></tr>
+    <tr><td class="cmd">iptables -L</td><td class="ex">sudo iptables -L -n -v --line-numbers</td><td>Правила iptables с номерами и счётчиками.</td></tr>
+    <tr><td class="cmd">nft list</td><td class="ex">sudo nft list ruleset</td><td>Все правила nftables.</td></tr>
+  </tbody>
+</table>
+
+<h2>Настройка сети: nmcli и resolv</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">nmcli dev</td><td class="ex">nmcli dev status</td><td>Интерфейсы и их состояние в NetworkManager.</td></tr>
+    <tr><td class="cmd">nmcli con show</td><td class="ex">nmcli con show</td><td>Сохранённые подключения.</td></tr>
+    <tr><td class="cmd">nmcli con up</td><td class="ex">nmcli con up "Wired connection 1"</td><td>Поднять подключение.</td></tr>
+    <tr><td class="cmd">nmcli con mod</td><td class="ex">nmcli con mod eth0 ipv4.addresses 10.0.0.5/24 ipv4.gateway 10.0.0.1 ipv4.method manual</td><td>Постоянно задать статический адрес.</td></tr>
+    <tr><td class="cmd">nmcli con mod dns</td><td class="ex">nmcli con mod eth0 ipv4.dns "1.1.1.1 8.8.8.8"</td><td>Задать DNS-серверы.</td></tr>
+    <tr><td class="cmd">nmcli con reload</td><td class="ex">nmcli con reload &amp;&amp; nmcli con up eth0</td><td>Применить изменения.</td></tr>
+    <tr><td class="cmd">cat /etc/resolv.conf</td><td class="ex">cat /etc/resolv.conf</td><td>Какой DNS используется (на systemd-resolved это заглушка).</td></tr>
+  </tbody>
+</table>
+
+<h2>Копирование по сети</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">scp</td><td class="ex">scp file.txt user@host:/tmp/</td><td>Копировать файл на удалённый сервер.</td></tr>
+    <tr><td class="cmd">scp -r</td><td class="ex">scp -r ./dir user@host:/srv/</td><td>Рекурсивно.</td></tr>
+    <tr><td class="cmd">scp -P</td><td class="ex">scp -P 2222 file user@host:/tmp/</td><td>Нестандартный порт SSH (заглавная P).</td></tr>
+    <tr><td class="cmd">scp -i</td><td class="ex">scp -i ~/.ssh/deploy file user@host:/tmp/</td><td>Указать ключ.</td></tr>
+    <tr><td class="cmd">sftp</td><td class="ex">sftp user@host</td><td>Интерактивная передача: get, put, ls, cd.</td></tr>
+    <tr><td class="cmd">rsync -avh</td><td class="ex">rsync -avh --progress ./dir/ user@host:/backup/</td><td>Синхронизация: только изменившиеся файлы, с правами и временем.</td></tr>
+    <tr><td class="cmd">rsync --delete</td><td class="ex">rsync -avh --delete ./site/ /var/www/site/</td><td>Удалять на приёмнике то, чего нет в источнике (осторожно).</td></tr>
+    <tr><td class="cmd">rsync --dry-run</td><td class="ex">rsync -avhn ./src/ dst/</td><td>Только показать, что будет сделано (-n).</td></tr>
+    <tr><td class="cmd">rsync --exclude</td><td class="ex">rsync -av --exclude='*.log' --exclude=node_modules ./app/ host:/app/</td><td>Исключить шаблоны.</td></tr>
+    <tr><td class="cmd">rsync -e ssh</td><td class="ex">rsync -av -e "ssh -p 2222" ./dir/ user@host:/x/</td><td>Свой SSH-порт или ключ.</td></tr>
+    <tr><td class="cmd">rsync --bwlimit</td><td class="ex">rsync -av --bwlimit=5000 ./big/ host:/big/</td><td>Ограничить скорость (КБ/с).</td></tr>
+  </tbody>
+</table>
+
+<h2>Пример: диагностика «сайт не открывается»</h2>
+<pre>ip -br a                      # есть ли адрес на интерфейсе
+ip route get 8.8.8.8         # есть ли маршрут наружу
+dig +short example.com       # резолвится ли имя
+ping -c 3 8.8.8.8            # доступность по IP (без DNS)
+curl -v -o /dev/null https://example.com   # где именно ломается запрос
+ss -tulpn | grep :443        # слушает ли сервис порт
+sudo ufw status              # не блокирует ли файрвол</pre>
+
+<div class="warn">
+  Команда <code>ufw enable</code> или изменение правил iptables/nftables по SSH может отрезать вам доступ к серверу. Перед этим разрешите свой порт SSH и держите открытую вторую сессию. Флаг <code>rsync --delete</code> удаляет файлы на приёмнике: сначала проверьте с <code>--dry-run</code>.
+</div>
+
+<div class="tip">
+  Если в curl не хватает понимания, почему запрос не проходит, добавьте <code>-v</code>: видно разрешение имени, TCP, TLS-сертификат и заголовки. Это быстрее, чем гадать по коду ошибки.
+</div>
+
+</div>
+</body>
+</html>

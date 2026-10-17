@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git: полезные настройки, алиасы и решение типичных проблем</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  h3 { color:var(--blue); font-size:15px; margin:18px 0 6px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Git: полезные настройки, алиасы и типичные проблемы</h1>
+<p class="lead">Пятая часть гида: ускорение работы, лайфхаки, инструменты и разбор ситуаций, с которыми сталкиваются почти все</p>
+
+<h2>Полезные настройки</h2>
+<pre># Цвета и удобный вид
+git config --global color.ui auto
+git config --global core.pager "less -FRX"
+
+# Автоматически исправлять опечатки в командах (через 2 секунды)
+git config --global help.autocorrect 20
+
+# Перенос строк: input на Linux/macOS, true на Windows
+git config --global core.autocrlf input
+
+# Включить переиспользование решений конфликтов (rerere)
+git config --global rerere.enabled true
+
+# Более умный diff по перемещённым блокам
+git config --global diff.colorMoved default
+
+# Быстрее и аккуратнее при pull и push
+git config --global pull.rebase true
+git config --global push.default current
+git config --global push.autoSetupRemote true
+
+# Ветка по умолчанию
+git config --global init.defaultBranch main
+
+# Использовать конкретный ключ для подписи коммитов
+git config --global user.signingkey ВАШ_КЛЮЧ
+git config --global commit.gpgsign true</pre>
+
+<h2>Алиасы: короткие команды</h2>
+<pre>git config --global alias.st "status -sb"
+git config --global alias.co "switch"
+git config --global alias.br "branch -vv"
+git config --global alias.lg "log --oneline --graph --decorate --all"
+git config --global alias.last "log -1 HEAD --stat"
+git config --global alias.unstage "restore --staged"
+git config --global alias.undo "reset --soft HEAD~1"
+git config --global alias.amend "commit --amend --no-edit"
+git config --global alias.wip "!git add -A &amp;&amp; git commit -m 'WIP'"</pre>
+<p>После этого <code>git st</code>, <code>git lg</code> и <code>git undo</code> работают как обычные команды. Восклицательный знак в начале делает алиас запуском внешней команды через оболочку.</p>
+
+<h2>Вывод истории: форматы</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git log --pretty</td><td class="ex">git log --pretty=format:"%C(yellow)%h%Creset %s %C(blue)(%an)%Creset"</td><td>Цветной формат: хэш, тема и автор.</td></tr>
+    <tr><td class="cmd">git log --date</td><td class="ex">git log --date=relative -5</td><td>Относительные даты: «3 days ago».</td></tr>
+    <tr><td class="cmd">git log --name-status</td><td class="ex">git log --name-status -3</td><td>Изменённые файлы с типом: A, M, D, R.</td></tr>
+    <tr><td class="cmd">git log --all</td><td class="ex">git log --all --oneline --graph</td><td>Все ветки и теги, а не только текущая.</td></tr>
+    <tr><td class="cmd">git log -n</td><td class="ex">git log -n 5 --author="Ivan"</td><td>Ограничить количество.</td></tr>
+    <tr><td class="cmd">git log --no-merges</td><td class="ex">git log --oneline --no-merges main</td><td>Без коммитов слияния, только реальная работа.</td></tr>
+    <tr><td class="cmd">git log --first-parent</td><td class="ex">git log --first-parent --oneline main</td><td>Идти только по основной ветке, без веток фич.</td></tr>
+    <tr><td class="cmd">git log ..</td><td class="ex">git log main..feature --oneline</td><td>Коммиты, которые есть в feature, но нет в main.</td></tr>
+    <tr><td class="cmd">git diff --stat</td><td class="ex">git diff --stat main...feature</td><td>Сводка изменений относительно общего предка веток.</td></tr>
+  </tbody>
+</table>
+
+<h2>Worktree: несколько рабочих папок одного репозитория</h2>
+<p>Если нужно срочно поправить ветку, не сохраняя текущую работу, создайте отдельную рабочую папку.</p>
+<pre>git worktree add ../hotfix hotfix/login       # новая папка на существующей ветке
+git worktree add -b feat/new ../feat-new main # новая ветка в новой папке
+git worktree list                             # все рабочие папки
+git worktree remove ../hotfix                 # удалить папку (ветка остаётся)
+git worktree prune                            # очистить записи о пропавших папках</pre>
+
+<h2>Хуки</h2>
+<p>Хуки — скрипты в папке <code>.git/hooks/</code>, которые Git запускает на разных этапах. Для совместной работы их лучше хранить в репозитории и подключать через <code>core.hooksPath</code>.</p>
+<table>
+  <thead><tr><th>Хук</th><th>Когда запускается</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">pre-commit</td><td>перед созданием коммита: линтеры, форматирование, поиск секретов</td></tr>
+    <tr><td class="cmd">commit-msg</td><td>проверка формата сообщения коммита</td></tr>
+    <tr><td class="cmd">pre-push</td><td>перед отправкой: тесты</td></tr>
+    <tr><td class="cmd">post-checkout / post-merge</td><td>после переключения и слияния: например, пересборка зависимостей</td></tr>
+  </tbody>
+</table>
+<pre># Пример: запретить коммит, если в индексе есть файлы .env
+mkdir -p .githooks
+cat &gt; .githooks/pre-commit &lt;&lt;'EOF'
+#!/bin/sh
+if git diff --cached --name-only | grep -q '\.env$'; then
+  echo "Нельзя коммитить .env"
+  exit 1
+fi
+EOF
+chmod +x .githooks/pre-commit
+git config core.hooksPath .githooks</pre>
+
+<h2>.gitignore</h2>
+<pre># Игнорировать сборочные артефакты
+build/
+dist/
+*.pyc
+__pycache__/
+
+# Секреты
+.env
+*.pem
+secrets/
+
+# Редакторы и ОС
+.idea/
+.vscode/
+.DS_Store
+
+# Исключение из правила: оставить конкретный файл
+!.env.example</pre>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git check-ignore</td><td class="ex">git check-ignore -v app.log</td><td>Какое правило игнорирует файл.</td></tr>
+    <tr><td class="cmd">git ls-files -i</td><td class="ex">git ls-files -i --exclude-standard</td><td>Отслеживаемые файлы, которые при этом игнорируются.</td></tr>
+    <tr><td class="cmd">git rm --cached</td><td class="ex">git rm -r --cached logs/</td><td>Перестать отслеживать уже добавленную папку, оставив её на диске.</td></tr>
+  </tbody>
+</table>
+
+<h2>Решение типичных проблем</h2>
+
+<h3>1. Случайно закоммитил пароль или ключ</h3>
+<pre># Если не отправлял: убрать из последнего коммита
+git rm --cached secrets.env
+echo "secrets.env" &gt;&gt; .gitignore
+git commit --amend --no-edit
+
+# Если уже отправил: считайте секрет скомпрометированным.
+# 1) немедленно смените его; 2) очистите историю (git filter-repo) и
+# попросите коллег пересоздать клоны. Одного revert недостаточно: старый коммит остаётся в истории.</pre>
+
+<h3>2. Detached HEAD</h3>
+<p>Вы перешли на тег или коммит, а не на ветку, и новые коммиты могут потеряться при переключении.</p>
+<pre>git status                        # подтвердит detached HEAD
+git switch -c спасение           # создать ветку прямо здесь и сохранить работу
+# или, если коммитов не было, просто:
+git switch main</pre>
+
+<h3>3. push отклонён: non-fast-forward</h3>
+<p>На сервере есть коммиты, которых нет у вас. Не используйте <code>--force</code> без причины.</p>
+<pre>git fetch origin
+git log --oneline HEAD..origin/feature      # что пришло
+git rebase origin/feature                   # перенести свои коммиты поверх
+git push</pre>
+
+<h3>4. Нужно «заморозить» файлы, но они уже отслеживаются</h3>
+<pre># Временно не учитывать локальные изменения в конфиге, не трогая репозиторий
+git update-index --skip-worktree config/local.yml
+# вернуть учёт
+git update-index --no-skip-worktree config/local.yml</pre>
+
+<h3>5. Слишком большой репозиторий</h3>
+<pre>git count-objects -vH                 # размеры объектов
+git gc --aggressive --prune=now       # сжать и очистить (осторожно)
+git clone --depth 1 URL               # для сборки без истории
+git clone --filter=blob:none URL      # частичный клон</pre>
+
+<h3>6. Файлы показываются как полностью изменённые</h3>
+<p>Обычно это разные переводы строк (CRLF и LF). Проверьте <code>core.autocrlf</code> и <code>.gitattributes</code>:</p>
+<pre># .gitattributes в корне репозитория
+* text=auto eol=lf
+*.bat text eol=crlf</pre>
+
+<h3>7. Не могу удалить ветку, git говорит «not fully merged»</h3>
+<p>Git защищает от потери коммитов. Если работа действительно не нужна, удалите принудительно: <code>git branch -D имя</code>. Перед этим проверьте <code>git log имя --oneline</code>.</p>
+
+<h3>8. Файлы не добавляются в индекс, хотя не в .gitignore</h3>
+<p>Проверьте, не попадают ли они под правило в глобальном <code>core.excludesFile</code>: <code>git config --get core.excludesFile</code> и <code>git check-ignore -v путь</code>.</p>
+
+<h2>Чек-лист перед коммитом и пушем</h2>
+<pre>git status -sb                 # что изменено и куда отстаём
+git diff --staged             # что войдёт в коммит
+git log --oneline -3          # последние коммиты для контекста
+# тесты и линтеры
+git commit                    # осмысленное сообщение
+git fetch --prune &amp;&amp; git rebase origin/main
+git push</pre>
+
+<div class="warn">
+  Не используйте <code>git push --force</code> на общих ветках (main, develop, release). Для собственных веток берите <code>--force-with-lease</code>. А команды <code>git clean -fdx</code>, <code>git reset --hard</code> и <code>git gc --prune=now</code> необратимо удаляют данные: сначала посмотрите, что они затронут (<code>-n</code>, <code>git status</code>).
+</div>
+
+<div class="tip">
+  Сообщения коммитов пишите в императивном стиле и в одну строку темы: «fix: таймаут подключения к БД», а не «исправил таймаут». Тело коммита используйте для объяснения причины. Так историю будет проще читать через <code>git log --oneline</code> и искать через <code>bisect</code>.
+</div>
+
+</div>
+</body>
+</html>

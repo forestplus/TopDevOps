@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux: файлы, каталоги, ссылки и права доступа</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Linux: файлы, каталоги, ссылки и права доступа</h1>
+<p class="lead">Копирование, перемещение, удаление, поиск и управление правами файлов и папок</p>
+
+<h2>Права доступа: как читать</h2>
+<pre>-rwxr-x---  1 ivan devs  4096 Oct 17 10:00 deploy.sh
+ │├─┤├─┤├─┤
+ │ │  │  └── others (остальные)
+ │ │  └───── group (группа)
+ │ └──────── owner (владелец)
+ └────────── тип: - файл, d папка, l символическая ссылка
+
+r = 4 (чтение), w = 2 (запись), x = 1 (выполнение)
+Для папки: r — видеть список, w — создавать и удалять, x — входить в неё</pre>
+
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">chmod 755</td><td class="ex">chmod 755 script.sh</td><td>Владелец: всё; группа и остальные: чтение и выполнение.</td></tr>
+    <tr><td class="cmd">chmod 640</td><td class="ex">chmod 640 config.yml</td><td>Владелец читает и пишет, группа читает, остальные ничего.</td></tr>
+    <tr><td class="cmd">chmod 600</td><td class="ex">chmod 600 ~/.ssh/id_ed25519</td><td>Только владелец. Для приватных ключей обязательно.</td></tr>
+    <tr><td class="cmd">chmod 700</td><td class="ex">chmod 700 ~/.ssh</td><td>Папка доступна только владельцу.</td></tr>
+    <tr><td class="cmd">chmod u+x</td><td class="ex">chmod u+x run.sh</td><td>Добавить право выполнения владельцу.</td></tr>
+    <tr><td class="cmd">chmod go-w</td><td class="ex">chmod go-w file</td><td>Убрать запись у группы и остальных.</td></tr>
+    <tr><td class="cmd">chmod a+r</td><td class="ex">chmod a+r report.pdf</td><td>Чтение для всех.</td></tr>
+    <tr><td class="cmd">chmod -R</td><td class="ex">chmod -R 750 /srv/app</td><td>Рекурсивно. Для файлов и папок права часто разные, см. пример ниже.</td></tr>
+    <tr><td class="cmd">chmod g+s</td><td class="ex">chmod g+s /srv/shared</td><td>setgid на папке: новые файлы получат группу папки.</td></tr>
+    <tr><td class="cmd">chmod +t</td><td class="ex">chmod +t /srv/drop</td><td>Sticky-бит: удалять файлы может только владелец файла (как /tmp).</td></tr>
+    <tr><td class="cmd">chmod u+s</td><td class="ex">chmod u+s tool</td><td>setuid: программа работает с правами владельца. Используйте с осторожностью.</td></tr>
+    <tr><td class="cmd">chmod --reference</td><td class="ex">chmod --reference=a.sh b.sh</td><td>Скопировать права с другого файла.</td></tr>
+    <tr><td class="cmd">chown</td><td class="ex">chown ivan file.txt</td><td>Сменить владельца.</td></tr>
+    <tr><td class="cmd">chown user:group</td><td class="ex">chown ivan:devs file.txt</td><td>Сменить владельца и группу.</td></tr>
+    <tr><td class="cmd">chown -R</td><td class="ex">chown -R www-data:www-data /var/www</td><td>Рекурсивно сменить владельца.</td></tr>
+    <tr><td class="cmd">chown --from</td><td class="ex">chown --from=1001 2001 -R /srv/data</td><td>Менять владельца только тем, кто имеет указанный UID.</td></tr>
+    <tr><td class="cmd">chgrp</td><td class="ex">chgrp devs project/</td><td>Сменить только группу.</td></tr>
+    <tr><td class="cmd">umask</td><td class="ex">umask 027</td><td>Маска прав для новых файлов в текущей сессии (027 даёт 750 для папок и 640 для файлов).</td></tr>
+  </tbody>
+</table>
+
+<h2>Создание и копирование</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">mkdir</td><td class="ex">mkdir projects</td><td>Создать папку.</td></tr>
+    <tr><td class="cmd">mkdir -p</td><td class="ex">mkdir -p app/{src,logs,config}</td><td>Создать цепочку папок и без ошибки, если уже есть.</td></tr>
+    <tr><td class="cmd">mkdir -m</td><td class="ex">mkdir -m 750 secure</td><td>Создать с правами.</td></tr>
+    <tr><td class="cmd">touch</td><td class="ex">touch note.txt</td><td>Создать пустой файл или обновить время изменения.</td></tr>
+    <tr><td class="cmd">touch -d</td><td class="ex">touch -d "2026-01-01 12:00" file</td><td>Задать конкретное время изменения.</td></tr>
+    <tr><td class="cmd">cp</td><td class="ex">cp a.txt b.txt</td><td>Копировать файл.</td></tr>
+    <tr><td class="cmd">cp -r</td><td class="ex">cp -r src/ dst/</td><td>Рекурсивно копировать папку.</td></tr>
+    <tr><td class="cmd">cp -a</td><td class="ex">cp -a /etc /backup/etc</td><td>Архивный режим: права, владельцы, ссылки и время сохраняются.</td></tr>
+    <tr><td class="cmd">cp -p</td><td class="ex">cp -p config.yml config.bak</td><td>Сохранить права и время.</td></tr>
+    <tr><td class="cmd">cp -i</td><td class="ex">cp -i a.txt b.txt</td><td>Спросить перед перезаписью.</td></tr>
+    <tr><td class="cmd">cp -u</td><td class="ex">cp -ru src/ dst/</td><td>Копировать только если источник новее.</td></tr>
+    <tr><td class="cmd">cp -v</td><td class="ex">cp -rv src/ dst/</td><td>Показывать каждое скопированное.</td></tr>
+    <tr><td class="cmd">mv</td><td class="ex">mv old.txt new.txt</td><td>Переименовать или переместить.</td></tr>
+    <tr><td class="cmd">mv -n</td><td class="ex">mv -n a.txt /backup/</td><td>Не перезаписывать существующий файл.</td></tr>
+    <tr><td class="cmd">mv -i</td><td class="ex">mv -i a.txt /backup/</td><td>Спросить перед перезаписью.</td></tr>
+    <tr><td class="cmd">mv -t</td><td class="ex">mv -t /backup/ *.log</td><td>Указать папку назначения первым аргументом (удобно с xargs).</td></tr>
+    <tr><td class="cmd">rename</td><td class="ex">rename 's/\.txt$/.md/' *.txt</td><td>Массовое переименование по регулярному выражению (пакет perl-rename).</td></tr>
+  </tbody>
+</table>
+
+<h2>Удаление</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">rm</td><td class="ex">rm file.txt</td><td>Удалить файл.</td></tr>
+    <tr><td class="cmd">rm -i</td><td class="ex">rm -i *.tmp</td><td>Подтверждать каждое удаление.</td></tr>
+    <tr><td class="cmd">rm -r</td><td class="ex">rm -r old_dir/</td><td>Удалить папку с содержимым.</td></tr>
+    <tr><td class="cmd">rm -f</td><td class="ex">rm -f maybe.txt</td><td>Не спрашивать и не ругаться, если файла нет.</td></tr>
+    <tr><td class="cmd">rm -rf</td><td class="ex">rm -rf build/</td><td>Жёсткое удаление без вопросов. Опасно, см. предупреждение.</td></tr>
+    <tr><td class="cmd">rmdir</td><td class="ex">rmdir empty_dir</td><td>Удалить только пустую папку (безопасный вариант).</td></tr>
+    <tr><td class="cmd">rmdir -p</td><td class="ex">rmdir -p a/b/c</td><td>Удалить вложенные пустые папки по цепочке.</td></tr>
+    <tr><td class="cmd">shred</td><td class="ex">shred -u -n 3 secret.txt</td><td>Затереть данные перед удалением (на SSD и CoW-файловых системах эффект ограничен).</td></tr>
+  </tbody>
+</table>
+
+<h2>Ссылки</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">ln -s</td><td class="ex">ln -s /opt/app/current/bin/app /usr/local/bin/app</td><td>Символическая ссылка.</td></tr>
+    <tr><td class="cmd">ln -sf</td><td class="ex">ln -sfn /opt/app/v2 /opt/app/current</td><td>Перезаписать существующую ссылку. -n нужен, чтобы не заходить внутрь старой папки.</td></tr>
+    <tr><td class="cmd">ln</td><td class="ex">ln original.txt hard.txt</td><td>Жёсткая ссылка: тот же inode, работает только в одной файловой системе.</td></tr>
+    <tr><td class="cmd">readlink -f</td><td class="ex">readlink -f /usr/bin/python3</td><td>Настоящий путь за цепочкой ссылок.</td></tr>
+    <tr><td class="cmd">realpath</td><td class="ex">realpath ./data</td><td>Абсолютный путь с раскрытием ссылок.</td></tr>
+  </tbody>
+</table>
+
+<h2>Просмотр и информация</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">ls -l</td><td class="ex">ls -l</td><td>Подробный список с правами.</td></tr>
+    <tr><td class="cmd">ls -la</td><td class="ex">ls -la</td><td>Включая скрытые файлы.</td></tr>
+    <tr><td class="cmd">ls -lh</td><td class="ex">ls -lh /var/log</td><td>Размеры в читаемом виде.</td></tr>
+    <tr><td class="cmd">ls -lt</td><td class="ex">ls -lt</td><td>Сортировка по времени: новые сверху.</td></tr>
+    <tr><td class="cmd">ls -lS</td><td class="ex">ls -lS</td><td>Сортировка по размеру: большие сверху.</td></tr>
+    <tr><td class="cmd">ls -R</td><td class="ex">ls -R project/</td><td>Рекурсивно.</td></tr>
+    <tr><td class="cmd">ls -d</td><td class="ex">ls -ld /tmp</td><td>Показать саму папку, а не её содержимое.</td></tr>
+    <tr><td class="cmd">ls -i</td><td class="ex">ls -i file</td><td>Показать номер inode.</td></tr>
+    <tr><td class="cmd">stat</td><td class="ex">stat file.txt</td><td>Размер, inode, права, время доступа, изменения и создания.</td></tr>
+    <tr><td class="cmd">file</td><td class="ex">file archive.bin</td><td>Определяет тип файла по содержимому.</td></tr>
+    <tr><td class="cmd">basename</td><td class="ex">basename /var/log/syslog</td><td>Имя файла без пути.</td></tr>
+    <tr><td class="cmd">dirname</td><td class="ex">dirname /var/log/syslog</td><td>Путь без имени файла.</td></tr>
+    <tr><td class="cmd">du -sh</td><td class="ex">du -sh /var/*</td><td>Суммарный размер каждого элемента.</td></tr>
+    <tr><td class="cmd">lsattr / chattr</td><td class="ex">chattr +i critical.conf</td><td>Атрибут immutable: файл нельзя менять или удалить даже root, пока атрибут не снят (-i).</td></tr>
+  </tbody>
+</table>
+
+<h2>Поиск: find</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">find</td><td class="ex">find . -name "*.log"</td><td>Файлы по имени (с учётом регистра).</td></tr>
+    <tr><td class="cmd">find -iname</td><td class="ex">find . -iname "readme*"</td><td>Имя без учёта регистра.</td></tr>
+    <tr><td class="cmd">find -type</td><td class="ex">find . -type d -name node_modules</td><td>Только папки (f — файлы, l — ссылки).</td></tr>
+    <tr><td class="cmd">find -size</td><td class="ex">find / -size +500M 2&gt;/dev/null</td><td>Больше 500 МБ. Суффиксы c, k, M, G.</td></tr>
+    <tr><td class="cmd">find -mtime</td><td class="ex">find /var/log -mtime +30</td><td>Изменены более 30 дней назад.</td></tr>
+    <tr><td class="cmd">find -mmin</td><td class="ex">find . -mmin -60</td><td>Изменены за последние 60 минут.</td></tr>
+    <tr><td class="cmd">find -newer</td><td class="ex">find . -newer ref.txt</td><td>Новее эталонного файла.</td></tr>
+    <tr><td class="cmd">find -user</td><td class="ex">find /srv -user ivan</td><td>Принадлежат пользователю.</td></tr>
+    <tr><td class="cmd">find -group</td><td class="ex">find /srv -group devs</td><td>Принадлежат группе.</td></tr>
+    <tr><td class="cmd">find -perm</td><td class="ex">find / -perm -4000 -type f 2&gt;/dev/null</td><td>Файлы с setuid-битом (полезно для аудита).</td></tr>
+    <tr><td class="cmd">find -empty</td><td class="ex">find . -type d -empty</td><td>Пустые папки.</td></tr>
+    <tr><td class="cmd">find -maxdepth</td><td class="ex">find . -maxdepth 1 -type f</td><td>Не заходить глубже указанного уровня.</td></tr>
+    <tr><td class="cmd">find -exec</td><td class="ex">find . -name "*.bak" -exec rm -v {} \;</td><td>Выполнить команду для каждого результата (\; — по одному, + — пачками).</td></tr>
+    <tr><td class="cmd">find -exec +</td><td class="ex">find . -name "*.jpg" -exec chmod 644 {} +</td><td>Передать много файлов одной командой, быстрее.</td></tr>
+    <tr><td class="cmd">find -print0</td><td class="ex">find . -name "*.tmp" -print0 | xargs -0 rm -f</td><td>Нулевой разделитель: безопасно для пробелов в именах.</td></tr>
+    <tr><td class="cmd">find -delete</td><td class="ex">find /tmp -mtime +7 -delete</td><td>Удалить найденное. Сначала проверьте без -delete.</td></tr>
+    <tr><td class="cmd">locate</td><td class="ex">locate nginx.conf</td><td>Быстрый поиск по базе (обновляется через updatedb).</td></tr>
+    <tr><td class="cmd">which / type</td><td class="ex">type -a python3</td><td>Где находится исполняемый файл и как он вызывается.</td></tr>
+  </tbody>
+</table>
+
+<h2>ACL: права для отдельных пользователей</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">getfacl</td><td class="ex">getfacl report.csv</td><td>Показать ACL файла.</td></tr>
+    <tr><td class="cmd">setfacl -m u:имя</td><td class="ex">setfacl -m u:ivan:rw report.csv</td><td>Дать пользователю ivan чтение и запись.</td></tr>
+    <tr><td class="cmd">setfacl -m g:имя</td><td class="ex">setfacl -m g:auditors:r-x /srv/logs</td><td>Дать группе чтение и обход.</td></tr>
+    <tr><td class="cmd">setfacl -R -m</td><td class="ex">setfacl -R -m d:u:ivan:rwX /srv/shared</td><td>Рекурсивно, с наследованием по умолчанию (d:) для новых файлов.</td></tr>
+    <tr><td class="cmd">setfacl -x</td><td class="ex">setfacl -x u:ivan report.csv</td><td>Удалить запись ACL.</td></tr>
+    <tr><td class="cmd">setfacl -b</td><td class="ex">setfacl -b report.csv</td><td>Удалить все ACL.</td></tr>
+  </tbody>
+</table>
+
+<h2>Пример: правильные права для веб-папки</h2>
+<pre># Папки 755, файлы 644 (чтобы веб-сервер читал)
+find /var/www/site -type d -exec chmod 755 {} +
+find /var/www/site -type f -exec chmod 644 {} +
+
+# Скрипты, которые нужно запускать
+chmod 755 /var/www/site/bin/*.sh
+
+# Владелец и группа
+chown -R deploy:www-data /var/www/site
+
+# Конфиг с паролями доступен только владельцу и группе
+chmod 640 /var/www/site/config/.env</pre>
+
+<div class="warn">
+  <code>rm -rf</code>, <code>chmod -R</code> и <code>chown -R</code> применяются ко всему дереву, включая случайно попавшие пути. Сначала выполните <code>ls</code> или <code>find</code> с теми же условиями, и только потом меняйте. Никогда не запускайте <code>chmod -R 777</code> как «быстрое решение»: это открывает запись всем пользователям системы.
+</div>
+
+<div class="tip">
+  Для права на папку важен бит <code>x</code>: без него нельзя зайти в каталог, даже если есть чтение. Ошибка «Permission denied» при работе с вложенными файлами часто связана именно с этим.
+</div>
+
+</div>
+</body>
+</html>

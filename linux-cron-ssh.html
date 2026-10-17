@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux: расписание задач и SSH</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Linux: расписание задач и SSH</h1>
+<p class="lead">Cron, at и systemd-таймеры, а также ключи, конфигурация, туннели и удалённое выполнение команд по SSH</p>
+
+<h2>Cron: синтаксис расписания</h2>
+<pre># минута(0-59)  час(0-23)  день(1-31)  месяц(1-12)  день_недели(0-7, 0 и 7 — воскресенье)
+  *             *           *           *            *        команда</pre>
+<table>
+  <thead><tr><th>Расписание</th><th>Значение</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">0 3 * * *</td><td>Каждый день в 03:00</td></tr>
+    <tr><td class="cmd">*/5 * * * *</td><td>Каждые 5 минут</td></tr>
+    <tr><td class="cmd">0 9 * * 1-5</td><td>По будням в 09:00</td></tr>
+    <tr><td class="cmd">30 2 1 * *</td><td>1 числа каждого месяца в 02:30</td></tr>
+    <tr><td class="cmd">0 */2 * * *</td><td>Каждые два часа, ровно в 0 минут</td></tr>
+    <tr><td class="cmd">0 9,18 * * *</td><td>В 09:00 и 18:00</td></tr>
+    <tr><td class="cmd">0 0 * * 0</td><td>Каждое воскресенье в полночь</td></tr>
+    <tr><td class="cmd">@reboot</td><td>Один раз при загрузке</td></tr>
+    <tr><td class="cmd">@daily / @weekly / @monthly</td><td>Сокращения для 0 0 * * *, 0 0 * * 0, 0 0 1 * *</td></tr>
+    <tr><td class="cmd">@hourly</td><td>Каждый час, в 0 минут</td></tr>
+  </tbody>
+</table>
+
+<h2>Управление crontab</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">crontab -e</td><td class="ex">crontab -e</td><td>Редактировать свой crontab (откроется редактор из $EDITOR).</td></tr>
+    <tr><td class="cmd">crontab -l</td><td class="ex">crontab -l</td><td>Показать свой crontab.</td></tr>
+    <tr><td class="cmd">crontab -r</td><td class="ex">crontab -r</td><td>Удалить весь crontab (без подтверждения, осторожно).</td></tr>
+    <tr><td class="cmd">crontab -u</td><td class="ex">sudo crontab -u deploy -l</td><td>Работа с crontab другого пользователя (нужны права root).</td></tr>
+    <tr><td class="cmd">crontab -i</td><td class="ex">crontab -ri</td><td>Удалять с подтверждением.</td></tr>
+    <tr><td class="cmd">/etc/cron.d/</td><td class="ex">/etc/cron.d/backup</td><td>Системные задания с полем пользователя (шестое поле).</td></tr>
+    <tr><td class="cmd">/etc/cron.daily</td><td class="ex">ls /etc/cron.daily</td><td>Скрипты, которые запускаются раз в день через run-parts.</td></tr>
+    <tr><td class="cmd">/var/log/syslog</td><td class="ex">grep CRON /var/log/syslog | tail</td><td>Журнал выполнения cron (на systemd — journalctl -u cron).</td></tr>
+  </tbody>
+</table>
+
+<h3>Пример crontab</h3>
+<pre># Бэкап каждую ночь в 03:15, с логом
+15 3 * * * /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1
+
+# Очистка временных файлов старше 7 дней, раз в час
+0 * * * * find /srv/tmp -type f -mtime +7 -delete
+
+# Проверка доступности сайта каждые 5 минут
+*/5 * * * * curl -fsS -o /dev/null https://example.com || echo "down $(date)" >> /var/log/site.log
+
+# Переменные окружения в crontab (PATH по умолчанию урезан)
+PATH=/usr/local/bin:/usr/bin:/bin
+MAILTO=""</pre>
+
+<div class="warn">
+  В cron окружение почти пустое: нет вашего PATH и переменных из ~/.bashrc. Указывайте полные пути к программам (например, <code>/usr/bin/python3</code>) и перенаправляйте вывод в файл, иначе ошибки уйдут на почту или потеряются.
+</div>
+
+<h2>at и systemd-таймеры</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">at</td><td class="ex">echo "./job.sh" | at now + 5 minutes</td><td>Одноразовое задание через 5 минут (пакет at).</td></tr>
+    <tr><td class="cmd">at -f</td><td class="ex">at -f job.sh 23:00 tomorrow</td><td>Взять команды из файла, выполнить завтра в 23:00.</td></tr>
+    <tr><td class="cmd">atq</td><td class="ex">atq</td><td>Список запланированных задач at.</td></tr>
+    <tr><td class="cmd">atrm</td><td class="ex">atrm 12</td><td>Удалить задачу с номером 12.</td></tr>
+    <tr><td class="cmd">systemctl list-timers</td><td class="ex">systemctl list-timers --all</td><td>Расписание systemd-таймеров: когда запустится и когда последний раз.</td></tr>
+    <tr><td class="cmd">systemd-run</td><td class="ex">sudo systemd-run --on-calendar="*-*-* 04:00" /usr/local/bin/job.sh</td><td>Создать временное задание на расписании systemd.</td></tr>
+    <tr><td class="cmd">systemd-run --scope</td><td class="ex">systemd-run --user --scope -p MemoryMax=512M ./heavy.sh</td><td>Запустить с ограничением памяти.</td></tr>
+  </tbody>
+</table>
+
+<h2>SSH: ключи</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">ssh-keygen</td><td class="ex">ssh-keygen -t ed25519 -C "ivan@laptop"</td><td>Создать ключ Ed25519 (рекомендуемый тип).</td></tr>
+    <tr><td class="cmd">ssh-keygen -b</td><td class="ex">ssh-keygen -t rsa -b 4096</td><td>RSA-ключ, если Ed25519 не поддерживается.</td></tr>
+    <tr><td class="cmd">ssh-keygen -f</td><td class="ex">ssh-keygen -t ed25519 -f ~/.ssh/deploy_key</td><td>Указать имя файла.</td></tr>
+    <tr><td class="cmd">ssh-keygen -p</td><td class="ex">ssh-keygen -p -f ~/.ssh/id_ed25519</td><td>Сменить парольную фразу ключа.</td></tr>
+    <tr><td class="cmd">ssh-keygen -l</td><td class="ex">ssh-keygen -lf ~/.ssh/id_ed25519.pub</td><td>Отпечаток ключа.</td></tr>
+    <tr><td class="cmd">ssh-keygen -R</td><td class="ex">ssh-keygen -R server.example.com</td><td>Удалить старый ключ хоста из known_hosts (после переустановки сервера).</td></tr>
+    <tr><td class="cmd">ssh-copy-id</td><td class="ex">ssh-copy-id -i ~/.ssh/id_ed25519.pub user@host</td><td>Добавить публичный ключ в authorized_keys на сервере.</td></tr>
+    <tr><td class="cmd">ssh-copy-id -p</td><td class="ex">ssh-copy-id -p 2222 user@host</td><td>Нестандартный порт.</td></tr>
+    <tr><td class="cmd">ssh-agent</td><td class="ex">eval "$(ssh-agent -s)"</td><td>Запустить агент, который держит расшифрованный ключ.</td></tr>
+    <tr><td class="cmd">ssh-add</td><td class="ex">ssh-add ~/.ssh/id_ed25519</td><td>Добавить ключ в агент (введёте парольную фразу один раз).</td></tr>
+    <tr><td class="cmd">ssh-add -l</td><td class="ex">ssh-add -l</td><td>Ключи, загруженные в агент.</td></tr>
+    <tr><td class="cmd">ssh-add -D</td><td class="ex">ssh-add -D</td><td>Удалить все ключи из агента.</td></tr>
+  </tbody>
+</table>
+
+<h2>SSH: подключение и команды</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">ssh</td><td class="ex">ssh ivan@server.example.com</td><td>Подключиться.</td></tr>
+    <tr><td class="cmd">ssh -p</td><td class="ex">ssh -p 2222 ivan@server</td><td>Нестандартный порт.</td></tr>
+    <tr><td class="cmd">ssh -i</td><td class="ex">ssh -i ~/.ssh/deploy_key deploy@server</td><td>Указать ключ.</td></tr>
+    <tr><td class="cmd">ssh -t</td><td class="ex">ssh -t server 'sudo systemctl status nginx'</td><td>Выделить терминал, нужен для sudo с запросом пароля или интерактивных программ.</td></tr>
+    <tr><td class="cmd">ssh cmd</td><td class="ex">ssh server 'df -h /'</td><td>Выполнить одну команду и выйти.</td></tr>
+    <tr><td class="cmd">ssh -v</td><td class="ex">ssh -vvv server</td><td>Отладка подключения (аутентификация, ключи, порт).</td></tr>
+    <tr><td class="cmd">ssh -o</td><td class="ex">ssh -o ConnectTimeout=5 -o BatchMode=yes server true</td><td>Проверка доступа в скриптах: без запросов, с таймаутом.</td></tr>
+    <tr><td class="cmd">ssh -J</td><td class="ex">ssh -J bastion.example.com internal-db</td><td>Подключиться через jump-хост (ProxyJump).</td></tr>
+    <tr><td class="cmd">ssh -N</td><td class="ex">ssh -N -f -L 5432:db:5432 bastion</td><td>Только туннель, без команды; -f уводит в фон.</td></tr>
+    <tr><td class="cmd">ssh -4 / -6</td><td class="ex">ssh -4 server</td><td>Принудительно IPv4 или IPv6.</td></tr>
+    <tr><td class="cmd">ssh -X</td><td class="ex">ssh -X server</td><td>Перенаправить X11 (графические программы на сервере).</td></tr>
+    <tr><td class="cmd">ssh -A</td><td class="ex">ssh -A bastion</td><td>Переслать агент ключей. Включайте только для доверенных хостов.</td></tr>
+  </tbody>
+</table>
+
+<h2>SSH: туннели</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">ssh -L</td><td class="ex">ssh -L 8080:localhost:80 user@server</td><td>Локальный порт 8080 ведёт на порт 80 сервера (он доступен только с вашей машины).</td></tr>
+    <tr><td class="cmd">ssh -L remote</td><td class="ex">ssh -L 5432:db.internal:5432 bastion</td><td>Доступ к внутренней базе через bastion.</td></tr>
+    <tr><td class="cmd">ssh -R</td><td class="ex">ssh -R 9000:localhost:3000 user@public</td><td>Порт 9000 на публичном сервере ведёт на ваш localhost:3000.</td></tr>
+    <tr><td class="cmd">ssh -D</td><td class="ex">ssh -D 1080 -N user@server</td><td>Динамический SOCKS-прокси на локальном порту 1080.</td></tr>
+  </tbody>
+</table>
+
+<h2>Конфигурация ~/.ssh/config</h2>
+<pre>Host web
+    HostName 10.0.0.12
+    User deploy
+    Port 2222
+    IdentityFile ~/.ssh/deploy_key
+    IdentitiesOnly yes
+
+Host db
+    HostName 10.0.1.5
+    User ivan
+    ProxyJump bastion
+
+Host bastion
+    HostName bastion.example.com
+    User ivan
+    ServerAliveInterval 60
+    ServerAliveCountMax 3</pre>
+<p>После этого достаточно <code>ssh web</code> или <code>ssh db</code>, а <code>scp file db:/tmp/</code> тоже работает через ProxyJump.</p>
+
+<h2>Права и безопасность</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">chmod 700 ~/.ssh</td><td class="ex">chmod 700 ~/.ssh</td><td>Папка с ключами доступна только владельцу.</td></tr>
+    <tr><td class="cmd">chmod 600 ключ</td><td class="ex">chmod 600 ~/.ssh/id_ed25519</td><td>Приватный ключ. Без этого ssh откажется работать.</td></tr>
+    <tr><td class="cmd">chmod 600 authorized_keys</td><td class="ex">chmod 600 ~/.ssh/authorized_keys</td><td>Файл разрешённых ключей на сервере.</td></tr>
+    <tr><td class="cmd">sshd -t</td><td class="ex">sudo sshd -t</td><td>Проверить синтаксис sshd_config перед перезагрузкой службы.</td></tr>
+    <tr><td class="cmd">systemctl reload sshd</td><td class="ex">sudo systemctl reload ssh</td><td>Применить изменения конфига sshd (на Debian служба называется ssh).</td></tr>
+    <tr><td class="cmd">sshd_config</td><td class="ex">PermitRootLogin no ; PasswordAuthentication no</td><td>Отключить вход root и вход по паролю (сначала убедитесь, что ключи работают).</td></tr>
+    <tr><td class="cmd">who / last</td><td class="ex">last -i | head</td><td>Кто и с каких адресов заходил по SSH.</td></tr>
+    <tr><td class="cmd">journalctl -u ssh</td><td class="ex">sudo journalctl -u ssh --since today</td><td>Журнал попыток входа и ошибок.</td></tr>
+  </tbody>
+</table>
+
+<h2>Пример: защищённый туннель к базе через bastion</h2>
+<pre># Поднять туннель в фоне: локальный порт 15432 ведёт на базу
+ssh -f -N -L 15432:10.0.1.5:5432 ivan@bastion.example.com
+
+# Подключиться к базе через локальный порт
+psql -h 127.0.0.1 -p 15432 -U app appdb
+
+# Закрыть туннель: найти процесс и завершить
+pgrep -af "ssh -f -N -L 15432"
+pkill -f "ssh -f -N -L 15432"</pre>
+
+<div class="warn">
+  <code>ssh -R</code> и <code>ssh -D</code> открывают доступ из внешней сети к вашему локальному сервису. Не оставляйте их без присмотра и привязывайте к localhost (например, <code>-R 127.0.0.1:9000:...</code>). Также не включайте <code>PasswordAuthentication yes</code> на публичных серверах: их постоянно перебирают.
+</div>
+
+<div class="tip">
+  Чтобы не потерять доступ при изменении sshd_config, не закрывайте текущую сессию, пока не проверите вход второй. И сначала запускайте <code>sshd -t</code>: ошибка в конфиге может не дать подключиться после перезапуска.
+</div>
+
+</div>
+</body>
+</html>

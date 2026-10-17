@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git: ветки, слияние, rebase и stash</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Git: ветки, слияние, rebase и stash</h1>
+<p class="lead">Вторая часть гида: работа с ветками, объединение изменений, конфликты, перенос коммитов и временное хранение правок</p>
+
+<h2>Ветки</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git branch</td><td class="ex">git branch</td><td>Локальные ветки (текущая помечена *).</td></tr>
+    <tr><td class="cmd">git branch -a</td><td class="ex">git branch -a</td><td>Все ветки, включая удалённые (remotes/origin/...).</td></tr>
+    <tr><td class="cmd">git branch -r</td><td class="ex">git branch -r</td><td>Только удалённые ветки.</td></tr>
+    <tr><td class="cmd">git branch -vv</td><td class="ex">git branch -vv</td><td>С последним коммитом и связанной удалённой веткой.</td></tr>
+    <tr><td class="cmd">git branch имя</td><td class="ex">git branch feature/login</td><td>Создать ветку, не переключаясь.</td></tr>
+    <tr><td class="cmd">git branch -d</td><td class="ex">git branch -d feature/login</td><td>Удалить, только если ветка слита (безопасно).</td></tr>
+    <tr><td class="cmd">git branch -D</td><td class="ex">git branch -D old-experiment</td><td>Удалить принудительно, даже без слияния.</td></tr>
+    <tr><td class="cmd">git branch -m</td><td class="ex">git branch -m old-name new-name</td><td>Переименовать ветку.</td></tr>
+    <tr><td class="cmd">git branch -u</td><td class="ex">git branch -u origin/main</td><td>Связать локальную ветку с удалённой.</td></tr>
+    <tr><td class="cmd">git branch --merged</td><td class="ex">git branch --merged main</td><td>Ветки, уже влитые в main (кандидаты на удаление).</td></tr>
+    <tr><td class="cmd">git branch --no-merged</td><td class="ex">git branch --no-merged main</td><td>Ветки, которые ещё не влиты.</td></tr>
+    <tr><td class="cmd">git switch</td><td class="ex">git switch main</td><td>Переключиться на ветку (современная команда).</td></tr>
+    <tr><td class="cmd">git switch -c</td><td class="ex">git switch -c feature/payments</td><td>Создать и сразу переключиться.</td></tr>
+    <tr><td class="cmd">git switch -</td><td class="ex">git switch -</td><td>Вернуться на предыдущую ветку.</td></tr>
+    <tr><td class="cmd">git checkout -b</td><td class="ex">git checkout -b hotfix/1.2.1 v1.2.0</td><td>Старая форма: создать ветку от тега.</td></tr>
+    <tr><td class="cmd">git checkout --</td><td class="ex">git checkout -- app.py</td><td>Старая форма: отменить изменения файла (лучше git restore).</td></tr>
+    <tr><td class="cmd">git restore</td><td class="ex">git restore app.py</td><td>Отменить изменения файла в рабочей папке (необратимо!).</td></tr>
+    <tr><td class="cmd">git restore --source</td><td class="ex">git restore --source=HEAD~2 app.py</td><td>Вернуть файл из другого коммита.</td></tr>
+    <tr><td class="cmd">git switch --detach</td><td class="ex">git switch --detach v2.0.0</td><td>Перейти в состояние detached HEAD (на тег или коммит).</td></tr>
+  </tbody>
+</table>
+
+<h2>Слияние: merge</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git merge</td><td class="ex">git switch main &amp;&amp; git merge feature/login</td><td>Влить ветку в текущую. Может создать коммит слияния.</td></tr>
+    <tr><td class="cmd">git merge --no-ff</td><td class="ex">git merge --no-ff feature/login</td><td>Всегда создавать коммит слияния (видно границы фичи в истории).</td></tr>
+    <tr><td class="cmd">git merge --ff-only</td><td class="ex">git merge --ff-only origin/main</td><td>Только перемотка вперёд; если нельзя без слияния, команда остановится.</td></tr>
+    <tr><td class="cmd">git merge --squash</td><td class="ex">git merge --squash feature/x &amp;&amp; git commit -m "feat: x"</td><td>Собрать все коммиты ветки в один, без коммита слияния.</td></tr>
+    <tr><td class="cmd">git merge --abort</td><td class="ex">git merge --abort</td><td>Отменить слияние с конфликтами и вернуться к исходному состоянию.</td></tr>
+    <tr><td class="cmd">git merge -X</td><td class="ex">git merge -X theirs feature/x</td><td>Стратегия при конфликтах: ours — наша версия, theirs — их версия.</td></tr>
+    <tr><td class="cmd">git merge -m</td><td class="ex">git merge --no-ff -m "merge: login" feature/login</td><td>Своё сообщение коммита слияния.</td></tr>
+    <tr><td class="cmd">git log --merge</td><td class="ex">git log --merge --oneline</td><td>Коммиты, из-за которых возник конфликт.</td></tr>
+  </tbody>
+</table>
+
+<h3>Разрешение конфликтов</h3>
+<pre>git merge feature/x
+# CONFLICT (content): Merge conflict in app.py
+
+# В файле появятся маркеры:
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+timeout = 30
+=======
+timeout = 60
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/x
+
+# 1. Исправьте файл, оставив нужный вариант, и удалите маркеры
+# 2. Добавьте исправленный файл
+git add app.py
+# 3. Завершите слияние
+git commit        # или git merge --continue
+
+# Список файлов с конфликтами
+git diff --name-only --diff-filter=U
+
+# Выбрать одну из версий целиком
+git checkout --ours app.py      # наша
+git checkout --theirs app.py    # их</pre>
+<p>Инструменты для сложных конфликтов: <code>git mergetool</code> откроет настроенную программу слияния. Для настройки используйте <code>git config --global merge.tool vimdiff</code> или другой редактор.</p>
+
+<h2>Перенос изменений: rebase</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git rebase</td><td class="ex">git switch feature/x &amp;&amp; git rebase main</td><td>Переставить коммиты ветки поверх main (линейная история).</td></tr>
+    <tr><td class="cmd">git rebase -i</td><td class="ex">git rebase -i HEAD~4</td><td>Интерактивно: переупорядочить, объединить, изменить или удалить 4 последних коммита.</td></tr>
+    <tr><td class="cmd">git rebase --onto</td><td class="ex">git rebase --onto main feature-base feature-x</td><td>Перенести коммиты feature-x с одной базы на другую.</td></tr>
+    <tr><td class="cmd">git rebase --continue</td><td class="ex">git rebase --continue</td><td>После разрешения конфликта продолжить rebase.</td></tr>
+    <tr><td class="cmd">git rebase --skip</td><td class="ex">git rebase --skip</td><td>Пропустить коммит, который не применяется.</td></tr>
+    <tr><td class="cmd">git rebase --abort</td><td class="ex">git rebase --abort</td><td>Отменить rebase и вернуть исходное состояние.</td></tr>
+    <tr><td class="cmd">git rebase --autosquash</td><td class="ex">git rebase -i --autosquash main</td><td>Автоматически поставить коммиты fixup! и squash! на нужное место.</td></tr>
+    <tr><td class="cmd">git pull --rebase</td><td class="ex">git pull --rebase origin main</td><td>Получить изменения и переставить свои коммиты поверх них.</td></tr>
+  </tbody>
+</table>
+
+<h3>Команды в интерактивном rebase</h3>
+<table>
+  <thead><tr><th>Команда</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">pick</td><td>оставить коммит как есть</td></tr>
+    <tr><td class="cmd">reword</td><td>оставить, но изменить сообщение</td></tr>
+    <tr><td class="cmd">edit</td><td>остановиться на коммите, чтобы изменить содержимое</td></tr>
+    <tr><td class="cmd">squash</td><td>объединить с предыдущим, сообщения склеиваются</td></tr>
+    <tr><td class="cmd">fixup</td><td>объединить с предыдущим, сообщение предыдущего коммита сохраняется</td></tr>
+    <tr><td class="cmd">drop</td><td>удалить коммит</td></tr>
+    <tr><td class="cmd">exec</td><td>выполнить команду (например, тесты) после коммита</td></tr>
+  </tbody>
+</table>
+
+<div class="warn">
+  Rebase переписывает историю: коммиты получают новые хэши. Не делайте rebase веток, которые уже опубликованы и с которыми работают другие люди. Для общей ветки используйте merge. После rebase опубликованной ветки потребуется <code>git push --force-with-lease</code>, и коллеги должны будут синхронизироваться заново.
+</div>
+
+<h2>Перенос отдельных коммитов: cherry-pick</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git cherry-pick</td><td class="ex">git cherry-pick abc1234</td><td>Применить изменения одного коммита к текущей ветке.</td></tr>
+    <tr><td class="cmd">git cherry-pick диапазон</td><td class="ex">git cherry-pick A^..B</td><td>Диапазон коммитов, включая A.</td></tr>
+    <tr><td class="cmd">git cherry-pick -n</td><td class="ex">git cherry-pick -n abc1234</td><td>Внести изменения в индекс без коммита, чтобы собрать несколько.</td></tr>
+    <tr><td class="cmd">git cherry-pick -x</td><td class="ex">git cherry-pick -x abc1234</td><td>Добавить в сообщение ссылку на исходный коммит.</td></tr>
+    <tr><td class="cmd">git cherry-pick --continue</td><td class="ex">git cherry-pick --continue</td><td>Продолжить после конфликта.</td></tr>
+    <tr><td class="cmd">git cherry-pick --abort</td><td class="ex">git cherry-pick --abort</td><td>Отменить.</td></tr>
+  </tbody>
+</table>
+
+<h2>Временное хранение: stash</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git stash</td><td class="ex">git stash</td><td>Спрятать незакоммиченные изменения и очистить рабочую папку.</td></tr>
+    <tr><td class="cmd">git stash push -m</td><td class="ex">git stash push -m "wip: кнопка оплаты"</td><td>Stash с понятным описанием.</td></tr>
+    <tr><td class="cmd">git stash -u</td><td class="ex">git stash push -u</td><td>Включить новые неотслеживаемые файлы.</td></tr>
+    <tr><td class="cmd">git stash -k</td><td class="ex">git stash push --keep-index</td><td>Оставить уже добавленные в индекс изменения в рабочей папке.</td></tr>
+    <tr><td class="cmd">git stash pop</td><td class="ex">git stash pop</td><td>Вернуть последний stash и удалить его из списка.</td></tr>
+    <tr><td class="cmd">git stash apply</td><td class="ex">git stash apply stash@{2}</td><td>Вернуть stash, но не удалять его.</td></tr>
+    <tr><td class="cmd">git stash list</td><td class="ex">git stash list</td><td>Все сохранённые stash.</td></tr>
+    <tr><td class="cmd">git stash show</td><td class="ex">git stash show -p stash@{0}</td><td>Что лежит в stash, с диффом.</td></tr>
+    <tr><td class="cmd">git stash drop</td><td class="ex">git stash drop stash@{1}</td><td>Удалить один stash.</td></tr>
+    <tr><td class="cmd">git stash clear</td><td class="ex">git stash clear</td><td>Удалить все stash (необратимо).</td></tr>
+    <tr><td class="cmd">git stash branch</td><td class="ex">git stash branch feature/from-stash</td><td>Создать ветку из stash и применить его.</td></tr>
+  </tbody>
+</table>
+
+<h2>Теги</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git tag</td><td class="ex">git tag -l "v1.*"</td><td>Список тегов по шаблону.</td></tr>
+    <tr><td class="cmd">git tag -a</td><td class="ex">git tag -a v1.4.0 -m "Релиз 1.4.0"</td><td>Аннотированный тег с сообщением (рекомендуется для релизов).</td></tr>
+    <tr><td class="cmd">git tag</td><td class="ex">git tag v1.4.0-rc1 abc1234</td><td>Лёгкий тег на конкретный коммит.</td></tr>
+    <tr><td class="cmd">git push --tags</td><td class="ex">git push origin --tags</td><td>Отправить все теги.</td></tr>
+    <tr><td class="cmd">git push origin :</td><td class="ex">git push origin --delete v1.4.0-rc1</td><td>Удалить тег на сервере.</td></tr>
+    <tr><td class="cmd">git tag -d</td><td class="ex">git tag -d v1.4.0-rc1</td><td>Удалить тег локально.</td></tr>
+    <tr><td class="cmd">git show</td><td class="ex">git show v1.4.0</td><td>Информация о теге и его коммите.</td></tr>
+  </tbody>
+</table>
+
+<h2>Типичный рабочий цикл</h2>
+<pre># Новая фича от актуальной main
+git switch main
+git pull --rebase origin main
+git switch -c feature/invoice-pdf
+
+# работа, коммиты
+git add -p
+git commit -m "feat: генерация PDF счетов"
+
+# синхронизация с main перед слиянием
+git fetch origin
+git rebase origin/main
+
+# публикация и слияние через Merge Request / Pull Request
+git push -u origin feature/invoice-pdf
+
+# после одобрения: локально обновиться
+git switch main
+git pull --rebase
+git branch -d feature/invoice-pdf
+git push origin --delete feature/invoice-pdf</pre>
+
+<div class="tip">
+  Если вы переключаетесь с незакоммиченной работой на другую ветку, а Git не даёт этого сделать, используйте <code>git stash push -m</code>, переключитесь и затем <code>git stash pop</code>. Не копируйте файлы вручную: так легко потерять правки.
+</div>
+
+</div>
+</body>
+</html>

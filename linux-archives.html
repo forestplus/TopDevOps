@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux: архивы, сжатие и распаковка</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Linux: архивы, сжатие и распаковка</h1>
+<p class="lead">Создание, просмотр, распаковка и проверка tar, gzip, bzip2, xz, zip и 7z-архивов</p>
+
+<h2>Ключи tar, которые нужно знать</h2>
+<table>
+  <thead><tr><th>Ключ</th><th>Значение</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">-c</td><td>create: создать архив</td></tr>
+    <tr><td class="cmd">-x</td><td>extract: распаковать</td></tr>
+    <tr><td class="cmd">-t</td><td>list: показать содержимое без распаковки</td></tr>
+    <tr><td class="cmd">-r / -u</td><td>append / update: добавить или обновить файлы (только для несжатых архивов)</td></tr>
+    <tr><td class="cmd">-d</td><td>diff: сравнить архив с файлами на диске</td></tr>
+    <tr><td class="cmd">-f</td><td>file: имя архива (должен идти последним из ключей с файлом перед ним)</td></tr>
+    <tr><td class="cmd">-v</td><td>verbose: выводить имена файлов</td></tr>
+    <tr><td class="cmd">-z / -j / -J</td><td>gzip (.gz), bzip2 (.bz2), xz (.xz)</td></tr>
+    <tr><td class="cmd">--zstd</td><td>zstd (.zst), нужен установленный zstd и GNU tar 1.31+</td></tr>
+    <tr><td class="cmd">-C</td><td>change directory: перейти в папку до операции</td></tr>
+    <tr><td class="cmd">-p</td><td>сохранять права доступа при распаковке</td></tr>
+    <tr><td class="cmd">--exclude</td><td>исключить файлы по шаблону</td></tr>
+  </tbody>
+</table>
+
+<h2>Создание архивов tar</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">tar -cvf</td><td class="ex">tar -cvf backup.tar ./data</td><td>Несжатый архив.</td></tr>
+    <tr><td class="cmd">tar -czvf</td><td class="ex">tar -czvf backup.tar.gz ./data</td><td>Архив, сжатый gzip (самый распространённый).</td></tr>
+    <tr><td class="cmd">tar -cjvf</td><td class="ex">tar -cjvf backup.tar.bz2 ./data</td><td>Сжатие bzip2: медленнее, чуть лучше сжимает.</td></tr>
+    <tr><td class="cmd">tar -cJvf</td><td class="ex">tar -cJvf backup.tar.xz ./data</td><td>Сжатие xz: максимальное сжатие, но медленнее.</td></tr>
+    <tr><td class="cmd">tar --zstd -cvf</td><td class="ex">tar --zstd -cvf backup.tar.zst ./data</td><td>Сжатие zstd: быстро и хорошо.</td></tr>
+    <tr><td class="cmd">tar -cvf</td><td class="ex">tar -cvf etc-$(date +%F).tar /etc</td><td>Имя архива с датой.</td></tr>
+    <tr><td class="cmd">tar -C</td><td class="ex">tar -czvf app.tgz -C /opt app</td><td>Архив без лишних родительских путей внутри.</td></tr>
+    <tr><td class="cmd">tar --exclude</td><td class="ex">tar --exclude='*.log' --exclude=node_modules -czvf app.tgz app/</td><td>Исключить шаблоны из архива.</td></tr>
+    <tr><td class="cmd">tar -T</td><td class="ex">tar -czvf out.tgz -T files.txt</td><td>Взять список файлов из текстового файла.</td></tr>
+    <tr><td class="cmd">find | tar</td><td class="ex">find . -name "*.conf" -print0 | tar --null -czvf conf.tgz -T -</td><td>Архив из результатов поиска (безопасно для имён с пробелами).</td></tr>
+    <tr><td class="cmd">tar -cf - | ssh</td><td class="ex">tar -czf - ./data | ssh user@backup 'cat &gt; /backup/data.tgz'</td><td>Потоковая отправка архива на другой сервер без промежуточного файла.</td></tr>
+    <tr><td class="cmd">tar -cf - | ssh</td><td class="ex">tar -czf - ./data | ssh user@host 'tar -xzf - -C /srv/restore'</td><td>Перенос папки на удалённый сервер и распаковка там же.</td></tr>
+  </tbody>
+</table>
+
+<h2>Просмотр и проверка tar</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">tar -tf</td><td class="ex">tar -tf backup.tar</td><td>Список файлов в архиве.</td></tr>
+    <tr><td class="cmd">tar -tvf</td><td class="ex">tar -tvf backup.tar.gz</td><td>Список с правами, размером и датой.</td></tr>
+    <tr><td class="cmd">tar -tzf | grep</td><td class="ex">tar -tzf app.tgz | grep "config"</td><td>Поиск файла внутри архива.</td></tr>
+    <tr><td class="cmd">tar -dzf</td><td class="ex">tar -dzf backup.tgz -C /restore</td><td>Сравнить архив с файлами на диске (покажет отличия).</td></tr>
+    <tr><td class="cmd">sha256sum</td><td class="ex">sha256sum backup.tar.gz &gt; backup.tar.gz.sha256</td><td>Контрольная сумма, чтобы потом проверить целостность.</td></tr>
+    <tr><td class="cmd">sha256sum -c</td><td class="ex">sha256sum -c backup.tar.gz.sha256</td><td>Проверка контрольной суммы.</td></tr>
+  </tbody>
+</table>
+
+<h2>Распаковка tar</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">tar -xf</td><td class="ex">tar -xf backup.tar</td><td>Распаковать в текущую папку.</td></tr>
+    <tr><td class="cmd">tar -xzf</td><td class="ex">tar -xzf backup.tar.gz</td><td>Распаковать gzip-архив.</td></tr>
+    <tr><td class="cmd">tar -xjf</td><td class="ex">tar -xjf backup.tar.bz2</td><td>Распаковать bzip2-архив.</td></tr>
+    <tr><td class="cmd">tar -xJf</td><td class="ex">tar -xJf backup.tar.xz</td><td>Распаковать xz-архив.</td></tr>
+    <tr><td class="cmd">tar --zstd</td><td class="ex">tar --zstd -xf backup.tar.zst</td><td>Распаковать zstd-архив.</td></tr>
+    <tr><td class="cmd">tar -xzf -C</td><td class="ex">tar -xzf app.tgz -C /opt/app</td><td>Распаковать в указанную папку (она должна существовать).</td></tr>
+    <tr><td class="cmd">tar -xzf</td><td class="ex">tar -xzf app.tgz app/config.yml</td><td>Извлечь один конкретный файл.</td></tr>
+    <tr><td class="cmd">tar --strip-components</td><td class="ex">tar --strip-components=1 -xzf app.tgz -C /opt/app</td><td>Убрать верхний уровень папок внутри архива.</td></tr>
+    <tr><td class="cmd">tar -xvf</td><td class="ex">tar -xvf backup.tar</td><td>Показывать распаковываемые файлы.</td></tr>
+    <tr><td class="cmd">tar -k</td><td class="ex">tar -xkf backup.tar</td><td>Не перезаписывать существующие файлы.</td></tr>
+    <tr><td class="cmd">tar --overwrite</td><td class="ex">tar --overwrite -xf backup.tar</td><td>Перезаписывать существующие файлы без вопроса.</td></tr>
+    <tr><td class="cmd">tar --no-same-owner</td><td class="ex">tar --no-same-owner -xf backup.tar</td><td>Не восстанавливать владельца файлов (полезно, когда распаковываете не от root).</td></tr>
+    <tr><td class="cmd">tar -p</td><td class="ex">sudo tar -xpf system.tar -C /</td><td>Восстановить права доступа (нужен root).</td></tr>
+  </tbody>
+</table>
+
+<h2>Сжатие и распаковка отдельных файлов</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">gzip</td><td class="ex">gzip data.sql</td><td>Сжимает и удаляет исходный файл (получится data.sql.gz).</td></tr>
+    <tr><td class="cmd">gzip -k</td><td class="ex">gzip -k data.sql</td><td>Сжимает, оставляя исходный файл.</td></tr>
+    <tr><td class="cmd">gzip -9</td><td class="ex">gzip -9 -k data.sql</td><td>Максимальная степень сжатия.</td></tr>
+    <tr><td class="cmd">gzip -l</td><td class="ex">gzip -l data.sql.gz</td><td>Сколько места экономит сжатие.</td></tr>
+    <tr><td class="cmd">gzip -t</td><td class="ex">gzip -t data.sql.gz</td><td>Проверка целостности, без распаковки.</td></tr>
+    <tr><td class="cmd">gunzip</td><td class="ex">gunzip data.sql.gz</td><td>Распаковывает и удаляет архив.</td></tr>
+    <tr><td class="cmd">gunzip -k</td><td class="ex">gunzip -k data.sql.gz</td><td>Распаковывает, оставляя .gz.</td></tr>
+    <tr><td class="cmd">zcat</td><td class="ex">zcat data.sql.gz | head</td><td>Читает сжатый файл, не распаковывая на диск.</td></tr>
+    <tr><td class="cmd">gzip -c</td><td class="ex">mysqldump db | gzip -c &gt; db.sql.gz</td><td>Сжатие потока данных через пайп.</td></tr>
+    <tr><td class="cmd">bzip2 / bunzip2</td><td class="ex">bzip2 -k file ; bunzip2 -k file.bz2</td><td>Сжатие и распаковка bzip2.</td></tr>
+    <tr><td class="cmd">xz / unxz</td><td class="ex">xz -9 -k file ; unxz -k file.xz</td><td>Сжатие и распаковка xz.</td></tr>
+    <tr><td class="cmd">xz -T0</td><td class="ex">tar -cf - data | xz -T0 &gt; data.tar.xz</td><td>Многопоточное сжатие xz (T0 — все ядра).</td></tr>
+  </tbody>
+</table>
+
+<h2>zip и 7z</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">zip -r</td><td class="ex">zip -r archive.zip ./dir</td><td>Рекурсивный архив zip.</td></tr>
+    <tr><td class="cmd">zip -e</td><td class="ex">zip -er secret.zip ./dir</td><td>Архив с паролем (запросит пароль).</td></tr>
+    <tr><td class="cmd">zip -d</td><td class="ex">zip -d archive.zip old.txt</td><td>Удалить файл из архива.</td></tr>
+    <tr><td class="cmd">zip -u</td><td class="ex">zip -ur archive.zip ./dir</td><td>Обновить только изменившиеся файлы.</td></tr>
+    <tr><td class="cmd">zip -x</td><td class="ex">zip -r a.zip ./dir -x "*.log"</td><td>Исключить шаблон.</td></tr>
+    <tr><td class="cmd">unzip -l</td><td class="ex">unzip -l archive.zip</td><td>Список содержимого.</td></tr>
+    <tr><td class="cmd">unzip -d</td><td class="ex">unzip archive.zip -d /opt/app</td><td>Распаковать в папку.</td></tr>
+    <tr><td class="cmd">unzip -o</td><td class="ex">unzip -o archive.zip</td><td>Перезаписывать без вопроса.</td></tr>
+    <tr><td class="cmd">unzip -t</td><td class="ex">unzip -t archive.zip</td><td>Проверка целостности.</td></tr>
+    <tr><td class="cmd">7z a</td><td class="ex">7z a archive.7z ./dir</td><td>Создать архив 7z (пакет p7zip-full).</td></tr>
+    <tr><td class="cmd">7z x</td><td class="ex">7z x archive.7z -o/opt/app</td><td>Распаковать с сохранением структуры в указанную папку.</td></tr>
+    <tr><td class="cmd">7z l</td><td class="ex">7z l archive.7z</td><td>Список содержимого.</td></tr>
+    <tr><td class="cmd">7z -p</td><td class="ex">7z a -p -mhe=on secret.7z ./dir</td><td>Архив с паролем и шифрованными именами файлов.</td></tr>
+  </tbody>
+</table>
+
+<h2>Типовые задачи</h2>
+<pre># Резервная копия каталога с датой и сжатием
+tar -czvf /backup/www-$(date +%F).tar.gz /var/www
+
+# Восстановить архив в исходные места, сохранив права (от root)
+sudo tar -xzpf /backup/www-2026-10-01.tar.gz -C /
+
+# Посмотреть, что занимает место в архиве, без распаковки
+tar -tzvf backup.tar.gz | sort -k3 -n | tail
+
+# Распаковать и сразу проверить на ошибки
+tar -xzf app.tgz && echo "OK"
+
+# Архив только новых файлов с момента указанной даты
+tar -czf recent.tgz --newer-mtime="2026-10-01" ./data</pre>
+
+<div class="warn">
+  Распаковка архива из недоверенного источника может перезаписать системные файлы или выйти за пределы папки (атака zip-slip). Сначала смотрите список через <code>-t</code>, а распаковывайте в отдельную временную папку через <code>-C</code>.
+</div>
+
+<div class="tip">
+  Чтобы получить список файлов, пригодный для повторного использования, сочетайте <code>find ... -print0</code> с <code>tar --null -T -</code>. Так работают даже имена с пробелами и переносами строк.
+</div>
+
+</div>
+</body>
+</html>

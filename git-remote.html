@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git: удалённые репозитории, fetch, pull и push</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Git: удалённые репозитории, fetch, pull и push</h1>
+<p class="lead">Третья часть гида: связь с сервером, получение и отправка изменений, отслеживаемые ветки и совместная работа</p>
+
+<h2>Remote: управление адресами</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git remote</td><td class="ex">git remote</td><td>Имена удалённых репозиториев.</td></tr>
+    <tr><td class="cmd">git remote -v</td><td class="ex">git remote -v</td><td>Имена и адреса (fetch и push).</td></tr>
+    <tr><td class="cmd">git remote add</td><td class="ex">git remote add upstream https://github.com/original/repo.git</td><td>Добавить ещё один remote (например, оригинал для форка).</td></tr>
+    <tr><td class="cmd">git remote rename</td><td class="ex">git remote rename origin gitlab</td><td>Переименовать remote.</td></tr>
+    <tr><td class="cmd">git remote remove</td><td class="ex">git remote remove old-server</td><td>Удалить remote из настроек (на сервере ничего не меняется).</td></tr>
+    <tr><td class="cmd">git remote set-url</td><td class="ex">git remote set-url origin git@github.com:user/repo.git</td><td>Сменить адрес (например, с HTTPS на SSH).</td></tr>
+    <tr><td class="cmd">git remote set-url --push</td><td class="ex">git remote set-url --push origin git@backup:repo.git</td><td>Отдельный адрес только для отправки.</td></tr>
+    <tr><td class="cmd">git remote show</td><td class="ex">git remote show origin</td><td>Подробно: ветки, отслеживание, что будет отправлено при push.</td></tr>
+    <tr><td class="cmd">git remote prune</td><td class="ex">git remote prune origin</td><td>Удалить локальные ссылки на ветки, которых уже нет на сервере.</td></tr>
+    <tr><td class="cmd">git ls-remote</td><td class="ex">git ls-remote --heads origin</td><td>Список веток и тегов на сервере без клонирования.</td></tr>
+  </tbody>
+</table>
+
+<h2>Получение изменений: fetch и pull</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git fetch</td><td class="ex">git fetch origin</td><td>Скачать новые коммиты и обновить origin/*, не трогая свои ветки.</td></tr>
+    <tr><td class="cmd">git fetch --all</td><td class="ex">git fetch --all --prune</td><td>Все remote, с удалением устаревших ссылок.</td></tr>
+    <tr><td class="cmd">git fetch --tags</td><td class="ex">git fetch --tags origin</td><td>Подтянуть все теги.</td></tr>
+    <tr><td class="cmd">git fetch origin ветка</td><td class="ex">git fetch origin feature/x:feature/x</td><td>Получить одну ветку и создать локальную с тем же именем.</td></tr>
+    <tr><td class="cmd">git pull</td><td class="ex">git pull origin main</td><td>fetch и merge в текущую ветку.</td></tr>
+    <tr><td class="cmd">git pull --rebase</td><td class="ex">git pull --rebase origin main</td><td>fetch и rebase: история остаётся линейной.</td></tr>
+    <tr><td class="cmd">git pull --ff-only</td><td class="ex">git pull --ff-only</td><td>Только если можно без слияния; иначе ошибка, без неожиданных коммитов.</td></tr>
+    <tr><td class="cmd">git pull --autostash</td><td class="ex">git pull --rebase --autostash</td><td>Временно спрятать локальные правки на время pull.</td></tr>
+    <tr><td class="cmd">git log HEAD..origin</td><td class="ex">git log --oneline HEAD..origin/main</td><td>Что есть на сервере и нет у меня.</td></tr>
+    <tr><td class="cmd">git log origin..HEAD</td><td class="ex">git log --oneline origin/main..HEAD</td><td>Что у меня есть и нет на сервере (то, что уйдёт при push).</td></tr>
+  </tbody>
+</table>
+
+<h2>Отправка изменений: push</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git push</td><td class="ex">git push</td><td>Отправить текущую ветку в связанную с ней удалённую.</td></tr>
+    <tr><td class="cmd">git push -u</td><td class="ex">git push -u origin feature/x</td><td>Отправить и связать локальную ветку с удалённой (при первом push).</td></tr>
+    <tr><td class="cmd">git push origin</td><td class="ex">git push origin main:main</td><td>Явно: локальная ветка main в удалённую main.</td></tr>
+    <tr><td class="cmd">git push origin --delete</td><td class="ex">git push origin --delete feature/old</td><td>Удалить ветку на сервере.</td></tr>
+    <tr><td class="cmd">git push --tags</td><td class="ex">git push origin v1.4.0</td><td>Отправить один тег.</td></tr>
+    <tr><td class="cmd">git push --force</td><td class="ex">git push --force origin feature/x</td><td>Перезаписать ветку на сервере. Опасно: можно потерять чужие коммиты.</td></tr>
+    <tr><td class="cmd">git push --force-with-lease</td><td class="ex">git push --force-with-lease origin feature/x</td><td>Безопасная перезапись: отказ, если на сервере появились чужие коммиты.</td></tr>
+    <tr><td class="cmd">git push --dry-run</td><td class="ex">git push --dry-run origin main</td><td>Проверить, что будет отправлено, без реальной отправки.</td></tr>
+    <tr><td class="cmd">git push --set-upstream</td><td class="ex">git push --set-upstream origin feature/x</td><td>То же, что -u.</td></tr>
+    <tr><td class="cmd">git push --no-verify</td><td class="ex">git push --no-verify</td><td>Пропустить pre-push хуки (используйте осознанно).</td></tr>
+  </tbody>
+</table>
+
+<div class="warn">
+  <code>git push --force</code> переписывает историю на сервере. Если кто-то уже скачал ветку, его локальные коммиты станут несовместимы. Всегда используйте <code>--force-with-lease</code>: команда откажется перезаписывать, если на сервере есть то, чего вы не видели.
+</div>
+
+<h2>Отслеживание веток</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git branch -vv</td><td class="ex">git branch -vv</td><td>Какая удалённая ветка связана и отстаёт ли локальная (ahead, behind).</td></tr>
+    <tr><td class="cmd">git branch -u</td><td class="ex">git branch -u origin/main main</td><td>Задать связь вручную.</td></tr>
+    <tr><td class="cmd">git rev-parse</td><td class="ex">git rev-parse --abbrev-ref @{u}</td><td>Имя upstream-ветки текущей ветки.</td></tr>
+    <tr><td class="cmd">git checkout --track</td><td class="ex">git switch --track origin/feature/x</td><td>Создать локальную ветку из удалённой с отслеживанием.</td></tr>
+    <tr><td class="cmd">git status</td><td class="ex">git status -sb</td><td>Короткий статус с информацией о расхождении с сервером.</td></tr>
+  </tbody>
+</table>
+
+<h2>Работа с форками и несколькими remote</h2>
+<pre># Клонируем свой форк
+git clone git@github.com:me/project.git
+cd project
+
+# Добавляем оригинальный репозиторий
+git remote add upstream git@github.com:team/project.git
+git fetch upstream
+
+# Обновляем свою main от оригинала и отправляем в свой форк
+git switch main
+git merge --ff-only upstream/main
+git push origin main
+
+# Ветка для задачи
+git switch -c fix/parser
+# ...коммиты...
+git push -u origin fix/parser</pre>
+
+<h2>Подмодули</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git submodule add</td><td class="ex">git submodule add https://github.com/lib/x.git vendor/x</td><td>Добавить подмодуль в папку vendor/x.</td></tr>
+    <tr><td class="cmd">git submodule update</td><td class="ex">git submodule update --init --recursive</td><td>Инициализировать и обновить подмодули, включая вложенные.</td></tr>
+    <tr><td class="cmd">git submodule status</td><td class="ex">git submodule status</td><td>Какой коммит зафиксирован для каждого подмодуля.</td></tr>
+    <tr><td class="cmd">git submodule foreach</td><td class="ex">git submodule foreach 'git pull origin main'</td><td>Выполнить команду в каждом подмодуле.</td></tr>
+    <tr><td class="cmd">git clone --recursive</td><td class="ex">git clone --recurse-submodules URL</td><td>Клонировать сразу вместе с подмодулями.</td></tr>
+  </tbody>
+</table>
+
+<h2>Синхронизация перед работой: типичная проверка</h2>
+<pre>git status -sb                     # куда отстаём и опережаем
+git fetch --all --prune           # обновить информацию о сервере
+git log --oneline HEAD..origin/main   # что пришло
+git pull --rebase --autostash     # подтянуть без лишних merge-коммитов
+git push                          # отправить свои коммиты</pre>
+
+<div class="tip">
+  Настройте <code>git config --global push.default current</code> и <code>git config --global pull.rebase true</code>. Тогда <code>git push</code> отправит текущую ветку, а <code>git pull</code> не будет создавать лишние коммиты слияния.
+</div>
+
+<div class="tip">
+  Для доступа по SSH добавьте ключ в ssh-agent и используйте адрес вида <code>git@host:repo.git</code>. Так не придётся вводить пароль при каждом fetch или push.
+</div>
+
+</div>
+</body>
+</html>

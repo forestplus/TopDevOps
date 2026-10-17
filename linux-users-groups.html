@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux: пользователи, группы и sudo</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Linux: пользователи, группы и sudo</h1>
+<p class="lead">Создание, изменение и удаление учётных записей и групп, права администратора и контроль сессий</p>
+
+<h2>Создание пользователя</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">useradd</td><td class="ex">useradd ivan</td><td>Создаёт пользователя без домашней папки (в Debian/Ubuntu без -m папка не появится).</td></tr>
+    <tr><td class="cmd">useradd -m</td><td class="ex">useradd -m ivan</td><td>Создаёт пользователя и его домашнюю папку /home/ivan.</td></tr>
+    <tr><td class="cmd">useradd -m -s</td><td class="ex">useradd -m -s /bin/bash ivan</td><td>Задаёт оболочку входа.</td></tr>
+    <tr><td class="cmd">useradd -c</td><td class="ex">useradd -m -c "Иван Петров" ivan</td><td>Добавляет комментарий (полное имя) в /etc/passwd.</td></tr>
+    <tr><td class="cmd">useradd -G</td><td class="ex">useradd -m -G sudo,docker ivan</td><td>Сразу добавляет в дополнительные группы (через запятую, без пробелов).</td></tr>
+    <tr><td class="cmd">useradd -g</td><td class="ex">useradd -m -g developers ivan</td><td>Задаёт основную группу (она должна существовать).</td></tr>
+    <tr><td class="cmd">useradd -u</td><td class="ex">useradd -m -u 2001 ivan</td><td>Задаёт UID вручную (полезно для согласованности между серверами).</td></tr>
+    <tr><td class="cmd">useradd -d</td><td class="ex">useradd -m -d /srv/ivan ivan</td><td>Указывает нестандартную домашнюю папку.</td></tr>
+    <tr><td class="cmd">useradd -e</td><td class="ex">useradd -m -e 2027-01-01 ivan</td><td>Учётная запись истекает в указанную дату.</td></tr>
+    <tr><td class="cmd">useradd -r</td><td class="ex">useradd -r -s /usr/sbin/nologin svc_app</td><td>Системный пользователь для службы: без входа и без домашней папки по умолчанию.</td></tr>
+    <tr><td class="cmd">adduser</td><td class="ex">adduser ivan</td><td>Интерактивная обёртка (Debian/Ubuntu): сама создаёт папку и спрашивает пароль.</td></tr>
+  </tbody>
+</table>
+
+<h2>Пароли и блокировка</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">passwd</td><td class="ex">passwd ivan</td><td>Интерактивно задаёт пароль.</td></tr>
+    <tr><td class="cmd">passwd</td><td class="ex">passwd</td><td>Меняет пароль текущего пользователя.</td></tr>
+    <tr><td class="cmd">passwd -l</td><td class="ex">passwd -l ivan</td><td>Блокирует вход (добавляет ! перед хэшем).</td></tr>
+    <tr><td class="cmd">passwd -u</td><td class="ex">passwd -u ivan</td><td>Снимает блокировку.</td></tr>
+    <tr><td class="cmd">passwd -e</td><td class="ex">passwd -e ivan</td><td>Требует сменить пароль при следующем входе.</td></tr>
+    <tr><td class="cmd">passwd -S</td><td class="ex">passwd -S ivan</td><td>Показывает состояние: P (есть пароль), L (заблокирован), NP (без пароля).</td></tr>
+    <tr><td class="cmd">chpasswd</td><td class="ex">echo "ivan:NewPass" | chpasswd</td><td>Задаёт пароль из стандартного ввода (пароль останется в истории оболочки, лучше через файл).</td></tr>
+    <tr><td class="cmd">chage -l</td><td class="ex">chage -l ivan</td><td>Показывает сроки действия пароля.</td></tr>
+    <tr><td class="cmd">chage -M</td><td class="ex">chage -M 90 ivan</td><td>Максимальный срок пароля: 90 дней.</td></tr>
+    <tr><td class="cmd">chage -E</td><td class="ex">chage -E 2027-01-01 ivan</td><td>Дата окончания учётной записи.</td></tr>
+    <tr><td class="cmd">chage -d 0</td><td class="ex">chage -d 0 ivan</td><td>Принудительная смена пароля при следующем входе.</td></tr>
+  </tbody>
+</table>
+
+<h2>Изменение пользователя</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">usermod -aG</td><td class="ex">usermod -aG docker ivan</td><td>Добавляет в группу docker, <b>сохраняя</b> остальные группы. Флаг -a обязателен.</td></tr>
+    <tr><td class="cmd">usermod -G</td><td class="ex">usermod -G docker ivan</td><td>Заменяет все дополнительные группы на указанные. Частая ошибка: все прежние группы пропадают.</td></tr>
+    <tr><td class="cmd">usermod -g</td><td class="ex">usermod -g devops ivan</td><td>Меняет основную группу.</td></tr>
+    <tr><td class="cmd">usermod -s</td><td class="ex">usermod -s /bin/zsh ivan</td><td>Меняет оболочку.</td></tr>
+    <tr><td class="cmd">usermod -l</td><td class="ex">usermod -l ivan.petrov ivan</td><td>Переименовывает логин (домашнюю папку переименуйте отдельно, если нужно).</td></tr>
+    <tr><td class="cmd">usermod -d -m</td><td class="ex">usermod -d /srv/ivan -m ivan</td><td>Меняет домашнюю папку и переносит содержимое.</td></tr>
+    <tr><td class="cmd">usermod -L / -U</td><td class="ex">usermod -L ivan</td><td>Блокирует или разблокирует учётную запись.</td></tr>
+    <tr><td class="cmd">usermod -e</td><td class="ex">usermod -e 2027-06-30 ivan</td><td>Задаёт дату истечения учётной записи.</td></tr>
+    <tr><td class="cmd">usermod -c</td><td class="ex">usermod -c "Иван, бухгалтерия" ivan</td><td>Меняет комментарий.</td></tr>
+  </tbody>
+</table>
+
+<h2>Удаление пользователя</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">userdel</td><td class="ex">userdel ivan</td><td>Удаляет учётную запись, домашняя папка остаётся.</td></tr>
+    <tr><td class="cmd">userdel -r</td><td class="ex">userdel -r ivan</td><td>Удаляет учётную запись вместе с домашней папкой и почтовым ящиком.</td></tr>
+    <tr><td class="cmd">userdel -f</td><td class="ex">userdel -f ivan</td><td>Удаляет, даже если пользователь сейчас в системе (процессы не завершаются автоматически).</td></tr>
+    <tr><td class="cmd">deluser</td><td class="ex">deluser --remove-home ivan</td><td>Обёртка в Debian/Ubuntu с той же логикой.</td></tr>
+  </tbody>
+</table>
+
+<h2>Группы</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">groupadd</td><td class="ex">groupadd developers</td><td>Создаёт группу.</td></tr>
+    <tr><td class="cmd">groupadd -g</td><td class="ex">groupadd -g 3000 devops</td><td>Создаёт группу с заданным GID.</td></tr>
+    <tr><td class="cmd">groupadd -r</td><td class="ex">groupadd -r svc_group</td><td>Системная группа.</td></tr>
+    <tr><td class="cmd">groupmod -n</td><td class="ex">groupmod -n devs developers</td><td>Переименовывает группу.</td></tr>
+    <tr><td class="cmd">groupmod -g</td><td class="ex">groupmod -g 3100 devs</td><td>Меняет GID.</td></tr>
+    <tr><td class="cmd">groupdel</td><td class="ex">groupdel developers</td><td>Удаляет группу (нельзя, если это основная группа существующего пользователя).</td></tr>
+    <tr><td class="cmd">gpasswd -a</td><td class="ex">gpasswd -a ivan developers</td><td>Добавляет пользователя в группу.</td></tr>
+    <tr><td class="cmd">gpasswd -d</td><td class="ex">gpasswd -d ivan developers</td><td>Убирает пользователя из группы.</td></tr>
+    <tr><td class="cmd">gpasswd -M</td><td class="ex">gpasswd -M ivan,petr,anna developers</td><td>Задаёт полный список участников группы.</td></tr>
+    <tr><td class="cmd">gpasswd -A</td><td class="ex">gpasswd -A ivan developers</td><td>Назначает администратора группы (может управлять её составом).</td></tr>
+    <tr><td class="cmd">gpasswd</td><td class="ex">gpasswd developers</td><td>Задаёт пароль группы (используется редко).</td></tr>
+    <tr><td class="cmd">newgrp</td><td class="ex">newgrp docker</td><td>Открывает оболочку с новой основной группой без перелогина.</td></tr>
+  </tbody>
+</table>
+
+<h2>Просмотр и поиск</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">id</td><td class="ex">id ivan</td><td>UID, GID и все группы пользователя.</td></tr>
+    <tr><td class="cmd">id -gn</td><td class="ex">id -gn ivan</td><td>Имя основной группы.</td></tr>
+    <tr><td class="cmd">id -u</td><td class="ex">id -u</td><td>Числовой UID текущего пользователя (0 — root).</td></tr>
+    <tr><td class="cmd">groups</td><td class="ex">groups ivan</td><td>Список групп пользователя.</td></tr>
+    <tr><td class="cmd">whoami</td><td class="ex">whoami</td><td>Имя текущего пользователя.</td></tr>
+    <tr><td class="cmd">getent</td><td class="ex">getent group developers</td><td>Читает базу учётных записей, в том числе из LDAP и AD.</td></tr>
+    <tr><td class="cmd">getent</td><td class="ex">getent passwd ivan</td><td>Данные пользователя из всех источников NSS.</td></tr>
+    <tr><td class="cmd">grep</td><td class="ex">grep ivan /etc/passwd</td><td>Поиск в файлах учётных записей напрямую.</td></tr>
+    <tr><td class="cmd">lid</td><td class="ex">lid -g developers</td><td>Пользователи группы (пакет libuser).</td></tr>
+  </tbody>
+</table>
+
+<h2>Переключение пользователя и sudo</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">su -</td><td class="ex">su - ivan</td><td>Переходит к пользователю с его окружением (дефис обязателен).</td></tr>
+    <tr><td class="cmd">su -c</td><td class="ex">su -c "systemctl restart nginx" root</td><td>Выполняет одну команду от имени другого пользователя.</td></tr>
+    <tr><td class="cmd">sudo</td><td class="ex">sudo apt update</td><td>Выполняет команду от root по правилам sudoers.</td></tr>
+    <tr><td class="cmd">sudo -i</td><td class="ex">sudo -i</td><td>Оболочка root с его окружением.</td></tr>
+    <tr><td class="cmd">sudo -u</td><td class="ex">sudo -u postgres psql</td><td>Выполнить от имени произвольного пользователя.</td></tr>
+    <tr><td class="cmd">sudo -l</td><td class="ex">sudo -l</td><td>Какие команды разрешены текущему пользователю.</td></tr>
+    <tr><td class="cmd">sudo -l -U</td><td class="ex">sudo -l -U ivan</td><td>То же для другого пользователя (требует прав).</td></tr>
+    <tr><td class="cmd">sudo -k</td><td class="ex">sudo -k</td><td>Сбрасывает кеш пароля sudo.</td></tr>
+    <tr><td class="cmd">visudo</td><td class="ex">visudo -f /etc/sudoers.d/ivan</td><td>Безопасное редактирование sudoers с проверкой синтаксиса.</td></tr>
+  </tbody>
+</table>
+
+<h3>Пример правила в /etc/sudoers.d/ivan</h3>
+<pre># Разрешить перезапуск только одной службы без пароля
+ivan ALL=(root) NOPASSWD: /usr/bin/systemctl restart nginx
+
+# Разрешить группе devops полный доступ через sudo
+%devops ALL=(ALL:ALL) ALL</pre>
+
+<h2>Сессии и журналы входа</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">who</td><td class="ex">who -a</td><td>Кто сейчас в системе, с подробностями.</td></tr>
+    <tr><td class="cmd">w</td><td class="ex">w</td><td>Кто в системе и что делает (нагрузка, команда).</td></tr>
+    <tr><td class="cmd">last</td><td class="ex">last -n 20 ivan</td><td>История входов конкретного пользователя.</td></tr>
+    <tr><td class="cmd">lastb</td><td class="ex">sudo lastb -n 20</td><td>Неудачные попытки входа (нужны права root).</td></tr>
+    <tr><td class="cmd">lastlog</td><td class="ex">lastlog -u ivan</td><td>Время последнего входа каждого пользователя.</td></tr>
+    <tr><td class="cmd">pkill</td><td class="ex">pkill -KILL -u ivan</td><td>Завершить все процессы пользователя (например, перед удалением).</td></tr>
+  </tbody>
+</table>
+
+<h2>Где хранятся данные</h2>
+<pre>/etc/passwd   учётные записи (имя, UID, GID, комментарий, домашняя папка, оболочка)
+/etc/shadow   хэши паролей и сроки действия (доступ только root)
+/etc/group    группы и их участники
+/etc/gshadow  пароли групп и администраторы групп
+/etc/sudoers  правила sudo (править только через visudo)
+/etc/sudoers.d/  дополнительные правила sudo, отдельные файлы</pre>
+
+<div class="warn">
+  Не используйте <code>usermod -G</code> без <code>-a</code> для уже существующих пользователей: список дополнительных групп будет заменён целиком. Всегда используйте <code>usermod -aG</code>. А правила sudo редактируйте только через <code>visudo</code>: ошибка в sudoers может закрыть доступ к системе.
+</div>
+
+<div class="tip">
+  Для доступа к сервисам удобнее создавать группы по ролям (например, <code>www-data</code>, <code>deploy</code>) и добавлять в них пользователей, а не выдавать права каждому файлу отдельно.
+</div>
+
+</div>
+</body>
+</html>

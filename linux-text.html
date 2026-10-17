@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux: работа с текстом, поиск и обработка</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Linux: работа с текстом, поиск и обработка</h1>
+<p class="lead">Просмотр файлов, поиск по содержимому, замена, выборка колонок и сравнение</p>
+
+<h2>Просмотр файлов</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">cat</td><td class="ex">cat file.txt</td><td>Выводит весь файл.</td></tr>
+    <tr><td class="cmd">cat -n</td><td class="ex">cat -n file.txt</td><td>С нумерацией строк.</td></tr>
+    <tr><td class="cmd">cat -A</td><td class="ex">cat -A file.txt</td><td>Показывает скрытые символы (табуляции как ^I, конец строки как $).</td></tr>
+    <tr><td class="cmd">cat &gt;&gt;</td><td class="ex">cat &gt;&gt; notes.txt</td><td>Дописать ввод в конец файла (завершение Ctrl+D).</td></tr>
+    <tr><td class="cmd">tac</td><td class="ex">tac file.txt</td><td>Строки в обратном порядке.</td></tr>
+    <tr><td class="cmd">head</td><td class="ex">head -n 20 file.txt</td><td>Первые 20 строк.</td></tr>
+    <tr><td class="cmd">head -c</td><td class="ex">head -c 200 file.bin | xxd</td><td>Первые 200 байт.</td></tr>
+    <tr><td class="cmd">tail -n</td><td class="ex">tail -n 50 app.log</td><td>Последние 50 строк.</td></tr>
+    <tr><td class="cmd">tail -n +N</td><td class="ex">tail -n +10 file.txt</td><td>Со строки 10 до конца.</td></tr>
+    <tr><td class="cmd">tail -f</td><td class="ex">tail -f app.log</td><td>Следить за добавлением строк.</td></tr>
+    <tr><td class="cmd">tail -F</td><td class="ex">tail -F app.log</td><td>Следить, даже если файл пересоздан при ротации логов.</td></tr>
+    <tr><td class="cmd">less</td><td class="ex">less file.txt</td><td>Постраничный просмотр. Поиск по /, выход по q.</td></tr>
+    <tr><td class="cmd">less +F</td><td class="ex">less +F app.log</td><td>Режим слежения внутри less (Ctrl+C — вернуться к листанию).</td></tr>
+    <tr><td class="cmd">less -S</td><td class="ex">less -S wide.csv</td><td>Не переносить длинные строки.</td></tr>
+    <tr><td class="cmd">more</td><td class="ex">more file.txt</td><td>Простой постраничный просмотр, меньше возможностей, чем less.</td></tr>
+    <tr><td class="cmd">wc</td><td class="ex">wc -l file.txt</td><td>Количество строк. Также -w (слова), -c (байты), -m (символы).</td></tr>
+    <tr><td class="cmd">nl</td><td class="ex">nl -ba file.txt</td><td>Пронумеровать все строки, включая пустые.</td></tr>
+    <tr><td class="cmd">column -t</td><td class="ex">column -t -s, data.csv</td><td>Выровнять колонки по разделителю.</td></tr>
+    <tr><td class="cmd">fold</td><td class="ex">fold -w 80 text.txt</td><td>Переносить строки на 80 символов.</td></tr>
+    <tr><td class="cmd">rev</td><td class="ex">echo abc | rev</td><td>Перевернуть каждую строку.</td></tr>
+  </tbody>
+</table>
+
+<h2>grep: поиск по содержимому</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">grep</td><td class="ex">grep "error" app.log</td><td>Строки, содержащие шаблон.</td></tr>
+    <tr><td class="cmd">grep -i</td><td class="ex">grep -i "error" app.log</td><td>Без учёта регистра.</td></tr>
+    <tr><td class="cmd">grep -v</td><td class="ex">grep -v "^#" nginx.conf</td><td>Инвертировать: строки, которые НЕ совпадают (без комментариев).</td></tr>
+    <tr><td class="cmd">grep -n</td><td class="ex">grep -n "timeout" app.conf</td><td>Показать номера строк.</td></tr>
+    <tr><td class="cmd">grep -c</td><td class="ex">grep -c "GET" access.log</td><td>Только количество совпадений.</td></tr>
+    <tr><td class="cmd">grep -o</td><td class="ex">grep -oE "[0-9]{1,3}(\.[0-9]{1,3}){3}" access.log</td><td>Выводить только совпавшую часть (например, IP-адреса).</td></tr>
+    <tr><td class="cmd">grep -w</td><td class="ex">grep -w "port" conf</td><td>Слово целиком, а не часть другого слова.</td></tr>
+    <tr><td class="cmd">grep -x</td><td class="ex">grep -x "enabled" flags.txt</td><td>Строка целиком совпадает с шаблоном.</td></tr>
+    <tr><td class="cmd">grep -r</td><td class="ex">grep -rn "DB_HOST" /srv/app/</td><td>Рекурсивный поиск по папке.</td></tr>
+    <tr><td class="cmd">grep -l</td><td class="ex">grep -rl "TODO" src/</td><td>Только имена файлов с совпадениями.</td></tr>
+    <tr><td class="cmd">grep -L</td><td class="ex">grep -rL "license" src/</td><td>Файлы, где совпадений нет.</td></tr>
+    <tr><td class="cmd">grep -E</td><td class="ex">grep -E "error|fail|timeout" app.log</td><td>Расширенные регулярные выражения (можно |, +, ?, {n}).</td></tr>
+    <tr><td class="cmd">grep -P</td><td class="ex">grep -P "\d{4}-\d{2}-\d{2}" app.log</td><td>Perl-регулярки (lookahead и \d).</td></tr>
+    <tr><td class="cmd">grep -A -B -C</td><td class="ex">grep -C 3 "Exception" app.log</td><td>Контекст: -A после, -B до, -C с обеих сторон.</td></tr>
+    <tr><td class="cmd">grep -m</td><td class="ex">grep -m 5 "ERROR" app.log</td><td>Остановиться после 5 совпадений.</td></tr>
+    <tr><td class="cmd">grep -q</td><td class="ex">if grep -q "ok" status; then echo yes; fi</td><td>Без вывода, только код возврата (удобно в скриптах).</td></tr>
+    <tr><td class="cmd">grep --include</td><td class="ex">grep -r --include="*.conf" "listen" /etc/</td><td>Искать только в файлах по шаблону.</td></tr>
+    <tr><td class="cmd">grep --exclude-dir</td><td class="ex">grep -r --exclude-dir=.git "TODO" .</td><td>Пропускать папки.</td></tr>
+    <tr><td class="cmd">grep -e</td><td class="ex">grep -e "warn" -e "error" app.log</td><td>Несколько шаблонов сразу (логическое ИЛИ).</td></tr>
+  </tbody>
+</table>
+
+<h2>sed: потоковая обработка и замена</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">sed 's/a/b/'</td><td class="ex">sed 's/old/new/' file</td><td>Заменить первое совпадение в каждой строке.</td></tr>
+    <tr><td class="cmd">sed 's/…/…/g'</td><td class="ex">sed 's/old/new/g' file</td><td>Заменить все совпадения.</td></tr>
+    <tr><td class="cmd">sed -i</td><td class="ex">sed -i 's/debug=true/debug=false/' app.conf</td><td>Править файл на месте.</td></tr>
+    <tr><td class="cmd">sed -i.bak</td><td class="ex">sed -i.bak 's/old/new/g' app.conf</td><td>Править на месте и сохранить копию app.conf.bak.</td></tr>
+    <tr><td class="cmd">sed -n 'N,Mp'</td><td class="ex">sed -n '10,20p' file</td><td>Вывести строки с 10 по 20.</td></tr>
+    <tr><td class="cmd">sed -n '/…/,/…/p'</td><td class="ex">sed -n '/START/,/END/p' file</td><td>Вывести блок между двумя шаблонами.</td></tr>
+    <tr><td class="cmd">sed '/…/d'</td><td class="ex">sed '/^#/d' nginx.conf</td><td>Удалить строки по шаблону.</td></tr>
+    <tr><td class="cmd">sed 'Nd'</td><td class="ex">sed '1d' data.csv</td><td>Удалить первую строку (заголовок).</td></tr>
+    <tr><td class="cmd">sed '/…/a'</td><td class="ex">sed '/listen/a\    server_name example.com;' nginx.conf</td><td>Добавить строку после совпадения.</td></tr>
+    <tr><td class="cmd">sed '/…/i'</td><td class="ex">sed '/^\[main\]/i # comment' conf.ini</td><td>Вставить строку перед совпадением.</td></tr>
+    <tr><td class="cmd">sed -E</td><td class="ex">sed -E 's/([0-9]+)-([0-9]+)/\2-\1/' file</td><td>Расширенные регулярки и группы захвата.</td></tr>
+    <tr><td class="cmd">sed 'Nq'</td><td class="ex">sed '5q' file</td><td>Вывести первые 5 строк и выйти.</td></tr>
+    <tr><td class="cmd">sed -e</td><td class="ex">sed -e 's/a/b/' -e 's/c/d/' file</td><td>Несколько правок за один проход.</td></tr>
+  </tbody>
+</table>
+
+<h2>awk: работа с колонками</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">awk '{print $1}'</td><td class="ex">awk '{print $1}' access.log</td><td>Первая колонка (разделитель — пробелы).</td></tr>
+    <tr><td class="cmd">awk -F</td><td class="ex">awk -F: '{print $1, $3}' /etc/passwd</td><td>Свой разделитель (здесь двоеточие).</td></tr>
+    <tr><td class="cmd">awk -F,</td><td class="ex">awk -F, 'NR&gt;1 {s+=$3} END {print s}' sales.csv</td><td>Сумма колонки в CSV, пропуская заголовок.</td></tr>
+    <tr><td class="cmd">awk 'условие'</td><td class="ex">awk -F: '$3 &gt;= 1000' /etc/passwd</td><td>Фильтр по условию (пользователи с UID от 1000).</td></tr>
+    <tr><td class="cmd">awk '/regexp/'</td><td class="ex">awk '/ERROR/ {print $0}' app.log</td><td>Строки по регулярному выражению.</td></tr>
+    <tr><td class="cmd">awk 'NR…'</td><td class="ex">awk 'NR&gt;=10 &amp;&amp; NR&lt;=20' file</td><td>Диапазон строк.</td></tr>
+    <tr><td class="cmd">awk '{print NF}'</td><td class="ex">awk '{print NF}' file</td><td>Число полей в каждой строке.</td></tr>
+    <tr><td class="cmd">awk массив</td><td class="ex">awk '{c[$9]++} END {for (k in c) print c[k], k}' access.log</td><td>Подсчёт по ключу (здесь код ответа HTTP).</td></tr>
+    <tr><td class="cmd">OFS</td><td class="ex">awk -F, 'BEGIN{OFS="\t"} {$1=$1; print}' data.csv</td><td>Поменять разделитель вывода.</td></tr>
+    <tr><td class="cmd">awk -v</td><td class="ex">awk -v min=100 '$2 &gt; min' data.txt</td><td>Передать переменную в awk.</td></tr>
+  </tbody>
+</table>
+
+<h2>cut, sort, uniq, tr</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">cut -d… -f…</td><td class="ex">cut -d: -f1,3 /etc/passwd</td><td>Выбрать поля 1 и 3 с разделителем двоеточие.</td></tr>
+    <tr><td class="cmd">cut -c</td><td class="ex">cut -c1-15 file</td><td>Символы с 1 по 15.</td></tr>
+    <tr><td class="cmd">sort</td><td class="ex">sort names.txt</td><td>Сортировка по алфавиту.</td></tr>
+    <tr><td class="cmd">sort -n</td><td class="ex">sort -n sizes.txt</td><td>Числовая сортировка.</td></tr>
+    <tr><td class="cmd">sort -h</td><td class="ex">du -sh * | sort -h</td><td>Сортировка с суффиксами K, M, G.</td></tr>
+    <tr><td class="cmd">sort -r</td><td class="ex">sort -rn counts.txt</td><td>Обратный порядок.</td></tr>
+    <tr><td class="cmd">sort -k</td><td class="ex">sort -k2,2n data.txt</td><td>По второй колонке как по числу.</td></tr>
+    <tr><td class="cmd">sort -u</td><td class="ex">sort -u list.txt</td><td>Сортировка с удалением дубликатов.</td></tr>
+    <tr><td class="cmd">sort -t</td><td class="ex">sort -t, -k3 sales.csv</td><td>Сортировка CSV по третьей колонке.</td></tr>
+    <tr><td class="cmd">uniq</td><td class="ex">sort list.txt | uniq</td><td>Удалить соседние дубликаты (нужна предварительная сортировка).</td></tr>
+    <tr><td class="cmd">uniq -c</td><td class="ex">sort ips.txt | uniq -c | sort -rn | head</td><td>Топ повторяющихся строк.</td></tr>
+    <tr><td class="cmd">uniq -d</td><td class="ex">sort list | uniq -d</td><td>Только строки, встречающиеся более одного раза.</td></tr>
+    <tr><td class="cmd">uniq -u</td><td class="ex">sort list | uniq -u</td><td>Только уникальные строки.</td></tr>
+    <tr><td class="cmd">tr</td><td class="ex">echo abc | tr 'a-z' 'A-Z'</td><td>Замена символов.</td></tr>
+    <tr><td class="cmd">tr -d</td><td class="ex">tr -d '\r' &lt; win.txt &gt; unix.txt</td><td>Удалить символы (например, Windows-переводы строк).</td></tr>
+    <tr><td class="cmd">tr -s</td><td class="ex">tr -s ' ' &lt; file</td><td>Сжать повторяющиеся пробелы.</td></tr>
+  </tbody>
+</table>
+
+<h2>Сравнение и объединение</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">diff</td><td class="ex">diff a.conf b.conf</td><td>Различия построчно.</td></tr>
+    <tr><td class="cmd">diff -u</td><td class="ex">diff -u old.conf new.conf</td><td>В формате unified (как в патчах и git).</td></tr>
+    <tr><td class="cmd">diff -r</td><td class="ex">diff -r dir1/ dir2/</td><td>Сравнить папки целиком.</td></tr>
+    <tr><td class="cmd">diff -q</td><td class="ex">diff -rq dir1/ dir2/</td><td>Только сообщить, что различается.</td></tr>
+    <tr><td class="cmd">diff -w</td><td class="ex">diff -w a b</td><td>Игнорировать пробелы.</td></tr>
+    <tr><td class="cmd">cmp</td><td class="ex">cmp backup.iso original.iso</td><td>Побайтовое сравнение, показывает первое отличие.</td></tr>
+    <tr><td class="cmd">comm</td><td class="ex">comm -12 sorted1 sorted2</td><td>Общие строки двух отсортированных файлов (-23 — только в первом).</td></tr>
+    <tr><td class="cmd">paste</td><td class="ex">paste names.txt emails.txt</td><td>Склеить файлы построчно через табуляцию.</td></tr>
+    <tr><td class="cmd">join</td><td class="ex">join -t: users.txt groups.txt</td><td>Объединить по общему ключу (файлы отсортированы по нему).</td></tr>
+  </tbody>
+</table>
+
+<h2>Потоки, xargs и разбиение</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">tee</td><td class="ex">make 2&gt;&amp;1 | tee build.log</td><td>Вывести на экран и записать в файл одновременно.</td></tr>
+    <tr><td class="cmd">tee -a</td><td class="ex">cmd | tee -a journal.txt</td><td>Дописывать, а не перезаписывать.</td></tr>
+    <tr><td class="cmd">xargs</td><td class="ex">cat ids.txt | xargs -n 1 echo</td><td>Превращает поток в аргументы команды.</td></tr>
+    <tr><td class="cmd">xargs -I</td><td class="ex">cat list | xargs -I{} cp {} /backup/</td><td>Подставлять каждое значение в нужное место.</td></tr>
+    <tr><td class="cmd">xargs -0</td><td class="ex">find . -print0 | xargs -0 wc -l</td><td>Безопасная работа с именами с пробелами.</td></tr>
+    <tr><td class="cmd">xargs -P</td><td class="ex">cat urls.txt | xargs -P 8 -n 1 curl -sO</td><td>Параллельное выполнение в 8 потоков.</td></tr>
+    <tr><td class="cmd">split -l</td><td class="ex">split -l 100000 big.csv part_</td><td>Разбить файл по 100000 строк.</td></tr>
+    <tr><td class="cmd">split -b</td><td class="ex">split -b 100M backup.tar part_</td><td>Разбить по размеру.</td></tr>
+    <tr><td class="cmd">cat part_*</td><td class="ex">cat part_* &gt; backup.tar</td><td>Собрать части обратно.</td></tr>
+    <tr><td class="cmd">printf</td><td class="ex">printf "%-10s %5d\n" name 42</td><td>Форматированный вывод.</td></tr>
+    <tr><td class="cmd">seq</td><td class="ex">seq 1 2 11</td><td>Последовательность чисел с шагом.</td></tr>
+  </tbody>
+</table>
+
+<h2>Пример: короткий анализ лога веб-сервера</h2>
+<pre># Топ-10 IP по числу запросов
+awk '{print $1}' access.log | sort | uniq -c | sort -rn | head -10
+
+# Количество ответов по кодам
+awk '{print $9}' access.log | sort | uniq -c | sort -rn
+
+# Ошибки 5xx за сегодня с временем
+grep "$(date +%d/%b/%Y)" access.log | awk '$9 ~ /^5/ {print $4, $7, $9}'
+
+# Заменить старый домен во всех конфигах с резервной копией
+grep -rl "old.example.com" /etc/nginx | xargs sed -i.bak 's/old.example.com/new.example.com/g'</pre>
+
+<div class="warn">
+  <code>sed -i</code> и <code>xargs</code> меняют файлы сразу. Перед массовой заменой запустите то же без <code>-i</code> (покажет результат в выводе) и сохраняйте резервную копию через <code>-i.bak</code>.
+</div>
+
+<div class="tip">
+  Для сложной обработки данных, когда sed и awk становятся трудночитаемыми, переходите на Python или jq (для JSON). Однострочники в shell хороши для разовых задач, а не для поддержки.
+</div>
+
+</div>
+</body>
+</html>

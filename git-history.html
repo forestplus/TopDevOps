@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git: отмена изменений, reset, reflog и восстановление</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Git: отмена изменений, reset, reflog и восстановление</h1>
+<p class="lead">Четвёртая часть гида: как откатить изменения на любом уровне, переписать историю и вернуть «потерянные» коммиты</p>
+
+<h2>Где и как отменять</h2>
+<table>
+  <thead><tr><th>Ситуация</th><th>Инструмент</th></tr></thead>
+  <tbody>
+    <tr><td>Правка в рабочей папке, которую нужно выбросить</td><td><code>git restore файл</code></td></tr>
+    <tr><td>Файл добавлен в индекс по ошибке</td><td><code>git restore --staged файл</code></td></tr>
+    <tr><td>Последний коммит неудачный, он локальный</td><td><code>git reset --soft HEAD~1</code></td></tr>
+    <tr><td>Коммит уже опубликован, нужно откатить эффект</td><td><code>git revert</code></td></tr>
+    <tr><td>Нужно вернуть «потерянный» коммит</td><td><code>git reflog</code></td></tr>
+  </tbody>
+</table>
+
+<h2>restore и checkout для файлов</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git restore</td><td class="ex">git restore app.py</td><td>Вернуть файл к состоянию индекса (правки в рабочей папке теряются).</td></tr>
+    <tr><td class="cmd">git restore --staged</td><td class="ex">git restore --staged app.py</td><td>Убрать из индекса, сохранив правки.</td></tr>
+    <tr><td class="cmd">git restore --source</td><td class="ex">git restore --source=HEAD~3 config.yml</td><td>Взять версию файла из любого коммита.</td></tr>
+    <tr><td class="cmd">git restore -p</td><td class="ex">git restore -p app.py</td><td>Отменить выборочно, по кускам.</td></tr>
+    <tr><td class="cmd">git checkout --</td><td class="ex">git checkout -- app.py</td><td>Старая форма того же: отменить правки файла.</td></tr>
+    <tr><td class="cmd">git clean</td><td class="ex">git clean -n</td><td>Показать неотслеживаемые файлы, которые будут удалены (сухой запуск).</td></tr>
+    <tr><td class="cmd">git clean -f</td><td class="ex">git clean -fd</td><td>Удалить неотслеживаемые файлы и папки (необратимо).</td></tr>
+    <tr><td class="cmd">git clean -fx</td><td class="ex">git clean -fdx</td><td>Удалить и файлы, игнорируемые .gitignore (например, сборочные артефакты).</td></tr>
+    <tr><td class="cmd">git clean -i</td><td class="ex">git clean -i</td><td>Интерактивный выбор файлов для удаления.</td></tr>
+  </tbody>
+</table>
+
+<h2>reset: перемещение указателя ветки</h2>
+<p>Команда <code>git reset</code> двигает ветку на другой коммит и по-разному затрагивает индекс и рабочую папку.</p>
+<table>
+  <thead><tr><th>Режим</th><th>Пример</th><th>Что меняется</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">--soft</td><td class="ex">git reset --soft HEAD~1</td><td>Ветка переходит назад, изменения остаются в индексе. Удобно, чтобы переписать коммит.</td></tr>
+    <tr><td class="cmd">--mixed</td><td class="ex">git reset HEAD~1</td><td>Режим по умолчанию: изменения остаются в рабочей папке, индекс очищается.</td></tr>
+    <tr><td class="cmd">--hard</td><td class="ex">git reset --hard origin/main</td><td>Всё совпадает с указанным коммитом. Незакоммиченные правки удаляются.</td></tr>
+    <tr><td class="cmd">--keep</td><td class="ex">git reset --keep HEAD~1</td><td>Как hard, но не трогает незакоммиченные правки в файлах, которые меняются.</td></tr>
+    <tr><td class="cmd">reset файл</td><td class="ex">git reset HEAD app.py</td><td>Убрать один файл из индекса (аналог restore --staged).</td></tr>
+  </tbody>
+</table>
+
+<div class="warn">
+  <code>git reset --hard</code> безвозвратно удаляет незакоммиченные изменения. Перед ним посмотрите <code>git status</code> и при необходимости сохраните работу через <code>git stash</code>.
+</div>
+
+<h2>revert: откат через новый коммит</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git revert</td><td class="ex">git revert abc1234</td><td>Создаёт новый коммит, который отменяет изменения указанного. История сохраняется.</td></tr>
+    <tr><td class="cmd">git revert --no-edit</td><td class="ex">git revert --no-edit HEAD</td><td>Отменить последний коммит с сообщением по умолчанию.</td></tr>
+    <tr><td class="cmd">git revert -n</td><td class="ex">git revert -n abc1234 def5678</td><td>Отменить несколько коммитов, не создавая отдельные коммиты.</td></tr>
+    <tr><td class="cmd">git revert -m</td><td class="ex">git revert -m 1 MERGE_COMMIT</td><td>Откат коммита слияния: указать родителя, чьи изменения сохранить.</td></tr>
+    <tr><td class="cmd">git revert диапазон</td><td class="ex">git revert HEAD~3..HEAD</td><td>Отменить серию коммитов.</td></tr>
+    <tr><td class="cmd">git revert --abort</td><td class="ex">git revert --abort</td><td>Прервать откат при конфликте.</td></tr>
+  </tbody>
+</table>
+
+<h2>reflog: журнал движения указателей</h2>
+<p>Git хранит историю перемещений HEAD и веток. Даже после <code>reset --hard</code> или удаления ветки коммит обычно можно найти в reflog в течение срока хранения (по умолчанию около 90 дней).</p>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git reflog</td><td class="ex">git reflog</td><td>Все движения HEAD: коммиты, переключения, reset.</td></tr>
+    <tr><td class="cmd">git reflog show</td><td class="ex">git reflog show feature/x</td><td>История конкретной ветки.</td></tr>
+    <tr><td class="cmd">git reset --hard HEAD@{n}</td><td class="ex">git reset --hard HEAD@{2}</td><td>Вернуться к состоянию из reflog.</td></tr>
+    <tr><td class="cmd">git branch</td><td class="ex">git branch recovered abc1234</td><td>Восстановить потерянный коммит в новую ветку (безопаснее, чем reset).</td></tr>
+    <tr><td class="cmd">git fsck --lost-found</td><td class="ex">git fsck --lost-found</td><td>Найти висящие коммиты, которых нет ни в одной ветке.</td></tr>
+  </tbody>
+</table>
+
+<div class="tip">
+  Ошибочно удалили ветку с коммитами? Найдите её последний коммит через <code>git reflog</code> и создайте ветку на нём: <code>git branch восстановленная abc1234</code>. Так вы сохраните работу без лишнего риска.
+</div>
+
+<h2>Переписывание истории: rebase -i</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git rebase -i HEAD~n</td><td class="ex">git rebase -i HEAD~5</td><td>Редактировать последние 5 коммитов.</td></tr>
+    <tr><td class="cmd">git rebase -i root</td><td class="ex">git rebase -i --root</td><td>Переписать всю историю, включая первый коммит.</td></tr>
+    <tr><td class="cmd">git commit --fixup</td><td class="ex">git commit --fixup=abc1234</td><td>Создать исправление для конкретного коммита.</td></tr>
+    <tr><td class="cmd">git rebase --autosquash</td><td class="ex">git rebase -i --autosquash main</td><td>Автоматически объединить fixup-коммиты.</td></tr>
+    <tr><td class="cmd">git commit --amend</td><td class="ex">git commit --amend</td><td>Изменить последний коммит.</td></tr>
+  </tbody>
+</table>
+<p>Порядок строк в интерактивном rebase — от старых коммитов к новым. Изменяйте слово перед хэшем: <code>pick</code>, <code>reword</code>, <code>edit</code>, <code>squash</code>, <code>fixup</code>, <code>drop</code>.</p>
+
+<h2>Поиск источника проблемы: bisect</h2>
+<p>Если известно, что ошибка появилась между двумя коммитами, bisect быстро найдёт виновника двоичным поиском.</p>
+<pre>git bisect start
+git bisect bad                  # текущий коммит сломан
+git bisect good v1.3.0          # этот тег точно работал
+# Git переключит на средний коммит. Проверьте и ответьте:
+git bisect good                 # или git bisect bad
+# ...повторять, пока Git не назовёт первый плохой коммит...
+git bisect reset                # вернуться к исходной ветке
+
+# Автоматический режим, если есть скрипт проверки (код 0 — хорошо)
+git bisect start HEAD v1.3.0
+git bisect run ./test.sh</pre>
+
+<h2>Анализ истории</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git blame -w</td><td class="ex">git blame -w -C app.py</td><td>Игнорировать пробелы и искать перенесённый код.</td></tr>
+    <tr><td class="cmd">git log -G</td><td class="ex">git log -G "password" --oneline</td><td>Коммиты, где изменились строки с регулярным выражением.</td></tr>
+    <tr><td class="cmd">git log --follow</td><td class="ex">git log --follow --oneline -- renamed.py</td><td>История файла, включая время до переименования.</td></tr>
+    <tr><td class="cmd">git grep</td><td class="ex">git grep -n "TODO" $(git rev-list -n 1 v1.0)</td><td>Поиск в конкретном коммите или теге.</td></tr>
+    <tr><td class="cmd">git cat-file</td><td class="ex">git cat-file -p HEAD^{tree}</td><td>Внутреннее содержимое объекта (для отладки).</td></tr>
+    <tr><td class="cmd">git rev-list</td><td class="ex">git rev-list --count HEAD</td><td>Число коммитов в ветке.</td></tr>
+  </tbody>
+</table>
+
+<h2>Пример: исправить последний коммит и отправить</h2>
+<pre># Ошибка в сообщении последнего коммита (ещё не отправлен)
+git commit --amend -m "fix: корректный таймаут"
+
+# Забыли файл в коммите
+git add config/timeouts.yml
+git commit --amend --no-edit
+
+# Коммит уже отправлен, а содержимое неверно: откат новым коммитом
+git revert HEAD
+git push
+
+# Хотим откатить только один файл к версии из предыдущего коммита
+git restore --source=HEAD~1 -- docs/guide.md
+git commit -m "docs: вернуть прежнюю версию guide.md"</pre>
+
+<div class="warn">
+  Переписывание истории (<code>rebase -i</code>, <code>reset</code>, <code>commit --amend</code>, <code>filter-repo</code>) меняет хэши коммитов. Для опубликованных веток используйте <code>revert</code>, а переписывание оставляйте для локальной работы. <code>git clean -fdx</code> удаляет всё лишнее без возврата, включая локальные конфиги, не попавшие в git.
+</div>
+
+<div class="tip">
+  Перед рискованными операциями создайте резервную ветку: <code>git branch backup-before-rebase</code>. Если что-то пойдёт не так, вернуться можно одной командой: <code>git reset --hard backup-before-rebase</code>.
+</div>
+
+</div>
+</body>
+</html>

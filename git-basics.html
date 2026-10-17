@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git: настройка, репозитории и коммиты</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Git: настройка, репозитории и коммиты</h1>
+<p class="lead">Первая часть гида: конфигурация, создание и клонирование репозиториев, индекс, коммиты и история</p>
+
+<h2>Модель Git в трёх зонах</h2>
+<pre>Рабочая папка  ──git add──▶  Индекс (staging)  ──git commit──▶  Репозиторий (история)
+      ◀────────────git restore / checkout────────────────────────────┘</pre>
+<p>Изменения сначала попадают в рабочую папку, затем вы выбираете, что добавить в индекс, и только после этого фиксируете коммит. Большинство команд ниже работает именно с этими тремя зонами.</p>
+
+<h2>Настройка: git config</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git config --global user.name</td><td class="ex">git config --global user.name "Иван Петров"</td><td>Имя автора в коммитах.</td></tr>
+    <tr><td class="cmd">git config --global user.email</td><td class="ex">git config --global user.email "ivan@example.com"</td><td>Email автора.</td></tr>
+    <tr><td class="cmd">git config --global init.defaultBranch</td><td class="ex">git config --global init.defaultBranch main</td><td>Имя ветки по умолчанию при git init.</td></tr>
+    <tr><td class="cmd">git config --global core.editor</td><td class="ex">git config --global core.editor "nano"</td><td>Редактор для сообщений коммитов.</td></tr>
+    <tr><td class="cmd">git config --global pull.rebase</td><td class="ex">git config --global pull.rebase true</td><td>git pull будет делать rebase вместо merge.</td></tr>
+    <tr><td class="cmd">git config --global core.autocrlf</td><td class="ex">git config --global core.autocrlf input</td><td>Переводы строк: input на Linux и macOS, true на Windows.</td></tr>
+    <tr><td class="cmd">git config --list</td><td class="ex">git config --list --show-origin</td><td>Все настройки и файлы, где они заданы.</td></tr>
+    <tr><td class="cmd">git config --local</td><td class="ex">git config --local user.email "work@company.com"</td><td>Настройка только для текущего репозитория.</td></tr>
+    <tr><td class="cmd">git config --get</td><td class="ex">git config --get user.email</td><td>Значение одной настройки.</td></tr>
+    <tr><td class="cmd">git config --unset</td><td class="ex">git config --unset core.editor</td><td>Удалить настройку.</td></tr>
+    <tr><td class="cmd">git config alias</td><td class="ex">git config --global alias.st status</td><td>Создать короткое имя команды.</td></tr>
+  </tbody>
+</table>
+
+<h2>Создание и клонирование</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git init</td><td class="ex">git init</td><td>Создать репозиторий в текущей папке.</td></tr>
+    <tr><td class="cmd">git init -b</td><td class="ex">git init -b main my-project</td><td>Создать папку и репозиторий с веткой main.</td></tr>
+    <tr><td class="cmd">git clone</td><td class="ex">git clone git@github.com:user/repo.git</td><td>Скопировать репозиторий с историей.</td></tr>
+    <tr><td class="cmd">git clone имя</td><td class="ex">git clone https://github.com/user/repo.git mydir</td><td>Клонировать в папку с другим именем.</td></tr>
+    <tr><td class="cmd">git clone --depth</td><td class="ex">git clone --depth 1 https://github.com/user/repo.git</td><td>Поверхностный клон: только последний коммит (быстро, но история неполная).</td></tr>
+    <tr><td class="cmd">git clone --branch</td><td class="ex">git clone -b release/2.0 --single-branch URL</td><td>Клонировать одну ветку.</td></tr>
+    <tr><td class="cmd">git clone --recurse-submodules</td><td class="ex">git clone --recurse-submodules URL</td><td>Сразу подтянуть подмодули.</td></tr>
+    <tr><td class="cmd">git clone --filter</td><td class="ex">git clone --filter=blob:none URL</td><td>Частичный клон: файлы подгружаются по требованию (для больших репозиториев).</td></tr>
+  </tbody>
+</table>
+
+<h2>Статус и индекс</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git status</td><td class="ex">git status</td><td>Что изменено, что в индексе, что не отслеживается.</td></tr>
+    <tr><td class="cmd">git status -s</td><td class="ex">git status -s</td><td>Короткий формат: M — изменён, A — добавлен, ?? — не отслеживается.</td></tr>
+    <tr><td class="cmd">git add</td><td class="ex">git add src/app.py</td><td>Добавить файл в индекс.</td></tr>
+    <tr><td class="cmd">git add .</td><td class="ex">git add .</td><td>Добавить всё в текущей папке и ниже (проверяйте статус, чтобы не попал мусор).</td></tr>
+    <tr><td class="cmd">git add -A</td><td class="ex">git add -A</td><td>Добавить все изменения во всём репозитории, включая удаления.</td></tr>
+    <tr><td class="cmd">git add -p</td><td class="ex">git add -p</td><td>Добавлять по кускам (hunks): y — взять, n — пропустить, s — разбить.</td></tr>
+    <tr><td class="cmd">git add -u</td><td class="ex">git add -u</td><td>Только уже отслеживаемые файлы (новые не трогает).</td></tr>
+    <tr><td class="cmd">git restore --staged</td><td class="ex">git restore --staged app.py</td><td>Убрать файл из индекса, оставив изменения в рабочей папке.</td></tr>
+    <tr><td class="cmd">git rm --cached</td><td class="ex">git rm --cached secrets.env</td><td>Перестать отслеживать файл, но оставить его на диске (например, после добавления в .gitignore).</td></tr>
+    <tr><td class="cmd">git mv</td><td class="ex">git mv old.py new.py</td><td>Переименовать с сохранением истории.</td></tr>
+    <tr><td class="cmd">git rm</td><td class="ex">git rm old.py</td><td>Удалить файл из репозитория и с диска.</td></tr>
+  </tbody>
+</table>
+
+<h2>Коммиты</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git commit -m</td><td class="ex">git commit -m "fix: таймаут подключения к БД"</td><td>Коммит с однострочным сообщением.</td></tr>
+    <tr><td class="cmd">git commit</td><td class="ex">git commit</td><td>Откроет редактор для сообщения (многострочное).</td></tr>
+    <tr><td class="cmd">git commit -am</td><td class="ex">git commit -am "docs: обновить README"</td><td>Добавить уже отслеживаемые изменения и закоммитить (новые файлы не добавляются).</td></tr>
+    <tr><td class="cmd">git commit --amend</td><td class="ex">git commit --amend -m "новое сообщение"</td><td>Переписать последний коммит (только локальный!).</td></tr>
+    <tr><td class="cmd">git commit --amend --no-edit</td><td class="ex">git add forgotten.txt &amp;&amp; git commit --amend --no-edit</td><td>Добавить забытый файл в последний коммит без смены сообщения.</td></tr>
+    <tr><td class="cmd">git commit --allow-empty</td><td class="ex">git commit --allow-empty -m "trigger CI"</td><td>Пустой коммит, например чтобы перезапустить сборку.</td></tr>
+    <tr><td class="cmd">git commit -v</td><td class="ex">git commit -v</td><td>Показать диф прямо в редакторе сообщения.</td></tr>
+    <tr><td class="cmd">git commit --fixup</td><td class="ex">git commit --fixup=abc1234</td><td>Коммит-исправление для последующего автосквоша при rebase -i.</td></tr>
+    <tr><td class="cmd">git commit -S</td><td class="ex">git commit -S -m "signed"</td><td>Подписать коммит GPG-ключом.</td></tr>
+  </tbody>
+</table>
+
+<h2>Просмотр истории и различий</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">git log</td><td class="ex">git log</td><td>История коммитов.</td></tr>
+    <tr><td class="cmd">git log --oneline</td><td class="ex">git log --oneline -n 15</td><td>Коротко: хэш и заголовок, 15 последних.</td></tr>
+    <tr><td class="cmd">git log --graph</td><td class="ex">git log --oneline --graph --decorate --all</td><td>Граф всех веток.</td></tr>
+    <tr><td class="cmd">git log -p</td><td class="ex">git log -p -2</td><td>Показать диф для каждого коммита.</td></tr>
+    <tr><td class="cmd">git log --stat</td><td class="ex">git log --stat -3</td><td>Какие файлы и сколько строк изменились.</td></tr>
+    <tr><td class="cmd">git log --author</td><td class="ex">git log --author="Иван" --since="2 weeks ago"</td><td>Коммиты автора за период.</td></tr>
+    <tr><td class="cmd">git log --since / --until</td><td class="ex">git log --since="2026-01-01" --until="2026-02-01"</td><td>Интервал дат.</td></tr>
+    <tr><td class="cmd">git log -- путь</td><td class="ex">git log --oneline -- src/api/</td><td>История конкретного файла или папки.</td></tr>
+    <tr><td class="cmd">git log --grep</td><td class="ex">git log --grep="fix" -i --oneline</td><td>Поиск по тексту сообщения (-i без учёта регистра).</td></tr>
+    <tr><td class="cmd">git log -S</td><td class="ex">git log -S "timeout" --oneline</td><td>Коммиты, где количество вхождений строки изменилось.</td></tr>
+    <tr><td class="cmd">git log --format</td><td class="ex">git log --format="%h %an %ad %s" --date=short</td><td>Свой формат вывода: %h хэш, %an автор, %ad дата, %s тема.</td></tr>
+    <tr><td class="cmd">git show</td><td class="ex">git show abc1234</td><td>Коммит и его диф.</td></tr>
+    <tr><td class="cmd">git show --stat</td><td class="ex">git show --stat HEAD</td><td>Последний коммит: только файлы.</td></tr>
+    <tr><td class="cmd">git diff</td><td class="ex">git diff</td><td>Изменения в рабочей папке, которые не в индексе.</td></tr>
+    <tr><td class="cmd">git diff --staged</td><td class="ex">git diff --staged</td><td>Что попадёт в следующий коммит.</td></tr>
+    <tr><td class="cmd">git diff HEAD~1</td><td class="ex">git diff HEAD~1 HEAD -- app.py</td><td>Сравнить с предыдущим коммитом по конкретному файлу.</td></tr>
+    <tr><td class="cmd">git diff --name-only</td><td class="ex">git diff --name-only main...feature</td><td>Только имена файлов, которые различаются между ветками.</td></tr>
+    <tr><td class="cmd">git blame</td><td class="ex">git blame -L 40,60 app.py</td><td>Кто и когда написал каждую строку в диапазоне.</td></tr>
+    <tr><td class="cmd">git shortlog</td><td class="ex">git shortlog -sn</td><td>Число коммитов по авторам.</td></tr>
+    <tr><td class="cmd">git describe</td><td class="ex">git describe --tags</td><td>Ближайший тег и число коммитов после него.</td></tr>
+  </tbody>
+</table>
+
+<h2>Удобные варианты статуса и диффа</h2>
+<pre># Что будет в коммите и насколько он велик
+git diff --staged --stat
+
+# Просмотр изменений по словам, а не по строкам
+git diff --word-diff
+
+# Игнорировать пробелы и переводы строк в диффе
+git diff -w
+
+# Диф с учётом перемещённых блоков
+git diff --color-moved=default</pre>
+
+<div class="warn">
+  <code>git commit --amend</code> и любые переписывания истории опасны, если коммит уже отправлен в общий репозиторий. Другие разработчики получат расхождение истории. Переписывайте только локальные коммиты.
+</div>
+
+<div class="tip">
+  Перед коммитом всегда смотрите <code>git status</code> и <code>git diff --staged</code>. Так вы поймаете случайно добавленные пароли, временные файлы и отладочный код, пока их ещё легко убрать.
+</div>
+
+</div>
+</body>
+</html>

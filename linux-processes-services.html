@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux: процессы, сигналы и службы systemd</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Linux: процессы, сигналы и службы systemd</h1>
+<p class="lead">Просмотр и управление процессами, фоновые задачи, сигналы и управление службами через systemctl</p>
+
+<h2>Просмотр процессов</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">ps aux</td><td class="ex">ps aux</td><td>Все процессы с пользователем, CPU, памятью и командой (формат BSD).</td></tr>
+    <tr><td class="cmd">ps -ef</td><td class="ex">ps -ef</td><td>Все процессы в формате System V, с PPID.</td></tr>
+    <tr><td class="cmd">ps -u</td><td class="ex">ps -u ivan</td><td>Процессы конкретного пользователя.</td></tr>
+    <tr><td class="cmd">ps -p</td><td class="ex">ps -fp 4312</td><td>Информация о процессе по PID.</td></tr>
+    <tr><td class="cmd">ps --forest</td><td class="ex">ps -ef --forest</td><td>Дерево родителей и потомков.</td></tr>
+    <tr><td class="cmd">ps --sort</td><td class="ex">ps aux --sort=-%mem | head</td><td>Сортировка по памяти (минус — по убыванию).</td></tr>
+    <tr><td class="cmd">ps -o</td><td class="ex">ps -eo pid,ppid,user,%cpu,%mem,cmd</td><td>Выбрать свои колонки.</td></tr>
+    <tr><td class="cmd">pstree</td><td class="ex">pstree -p 1</td><td>Дерево процессов с PID.</td></tr>
+    <tr><td class="cmd">top</td><td class="ex">top -u ivan</td><td>Интерактивный монитор, фильтр по пользователю.</td></tr>
+    <tr><td class="cmd">top keys</td><td class="ex">P (CPU), M (память), k (kill), q (выход)</td><td>Клавиши в top.</td></tr>
+    <tr><td class="cmd">htop</td><td class="ex">htop -p 4312</td><td>Удобный монитор с деревом (нужен пакет htop).</td></tr>
+    <tr><td class="cmd">pgrep</td><td class="ex">pgrep -a nginx</td><td>PID процессов по имени, с командой.</td></tr>
+    <tr><td class="cmd">pgrep -f</td><td class="ex">pgrep -f "gunicorn.*app:main"</td><td>Поиск по полной командной строке.</td></tr>
+    <tr><td class="cmd">pgrep -u</td><td class="ex">pgrep -u ivan python</td><td>Процессы пользователя с именем python.</td></tr>
+    <tr><td class="cmd">pidof</td><td class="ex">pidof sshd</td><td>PID по точному имени программы.</td></tr>
+    <tr><td class="cmd">lsof -p</td><td class="ex">lsof -p 4312</td><td>Открытые файлы и сокеты процесса.</td></tr>
+    <tr><td class="cmd">strace -p</td><td class="ex">strace -p 4312 -e trace=network</td><td>Системные вызовы процесса (диагностика).</td></tr>
+    <tr><td class="cmd">/proc/PID</td><td class="ex">cat /proc/4312/status</td><td>Сведения ядра о процессе: состояние, память, потоки.</td></tr>
+  </tbody>
+</table>
+
+<h2>Сигналы: kill, pkill, killall</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">kill -l</td><td class="ex">kill -l</td><td>Список всех сигналов.</td></tr>
+    <tr><td class="cmd">kill</td><td class="ex">kill 4312</td><td>Отправить SIGTERM (мягкое завершение, по умолчанию).</td></tr>
+    <tr><td class="cmd">kill -HUP</td><td class="ex">kill -HUP 4312</td><td>Перечитать конфигурацию (так работают многие демоны).</td></tr>
+    <tr><td class="cmd">kill -INT</td><td class="ex">kill -INT 4312</td><td>Как Ctrl+C.</td></tr>
+    <tr><td class="cmd">kill -STOP / -CONT</td><td class="ex">kill -STOP 4312 ; kill -CONT 4312</td><td>Приостановить и продолжить процесс.</td></tr>
+    <tr><td class="cmd">kill -KILL</td><td class="ex">kill -9 4312</td><td>Принудительно, процесс не может его перехватить. Крайняя мера.</td></tr>
+    <tr><td class="cmd">kill -0</td><td class="ex">kill -0 4312 && echo running</td><td>Проверка, что процесс существует, без отправки сигнала.</td></tr>
+    <tr><td class="cmd">kill -USR1</td><td class="ex">kill -USR1 4312</td><td>Пользовательский сигнал (например, для смены уровня логов).</td></tr>
+    <tr><td class="cmd">pkill</td><td class="ex">pkill -f "old-worker"</td><td>Завершить по имени или шаблону командной строки.</td></tr>
+    <tr><td class="cmd">pkill -u</td><td class="ex">pkill -KILL -u ivan</td><td>Завершить все процессы пользователя.</td></tr>
+    <tr><td class="cmd">killall</td><td class="ex">killall -HUP nginx</td><td>Отправить сигнал всем процессам с именем (пакет psmisc).</td></tr>
+    <tr><td class="cmd">timeout</td><td class="ex">timeout -k 5 30 long_command</td><td>Завершить команду через 30 секунд, при зависании — через 5 секунд дополнительно.</td></tr>
+  </tbody>
+</table>
+
+<h2>Приоритеты, фон и задания</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">nice</td><td class="ex">nice -n 10 ./batch.sh</td><td>Запустить с пониженным приоритетом (от -20 до 19).</td></tr>
+    <tr><td class="cmd">renice</td><td class="ex">renice -n 5 -p 4312</td><td>Изменить приоритет работающего процесса.</td></tr>
+    <tr><td class="cmd">ionice</td><td class="ex">ionice -c3 -p 4312</td><td>Класс дискового ввода-вывода: 3 — только когда диск свободен.</td></tr>
+    <tr><td class="cmd">&amp;</td><td class="ex">./job.sh &amp;</td><td>Запустить в фоне.</td></tr>
+    <tr><td class="cmd">jobs</td><td class="ex">jobs -l</td><td>Список фоновых задач текущей оболочки.</td></tr>
+    <tr><td class="cmd">fg / bg</td><td class="ex">fg %1 ; bg %1</td><td>Вернуть задачу на передний план или продолжить в фоне.</td></tr>
+    <tr><td class="cmd">Ctrl+Z</td><td class="ex">Ctrl+Z</td><td>Приостановить текущую задачу.</td></tr>
+    <tr><td class="cmd">disown</td><td class="ex">disown -h %1</td><td>Отвязать задачу от оболочки, чтобы она не получала SIGHUP при закрытии.</td></tr>
+    <tr><td class="cmd">nohup</td><td class="ex">nohup ./job.sh &gt; job.log 2&gt;&amp;1 &amp;</td><td>Переживает закрытие сессии, вывод в файл.</td></tr>
+    <tr><td class="cmd">wait</td><td class="ex">wait $pid</td><td>В скрипте дождаться завершения фоновой задачи.</td></tr>
+    <tr><td class="cmd">sleep</td><td class="ex">sleep 1.5</td><td>Пауза, в секундах (можно с суффиксами s, m, h).</td></tr>
+  </tbody>
+</table>
+
+<h2>systemctl: службы</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">systemctl status</td><td class="ex">systemctl status nginx</td><td>Состояние, PID, последние записи журнала.</td></tr>
+    <tr><td class="cmd">systemctl start</td><td class="ex">systemctl start nginx</td><td>Запустить службу.</td></tr>
+    <tr><td class="cmd">systemctl stop</td><td class="ex">systemctl stop nginx</td><td>Остановить.</td></tr>
+    <tr><td class="cmd">systemctl restart</td><td class="ex">systemctl restart nginx</td><td>Перезапустить (с остановкой).</td></tr>
+    <tr><td class="cmd">systemctl reload</td><td class="ex">systemctl reload nginx</td><td>Перечитать конфигурацию без остановки (если служба поддерживает).</td></tr>
+    <tr><td class="cmd">reload-or-restart</td><td class="ex">systemctl reload-or-restart nginx</td><td>Перечитать, а если не поддерживается, перезапустить.</td></tr>
+    <tr><td class="cmd">enable</td><td class="ex">systemctl enable nginx</td><td>Автозапуск при загрузке.</td></tr>
+    <tr><td class="cmd">enable --now</td><td class="ex">systemctl enable --now nginx</td><td>Включить автозапуск и сразу запустить.</td></tr>
+    <tr><td class="cmd">disable --now</td><td class="ex">systemctl disable --now nginx</td><td>Выключить автозапуск и сразу остановить.</td></tr>
+    <tr><td class="cmd">is-active</td><td class="ex">systemctl is-active nginx</td><td>Короткий ответ active/inactive (удобно в скриптах).</td></tr>
+    <tr><td class="cmd">is-enabled</td><td class="ex">systemctl is-enabled nginx</td><td>Включена ли автозагрузка.</td></tr>
+    <tr><td class="cmd">is-failed</td><td class="ex">systemctl is-failed nginx</td><td>Упала ли служба.</td></tr>
+    <tr><td class="cmd">list-units</td><td class="ex">systemctl list-units --type=service --state=running</td><td>Запущенные службы.</td></tr>
+    <tr><td class="cmd">--failed</td><td class="ex">systemctl --failed</td><td>Все упавшие службы — хорошая первая проверка.</td></tr>
+    <tr><td class="cmd">list-unit-files</td><td class="ex">systemctl list-unit-files --type=service</td><td>Все установленные службы и их состояние автозапуска.</td></tr>
+    <tr><td class="cmd">daemon-reload</td><td class="ex">systemctl daemon-reload</td><td>Перечитать unit-файлы после изменения.</td></tr>
+    <tr><td class="cmd">cat</td><td class="ex">systemctl cat nginx</td><td>Показать unit-файл, включая переопределения.</td></tr>
+    <tr><td class="cmd">edit</td><td class="ex">systemctl edit nginx</td><td>Создать override.conf без правки оригинала.</td></tr>
+    <tr><td class="cmd">edit --full</td><td class="ex">systemctl edit --full nginx</td><td>Полная копия unit-файла для редактирования.</td></tr>
+    <tr><td class="cmd">mask / unmask</td><td class="ex">systemctl mask bluetooth</td><td>Полностью запретить запуск, даже вручную.</td></tr>
+    <tr><td class="cmd">show</td><td class="ex">systemctl show -p MainPID,ActiveState nginx</td><td>Свойства службы в виде ключ=значение.</td></tr>
+    <tr><td class="cmd">list-timers</td><td class="ex">systemctl list-timers --all</td><td>Расписание systemd-таймеров (аналог cron).</td></tr>
+    <tr><td class="cmd">reboot</td><td class="ex">systemctl reboot</td><td>Перезагрузка.</td></tr>
+    <tr><td class="cmd">poweroff</td><td class="ex">systemctl poweroff</td><td>Выключение.</td></tr>
+    <tr><td class="cmd">systemd-analyze</td><td class="ex">systemd-analyze blame | head</td><td>Какие службы медленнее всего стартуют.</td></tr>
+  </tbody>
+</table>
+
+<h2>journalctl: журнал</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">journalctl -u</td><td class="ex">journalctl -u nginx</td><td>Журнал одной службы.</td></tr>
+    <tr><td class="cmd">journalctl -f</td><td class="ex">journalctl -u nginx -f</td><td>Следить за новыми записями.</td></tr>
+    <tr><td class="cmd">journalctl -n</td><td class="ex">journalctl -u nginx -n 100 --no-pager</td><td>Последние 100 записей без постраничного вывода.</td></tr>
+    <tr><td class="cmd">journalctl --since</td><td class="ex">journalctl --since "2026-10-17 09:00" --until "10:00"</td><td>Интервал времени.</td></tr>
+    <tr><td class="cmd">journalctl --since</td><td class="ex">journalctl --since "1 hour ago"</td><td>Относительное время.</td></tr>
+    <tr><td class="cmd">journalctl -p</td><td class="ex">journalctl -p err -b</td><td>Только ошибки (уровни: emerg, alert, crit, err, warning, notice, info, debug).</td></tr>
+    <tr><td class="cmd">journalctl -k</td><td class="ex">journalctl -k</td><td>Сообщения ядра (как dmesg).</td></tr>
+    <tr><td class="cmd">journalctl -b</td><td class="ex">journalctl -b -1</td><td>Журнал предыдущей загрузки (полезно после падения).</td></tr>
+    <tr><td class="cmd">journalctl -o</td><td class="ex">journalctl -u app -o json-pretty -n 1</td><td>Формат вывода: short, verbose, json, cat и др.</td></tr>
+    <tr><td class="cmd">journalctl --disk-usage</td><td class="ex">journalctl --disk-usage</td><td>Сколько места занимает журнал.</td></tr>
+    <tr><td class="cmd">--vacuum-time</td><td class="ex">sudo journalctl --vacuum-time=7d</td><td>Удалить записи старше 7 дней.</td></tr>
+    <tr><td class="cmd">--vacuum-size</td><td class="ex">sudo journalctl --vacuum-size=500M</td><td>Ограничить размер журнала.</td></tr>
+  </tbody>
+</table>
+
+<h2>Типовые сценарии</h2>
+<pre># Служба упала: что случилось и когда
+systemctl status app --no-pager -l
+journalctl -u app --since "30 min ago" --no-pager
+
+# Перезапуск службы после правки конфига с проверкой
+nginx -t && systemctl reload nginx
+
+# Найти самый прожорливый процесс по памяти
+ps -eo pid,user,%mem,cmd --sort=-%mem | head -5
+
+# Аккуратно остановить зависший процесс: сначала мягко, потом жёстко
+kill 4312 ; sleep 5 ; kill -0 4312 2&gt;/dev/null &amp;&amp; kill -9 4312</pre>
+
+<div class="warn">
+  <code>kill -9</code> и <code>systemctl mask</code> — мощные инструменты. Принудительное завершение не даёт программе сохранить данные и удалить временные файлы. Перед <code>mask</code> убедитесь, что служба не нужна другим зависимостям.
+</div>
+
+<div class="tip">
+  Перед ручным запуском службы сверьтесь с её unit-файлом через <code>systemctl cat</code>. Так вы увидите рабочую папку, переменные окружения и пользователя, от имени которого она работает.
+</div>
+
+</div>
+</body>
+</html>

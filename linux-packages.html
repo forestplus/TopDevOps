@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux: установка и обновление пакетов</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Linux: установка и обновление пакетов</h1>
+<p class="lead">apt и dpkg для Debian и Ubuntu, dnf и rpm для RHEL, Fedora и производных</p>
+
+<h2>apt: Debian и Ubuntu</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">apt update</td><td class="ex">sudo apt update</td><td>Обновить список пакетов из репозиториев (не сами пакеты).</td></tr>
+    <tr><td class="cmd">apt upgrade</td><td class="ex">sudo apt upgrade -y</td><td>Обновить установленные пакеты, не удаляя другие.</td></tr>
+    <tr><td class="cmd">apt full-upgrade</td><td class="ex">sudo apt full-upgrade</td><td>Обновление с установкой и удалением пакетов при необходимости.</td></tr>
+    <tr><td class="cmd">apt install</td><td class="ex">sudo apt install -y htop curl</td><td>Установить несколько пакетов.</td></tr>
+    <tr><td class="cmd">apt install --no-install-recommends</td><td class="ex">sudo apt install --no-install-recommends -y nginx</td><td>Без рекомендуемых пакетов (меньше мусора на сервере).</td></tr>
+    <tr><td class="cmd">apt install pkg=</td><td class="ex">sudo apt install nginx=1.24.0-2ubuntu7</td><td>Конкретная версия (должна быть в репозитории).</td></tr>
+    <tr><td class="cmd">apt install -t</td><td class="ex">sudo apt install -t bookworm-backports nginx</td><td>Из другого релиза или backports.</td></tr>
+    <tr><td class="cmd">apt reinstall</td><td class="ex">sudo apt reinstall openssh-server</td><td>Переустановить пакет (восстановить повреждённые файлы).</td></tr>
+    <tr><td class="cmd">apt remove</td><td class="ex">sudo apt remove nginx</td><td>Удалить, оставив конфиги.</td></tr>
+    <tr><td class="cmd">apt purge</td><td class="ex">sudo apt purge nginx</td><td>Удалить вместе с конфигурацией.</td></tr>
+    <tr><td class="cmd">apt autoremove</td><td class="ex">sudo apt autoremove --purge -y</td><td>Удалить зависимости, которые больше никому не нужны.</td></tr>
+    <tr><td class="cmd">apt clean</td><td class="ex">sudo apt clean</td><td>Очистить кеш загруженных .deb.</td></tr>
+    <tr><td class="cmd">apt autoclean</td><td class="ex">sudo apt autoclean</td><td>Удалить кеш устаревших версий.</td></tr>
+    <tr><td class="cmd">apt search</td><td class="ex">apt search "web server" | head</td><td>Поиск по описанию и имени.</td></tr>
+    <tr><td class="cmd">apt show</td><td class="ex">apt show nginx</td><td>Подробная информация: версия, зависимости, описание.</td></tr>
+    <tr><td class="cmd">apt list --installed</td><td class="ex">apt list --installed | grep nginx</td><td>Установленные пакеты.</td></tr>
+    <tr><td class="cmd">apt list --upgradable</td><td class="ex">apt list --upgradable</td><td>Что можно обновить.</td></tr>
+    <tr><td class="cmd">apt-cache policy</td><td class="ex">apt-cache policy nginx</td><td>Установленная и доступная версии, источник.</td></tr>
+    <tr><td class="cmd">apt-mark hold</td><td class="ex">sudo apt-mark hold docker-ce</td><td>Запретить обновление пакета.</td></tr>
+    <tr><td class="cmd">apt-mark unhold</td><td class="ex">sudo apt-mark unhold docker-ce</td><td>Снять запрет.</td></tr>
+    <tr><td class="cmd">apt-mark showmanual</td><td class="ex">apt-mark showmanual</td><td>Пакеты, которые вы ставили сами (не зависимости).</td></tr>
+    <tr><td class="cmd">apt changelog</td><td class="ex">apt changelog nginx | head</td><td>Журнал изменений пакета.</td></tr>
+    <tr><td class="cmd">apt -s</td><td class="ex">sudo apt -s upgrade</td><td>Симуляция (-s): показать, что будет сделано, ничего не меняя.</td></tr>
+    <tr><td class="cmd">apt-file</td><td class="ex">apt-file search bin/dig</td><td>Какой пакет содержит файл (пакет apt-file, сначала apt-file update).</td></tr>
+  </tbody>
+</table>
+
+<h2>dpkg: работа с .deb напрямую</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">dpkg -i</td><td class="ex">sudo dpkg -i tool.deb</td><td>Установить локальный .deb (зависимости потом: apt -f install).</td></tr>
+    <tr><td class="cmd">apt -f install</td><td class="ex">sudo apt -f install</td><td>Доставить недостающие зависимости после dpkg -i.</td></tr>
+    <tr><td class="cmd">dpkg -l</td><td class="ex">dpkg -l | grep nginx</td><td>Список пакетов и их состояние (ii — установлен).</td></tr>
+    <tr><td class="cmd">dpkg -L</td><td class="ex">dpkg -L nginx</td><td>Файлы, которые пакет установил.</td></tr>
+    <tr><td class="cmd">dpkg -S</td><td class="ex">dpkg -S /usr/bin/dig</td><td>Какому пакету принадлежит файл.</td></tr>
+    <tr><td class="cmd">dpkg -s</td><td class="ex">dpkg -s nginx</td><td>Статус и описание установленного пакета.</td></tr>
+    <tr><td class="cmd">dpkg --configure -a</td><td class="ex">sudo dpkg --configure -a</td><td>Доделать прерванную установку.</td></tr>
+    <tr><td class="cmd">dpkg -r</td><td class="ex">sudo dpkg -r nginx</td><td>Удалить (как apt remove, без зависимостей).</td></tr>
+    <tr><td class="cmd">dpkg -P</td><td class="ex">sudo dpkg -P nginx</td><td>Удалить с конфигурацией (как purge).</td></tr>
+  </tbody>
+</table>
+
+<h2>dnf и yum: RHEL, Fedora, Rocky, AlmaLinux</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">dnf check-update</td><td class="ex">sudo dnf check-update</td><td>Проверить доступные обновления (аналог apt update + list).</td></tr>
+    <tr><td class="cmd">dnf upgrade</td><td class="ex">sudo dnf upgrade --refresh -y</td><td>Обновить всё, сначала обновив кеш метаданных.</td></tr>
+    <tr><td class="cmd">dnf upgrade --security</td><td class="ex">sudo dnf upgrade --security -y</td><td>Только обновления безопасности.</td></tr>
+    <tr><td class="cmd">dnf install</td><td class="ex">sudo dnf install -y htop</td><td>Установить пакет.</td></tr>
+    <tr><td class="cmd">dnf install (version)</td><td class="ex">sudo dnf install nginx-1.24.0</td><td>Конкретная версия, если доступна.</td></tr>
+    <tr><td class="cmd">dnf reinstall</td><td class="ex">sudo dnf reinstall openssh-server</td><td>Переустановить.</td></tr>
+    <tr><td class="cmd">dnf remove</td><td class="ex">sudo dnf remove nginx</td><td>Удалить пакет и не нужные зависимости.</td></tr>
+    <tr><td class="cmd">dnf autoremove</td><td class="ex">sudo dnf autoremove</td><td>Удалить сиротские зависимости.</td></tr>
+    <tr><td class="cmd">dnf search</td><td class="ex">dnf search "web server"</td><td>Поиск пакетов.</td></tr>
+    <tr><td class="cmd">dnf info</td><td class="ex">dnf info nginx</td><td>Подробности о пакете.</td></tr>
+    <tr><td class="cmd">dnf provides</td><td class="ex">dnf provides */bin/dig</td><td>Какой пакет даёт нужный файл.</td></tr>
+    <tr><td class="cmd">dnf list installed</td><td class="ex">dnf list installed | grep nginx</td><td>Установленные пакеты.</td></tr>
+    <tr><td class="cmd">dnf history</td><td class="ex">sudo dnf history</td><td>Журнал транзакций.</td></tr>
+    <tr><td class="cmd">dnf history undo</td><td class="ex">sudo dnf history undo 42</td><td>Откатить транзакцию с номером 42.</td></tr>
+    <tr><td class="cmd">dnf group install</td><td class="ex">sudo dnf group install "Development Tools"</td><td>Установить группу пакетов.</td></tr>
+    <tr><td class="cmd">dnf versionlock</td><td class="ex">sudo dnf versionlock add nginx</td><td>Зафиксировать версию (пакет python3-dnf-plugin-versionlock).</td></tr>
+    <tr><td class="cmd">dnf clean all</td><td class="ex">sudo dnf clean all</td><td>Очистить кеш.</td></tr>
+    <tr><td class="cmd">dnf config-manager</td><td class="ex">sudo dnf config-manager --set-enabled crb</td><td>Включить репозиторий.</td></tr>
+    <tr><td class="cmd">yum</td><td class="ex">yum update</td><td>На старых системах; на современных yum — ссылка на dnf.</td></tr>
+  </tbody>
+</table>
+
+<h2>rpm: работа с пакетами RPM напрямую</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">rpm -qa</td><td class="ex">rpm -qa | grep nginx</td><td>Все установленные пакеты.</td></tr>
+    <tr><td class="cmd">rpm -qi</td><td class="ex">rpm -qi nginx</td><td>Информация о пакете.</td></tr>
+    <tr><td class="cmd">rpm -ql</td><td class="ex">rpm -ql nginx</td><td>Файлы пакета.</td></tr>
+    <tr><td class="cmd">rpm -qf</td><td class="ex">rpm -qf /usr/bin/dig</td><td>Какой пакет владеет файлом.</td></tr>
+    <tr><td class="cmd">rpm -qc</td><td class="ex">rpm -qc nginx</td><td>Файлы конфигурации пакета.</td></tr>
+    <tr><td class="cmd">rpm -ivh</td><td class="ex">sudo rpm -ivh tool.rpm</td><td>Установить локальный RPM.</td></tr>
+    <tr><td class="cmd">rpm -Uvh</td><td class="ex">sudo rpm -Uvh tool-2.rpm</td><td>Обновить или установить.</td></tr>
+    <tr><td class="cmd">rpm -e</td><td class="ex">sudo rpm -e nginx</td><td>Удалить без учёта зависимостей (осторожно).</td></tr>
+    <tr><td class="cmd">rpm -V</td><td class="ex">rpm -V nginx</td><td>Проверить, менялись ли файлы пакета после установки.</td></tr>
+    <tr><td class="cmd">rpm --import</td><td class="ex">sudo rpm --import RPM-GPG-KEY</td><td>Импортировать ключ подписи перед установкой стороннего пакета.</td></tr>
+  </tbody>
+</table>
+
+<h2>Другие менеджеры</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">snap</td><td class="ex">snap list ; sudo snap install htop</td><td>Пакеты snap (Ubuntu).</td></tr>
+    <tr><td class="cmd">snap refresh</td><td class="ex">sudo snap refresh</td><td>Обновить все snap-пакеты.</td></tr>
+    <tr><td class="cmd">flatpak</td><td class="ex">flatpak list ; flatpak update</td><td>Пакеты flatpak (больше для десктопа).</td></tr>
+    <tr><td class="cmd">pip</td><td class="ex">pip install --user httpie</td><td>Python-пакеты в домашнюю папку, без системного вмешательства.</td></tr>
+    <tr><td class="cmd">pipx</td><td class="ex">pipx install ansible-lint</td><td>Изолированная установка Python-утилит.</td></tr>
+  </tbody>
+</table>
+
+<h2>Типовой сценарий: обновить сервер безопасно</h2>
+<pre># Debian / Ubuntu
+sudo apt update
+apt list --upgradable
+sudo apt -s upgrade                  # симуляция
+sudo apt upgrade -y
+sudo apt autoremove --purge -y
+[ -f /var/run/reboot-required ] && echo "нужна перезагрузка"
+
+# RHEL / Rocky / Alma
+sudo dnf upgrade --refresh -y
+sudo dnf history list | head
+sudo needs-restarting -r             # нужна ли перезагрузка (пакет dnf-utils)</pre>
+
+<div class="warn">
+  Обновление всех пакетов на продакшене без проверки может сломать приложение: например, новая версия библиотеки или нового PHP. Сначала обновляйте на тестовом сервере, смотрите <code>apt -s upgrade</code> или <code>dnf check-update</code>, а затем планируйте окно обслуживания и держите <code>apt-mark hold</code> или <code>versionlock</code> для критичных пакетов.
+</div>
+
+<div class="tip">
+  Если после обновления что-то сломалось на RHEL-системе, посмотрите <code>dnf history</code> и откатите нужную транзакцию через <code>dnf history undo</code>. На Debian откат сложнее, поэтому для него полезны снапшоты виртуальной машины или файловой системы.
+</div>
+
+</div>
+</body>
+</html>

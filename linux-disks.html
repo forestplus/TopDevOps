@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux: диски, разделы, файловые системы и монтирование</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Linux: диски, разделы, файловые системы и монтирование</h1>
+<p class="lead">Просмотр дисков, создание разделов и файловых систем, монтирование, fstab, место на диске и swap</p>
+
+<h2>Просмотр устройств</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">lsblk</td><td class="ex">lsblk</td><td>Дерево дисков, разделов и точек монтирования.</td></tr>
+    <tr><td class="cmd">lsblk -f</td><td class="ex">lsblk -f</td><td>Добавляет файловые системы, UUID и метки.</td></tr>
+    <tr><td class="cmd">lsblk -o</td><td class="ex">lsblk -o NAME,SIZE,TYPE,MOUNTPOINT</td><td>Свой набор колонок.</td></tr>
+    <tr><td class="cmd">lsblk -d</td><td class="ex">lsblk -d -o NAME,ROTA,SIZE</td><td>Только диски; ROTA=1 — HDD, 0 — SSD.</td></tr>
+    <tr><td class="cmd">blkid</td><td class="ex">sudo blkid</td><td>UUID, тип файловой системы и метка каждого раздела.</td></tr>
+    <tr><td class="cmd">fdisk -l</td><td class="ex">sudo fdisk -l /dev/sda</td><td>Таблица разделов диска (только чтение).</td></tr>
+    <tr><td class="cmd">parted -l</td><td class="ex">sudo parted -l</td><td>Разделы всех дисков, включая GPT-большие диски.</td></tr>
+    <tr><td class="cmd">smartctl -a</td><td class="ex">sudo smartctl -a /dev/sda</td><td>Состояние диска по SMART (пакет smartmontools).</td></tr>
+    <tr><td class="cmd">udevadm info</td><td class="ex">udevadm info -q all /dev/sdb</td><td>Все атрибуты устройства из udev.</td></tr>
+  </tbody>
+</table>
+
+<h2>Разделы и файловые системы</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">fdisk</td><td class="ex">sudo fdisk /dev/sdb</td><td>Интерактивно создать раздел в MBR (m — справка, n — новый, w — записать).</td></tr>
+    <tr><td class="cmd">gdisk</td><td class="ex">sudo gdisk /dev/sdb</td><td>Интерактивно создать раздел в GPT.</td></tr>
+    <tr><td class="cmd">parted mklabel</td><td class="ex">sudo parted /dev/sdb mklabel gpt</td><td>Создать таблицу разделов GPT (удаляет все разделы!).</td></tr>
+    <tr><td class="cmd">parted mkpart</td><td class="ex">sudo parted -a optimal /dev/sdb mkpart data ext4 0% 100%</td><td>Создать раздел на весь диск.</td></tr>
+    <tr><td class="cmd">mkfs.ext4</td><td class="ex">sudo mkfs.ext4 -L data /dev/sdb1</td><td>Создать ext4 с меткой data.</td></tr>
+    <tr><td class="cmd">mkfs.xfs</td><td class="ex">sudo mkfs.xfs -L data /dev/sdb1</td><td>Создать XFS (часто для больших данных).</td></tr>
+    <tr><td class="cmd">mkfs.vfat</td><td class="ex">sudo mkfs.vfat -F 32 /dev/sdc1</td><td>FAT32 для флешек и EFI-раздела.</td></tr>
+    <tr><td class="cmd">mkfs.ext4 -m</td><td class="ex">sudo mkfs.ext4 -m 1 /dev/sdb1</td><td>Зарезервировать 1% под root вместо 5% по умолчанию (для больших данных).</td></tr>
+    <tr><td class="cmd">wipefs</td><td class="ex">sudo wipefs -a /dev/sdb1</td><td>Удалить сигнатуры файловой системы (перед переформатированием).</td></tr>
+    <tr><td class="cmd">e2label</td><td class="ex">sudo e2label /dev/sdb1 newlabel</td><td>Сменить метку ext2/3/4.</td></tr>
+    <tr><td class="cmd">tune2fs -l</td><td class="ex">sudo tune2fs -l /dev/sdb1</td><td>Параметры ext-файловой системы.</td></tr>
+    <tr><td class="cmd">tune2fs -c</td><td class="ex">sudo tune2fs -c 0 -i 0 /dev/sdb1</td><td>Отключить периодическую принудительную проверку (ext).</td></tr>
+    <tr><td class="cmd">fsck -n</td><td class="ex">sudo fsck -n /dev/sdb1</td><td>Проверка без исправлений (безопасно).</td></tr>
+    <tr><td class="cmd">fsck -y</td><td class="ex">sudo fsck -y /dev/sdb1</td><td>Проверка и автоматическое исправление (раздел должен быть размонтирован).</td></tr>
+    <tr><td class="cmd">xfs_repair</td><td class="ex">sudo xfs_repair -n /dev/sdb1</td><td>Проверка XFS (раздел размонтирован, -n — без правок).</td></tr>
+  </tbody>
+</table>
+
+<h2>Монтирование</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">mount</td><td class="ex">sudo mount /dev/sdb1 /data</td><td>Смонтировать раздел в каталог (каталог должен существовать).</td></tr>
+    <tr><td class="cmd">mount -t</td><td class="ex">sudo mount -t ext4 /dev/sdb1 /data</td><td>Указать тип файловой системы явно.</td></tr>
+    <tr><td class="cmd">mount -o ro</td><td class="ex">sudo mount -o ro /dev/sdb1 /mnt/rescue</td><td>Только чтение.</td></tr>
+    <tr><td class="cmd">mount -o remount</td><td class="ex">sudo mount -o remount,ro /</td><td>Изменить опции уже смонтированного раздела.</td></tr>
+    <tr><td class="cmd">mount -U</td><td class="ex">sudo mount UUID=xxxx-xxxx /data</td><td>Монтировать по UUID (надёжнее, чем /dev/sdX).</td></tr>
+    <tr><td class="cmd">mount --bind</td><td class="ex">sudo mount --bind /srv/src /srv/view</td><td>Показать одну папку в другом месте.</td></tr>
+    <tr><td class="cmd">mount -a</td><td class="ex">sudo mount -a</td><td>Смонтировать всё из /etc/fstab (проверка fstab перед перезагрузкой).</td></tr>
+    <tr><td class="cmd">umount</td><td class="ex">sudo umount /data</td><td>Размонтировать (раздел не должен быть занят).</td></tr>
+    <tr><td class="cmd">umount -l</td><td class="ex">sudo umount -l /data</td><td>Отцепить сразу, фактическое размонтирование — когда раздел освободится.</td></tr>
+    <tr><td class="cmd">findmnt</td><td class="ex">findmnt /data</td><td>Дерево точек монтирования, с опциями и источником.</td></tr>
+    <tr><td class="cmd">lsof +D</td><td class="ex">sudo lsof +D /data</td><td>Кто держит файлы в каталоге (почему не размонтируется).</td></tr>
+    <tr><td class="cmd">fuser -m</td><td class="ex">sudo fuser -vm /data</td><td>Процессы, использующие точку монтирования.</td></tr>
+  </tbody>
+</table>
+
+<h2>/etc/fstab</h2>
+<pre># <file system>                             <mount point>  <type>  <options>        <dump> <pass>
+UUID=3f2a-9b1c-0000-1111                    /              ext4    errors=remount-ro  0      1
+UUID=7d4e-aaaa-2222-3333                    /data          ext4    defaults,noatime   0      2
+//nas/share                                 /mnt/nas       cifs    credentials=/root/.smb,uid=1000  0  0
+/swapfile                                   none           swap    sw                 0      0
+tmpfs                                       /tmp           tmpfs   defaults,noexec,nosuid  0  0</pre>
+<table>
+  <thead><tr><th>Поле</th><th>Значение</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">options</td><td>defaults, noatime (не писать время доступа), nofail (не падать при загрузке без диска), noexec, nosuid, ro</td></tr>
+    <tr><td class="cmd">dump</td><td>0 — не использовать утилитой dump (почти всегда 0)</td></tr>
+    <tr><td class="cmd">pass</td><td>порядок fsck при загрузке: 1 — корень, 2 — остальные, 0 — не проверять</td></tr>
+  </tbody>
+</table>
+<p>Перед перезагрузкой обязательно выполните <code>sudo mount -a</code>: если строка в fstab неверна, система может не загрузиться.</p>
+
+<h2>Место на диске</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">df -h</td><td class="ex">df -h</td><td>Свободное место по разделам.</td></tr>
+    <tr><td class="cmd">df -hT</td><td class="ex">df -hT</td><td>С типом файловой системы.</td></tr>
+    <tr><td class="cmd">df -i</td><td class="ex">df -i</td><td>Свободные inode. Диск может быть полон по inode, хотя место есть.</td></tr>
+    <tr><td class="cmd">df --output</td><td class="ex">df -h --output=target,pcent,avail</td><td>Выбрать колонки.</td></tr>
+    <tr><td class="cmd">du -sh</td><td class="ex">du -sh /var/*</td><td>Суммарный размер каждого элемента.</td></tr>
+    <tr><td class="cmd">du --max-depth</td><td class="ex">du -h --max-depth=1 /var | sort -h</td><td>Вложенность на один уровень, по возрастанию.</td></tr>
+    <tr><td class="cmd">du -x</td><td class="ex">du -xh / --max-depth=1 | sort -h</td><td>Не переходить на другие разделы (-x).</td></tr>
+    <tr><td class="cmd">du -a</td><td class="ex">du -ah /var/log | sort -rh | head</td><td>Все файлы, самые большие сверху.</td></tr>
+    <tr><td class="cmd">ncdu</td><td class="ex">sudo ncdu /var</td><td>Интерактивный анализатор (пакет ncdu).</td></tr>
+    <tr><td class="cmd">lsof +L1</td><td class="ex">sudo lsof +L1</td><td>Удалённые, но открытые процессами файлы: место не освобождается, пока процесс не завершён.</td></tr>
+    <tr><td class="cmd">journalctl --vacuum</td><td class="ex">sudo journalctl --vacuum-size=200M</td><td>Освободить место под журналом.</td></tr>
+  </tbody>
+</table>
+
+<h2>Swap и память</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">free -h</td><td class="ex">free -h</td><td>Память и swap в читаемом виде.</td></tr>
+    <tr><td class="cmd">swapon --show</td><td class="ex">swapon --show</td><td>Активные разделы подкачки.</td></tr>
+    <tr><td class="cmd">fallocate</td><td class="ex">sudo fallocate -l 4G /swapfile</td><td>Создать файл для swap быстро.</td></tr>
+    <tr><td class="cmd">chmod 600 + mkswap</td><td class="ex">sudo chmod 600 /swapfile &amp;&amp; sudo mkswap /swapfile</td><td>Подготовить swap-файл (права обязательны).</td></tr>
+    <tr><td class="cmd">swapon</td><td class="ex">sudo swapon /swapfile</td><td>Включить swap.</td></tr>
+    <tr><td class="cmd">swapoff</td><td class="ex">sudo swapoff /swapfile</td><td>Выключить (нужно достаточно свободной RAM).</td></tr>
+    <tr><td class="cmd">sysctl vm.swappiness</td><td class="ex">sysctl vm.swappiness=10</td><td>Насколько охотно ядро уходит в swap (0–100).</td></tr>
+  </tbody>
+</table>
+
+<h2>LVM</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Вариант</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">pvs / pvcreate</td><td class="ex">sudo pvcreate /dev/sdb</td><td>Физический том для LVM.</td></tr>
+    <tr><td class="cmd">vgs / vgcreate</td><td class="ex">sudo vgcreate vg_data /dev/sdb</td><td>Группа томов.</td></tr>
+    <tr><td class="cmd">lvs / lvcreate</td><td class="ex">sudo lvcreate -L 20G -n lv_app vg_data</td><td>Логический том фиксированного размера.</td></tr>
+    <tr><td class="cmd">lvcreate -l 100%FREE</td><td class="ex">sudo lvcreate -l 100%FREE -n lv_all vg_data</td><td>Занять всё свободное место.</td></tr>
+    <tr><td class="cmd">lvextend -r</td><td class="ex">sudo lvextend -r -L +10G /dev/vg_data/lv_app</td><td>Увеличить том и файловую систему одной командой (-r).</td></tr>
+    <tr><td class="cmd">resize2fs</td><td class="ex">sudo resize2fs /dev/vg_data/lv_app</td><td>Растянуть ext4 под размер тома вручную.</td></tr>
+    <tr><td class="cmd">xfs_growfs</td><td class="ex">sudo xfs_growfs /data</td><td>Растянуть XFS (работает по точке монтирования).</td></tr>
+  </tbody>
+</table>
+
+<h2>Пример: новый диск под данные</h2>
+<pre>sudo lsblk                                      # найти новый диск, например sdb
+sudo parted -s /dev/sdb mklabel gpt
+sudo parted -s -a optimal /dev/sdb mkpart data ext4 0% 100%
+sudo mkfs.ext4 -L data /dev/sdb1
+sudo mkdir -p /data
+sudo mount /dev/sdb1 /data
+sudo blkid /dev/sdb1                            # взять UUID
+echo 'UUID=ВАШ-UUID /data ext4 defaults,noatime,nofail 0 2' | sudo tee -a /etc/fstab
+sudo mount -a && df -hT /data</pre>
+
+<div class="warn">
+  <code>mkfs</code>, <code>wipefs</code>, <code>parted mklabel</code> и <code>fdisk</code> с записью удаляют данные на устройстве без возможности восстановления. Всегда проверяйте имя устройства через <code>lsblk</code> перед запуском: <code>/dev/sdb</code> и <code>/dev/sda</code> легко перепутать. Ошибка в <code>/etc/fstab</code> может не дать системе загрузиться, поэтому проверяйте <code>mount -a</code> до перезагрузки.
+</div>
+
+<div class="tip">
+  Для дисков с данными добавляйте в fstab опцию <code>nofail</code>: если диск не подключён, система всё равно загрузится. А для SSD полезна опция <code>noatime</code>, которая снижает лишние записи.
+</div>
+
+</div>
+</body>
+</html>
