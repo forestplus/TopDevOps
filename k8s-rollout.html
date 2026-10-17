@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kubernetes: обновление, масштабирование и откат Deployment</title>
+<style>
+  :root {
+    --paper: #fbfaf5;
+    --ink: #1f2a44;
+    --blue: #1e4fa3;
+    --green: #2e7d4f;
+    --red: #b5232b;
+    --line: #c9d3e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #1b1f27; --ink: #e6e9ef; --blue: #7fa8ff; --green: #7fd6a0; --red: #ff7b7b; --line: #3a4352; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { text-align: center; color: var(--blue); font-size: 26px; margin: 0 0 6px; }
+  .lead { text-align: center; opacity: 0.8; margin: 0 0 24px; }
+  h2 {
+    color: var(--green);
+    border-bottom: 2px solid var(--line);
+    padding-bottom: 4px;
+    font-size: 19px;
+    margin: 30px 0 12px;
+  }
+  p { margin: 8px 0; }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    color: var(--red);
+    font-size: 13px;
+    background: rgba(127,127,127,0.12);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background: rgba(127,127,127,0.08);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    margin: 10px 0;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+  th, td { border: 1px solid var(--line); padding: 7px 9px; vertical-align: top; text-align: left; }
+  th { color: var(--blue); }
+  ul { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .tip {
+    border-left: 4px solid var(--green);
+    padding: 8px 12px;
+    background: rgba(46,125,79,0.08);
+    border-radius: 4px;
+    margin: 12px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Kubernetes: обновление, масштабирование и откат Deployment</h1>
+<p class="lead">Как выкатить новую версию, посмотреть историю и быстро откатиться</p>
+
+<h2>Как работает обновление</h2>
+<p>Deployment по умолчанию использует стратегию RollingUpdate: новые поды поднимаются постепенно, а старые удаляются только после того, как новые стали готовы. Поэтому readiness probe имеет прямое значение: без неё Kubernetes не знает, когда новый под можно считать рабочим.</p>
+<p>Две настройки управляют темпом обновления:</p>
+<ul>
+  <li><code>maxSurge</code> — сколько подов можно создать сверх желаемого количества;</li>
+  <li><code>maxUnavailable</code> — сколько подов может быть недоступно во время обновления.</li>
+</ul>
+<pre>strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0</pre>
+<p>Значение <code>maxUnavailable: 0</code> означает, что сервис не теряет мощность во время выкатки.</p>
+
+<h2>Основные команды</h2>
+<table>
+  <thead><tr><th>Задача</th><th>Команда</th></tr></thead>
+  <tbody>
+    <tr><td>Обновить образ контейнера</td><td><code>kubectl set image deployment/&lt;name&gt; &lt;container&gt;=&lt;image&gt;:&lt;tag&gt; -n &lt;ns&gt;</code></td></tr>
+    <tr><td>Следить за ходом выкатки</td><td><code>kubectl rollout status deployment/&lt;name&gt; -n &lt;ns&gt;</code></td></tr>
+    <tr><td>Посмотреть историю ревизий</td><td><code>kubectl rollout history deployment/&lt;name&gt; -n &lt;ns&gt;</code></td></tr>
+    <tr><td>Посмотреть детали конкретной ревизии</td><td><code>kubectl rollout history deployment/&lt;name&gt; --revision=3 -n &lt;ns&gt;</code></td></tr>
+    <tr><td>Откатить на предыдущую версию</td><td><code>kubectl rollout undo deployment/&lt;name&gt; -n &lt;ns&gt;</code></td></tr>
+    <tr><td>Откатить на конкретную ревизию</td><td><code>kubectl rollout undo deployment/&lt;name&gt; --to-revision=2 -n &lt;ns&gt;</code></td></tr>
+    <tr><td>Перезапустить все поды (например, после смены ConfigMap)</td><td><code>kubectl rollout restart deployment/&lt;name&gt; -n &lt;ns&gt;</code></td></tr>
+    <tr><td>Приостановить выкатку</td><td><code>kubectl rollout pause deployment/&lt;name&gt; -n &lt;ns&gt;</code></td></tr>
+    <tr><td>Возобновить выкатку</td><td><code>kubectl rollout resume deployment/&lt;name&gt; -n &lt;ns&gt;</code></td></tr>
+    <tr><td>Изменить число реплик</td><td><code>kubectl scale deployment/&lt;name&gt; --replicas=3 -n &lt;ns&gt;</code></td></tr>
+    <tr><td>Посмотреть разницу перед применением</td><td><code>kubectl diff -f deployment.yaml</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Пошаговый сценарий выкатки</h2>
+<ul>
+  <li>Проверьте текущее состояние: <code>kubectl get deployment &lt;name&gt; -n &lt;ns&gt;</code>.</li>
+  <li>Посмотрите, что изменится: <code>kubectl diff -f deployment.yaml</code>.</li>
+  <li>Примените изменения: <code>kubectl apply -f deployment.yaml</code> или обновите образ через <code>set image</code>.</li>
+  <li>Дождитесь результата: <code>kubectl rollout status deployment/&lt;name&gt;</code>.</li>
+  <li>Если выкатка зависла, проверьте новые поды: <code>kubectl get pods -n &lt;ns&gt;</code> и <code>kubectl describe pod &lt;pod&gt;</code>.</li>
+  <li>При проблеме откатитесь: <code>kubectl rollout undo deployment/&lt;name&gt;</code>.</li>
+</ul>
+
+<h2>Типичные проблемы</h2>
+<table>
+  <thead><tr><th>Симптом</th><th>Вероятная причина</th><th>Что сделать</th></tr></thead>
+  <tbody>
+    <tr><td>ProgressDeadlineExceeded в статусе</td><td>Новые поды не становятся Ready в отведённое время</td><td>Проверить readiness probe и логи нового пода, затем откатить</td></tr>
+    <tr><td>Старые поды не удаляются</td><td>Новые не проходят readiness, а <code>maxUnavailable</code> равен 0</td><td>Исправить приложение или временно откатить</td></tr>
+    <tr><td>После отката приложение всё равно работает со старой конфигурацией</td><td>Изменился ConfigMap или Secret, а поды не перезапускались</td><td><code>kubectl rollout restart deployment/&lt;name&gt;</code></td></tr>
+    <tr><td>Нет подходящей ревизии для отката</td><td>Ревизии очищены по <code>revisionHistoryLimit</code></td><td>Задать разумное значение этого параметра (например, 10) и хранить манифесты в git</td></tr>
+  </tbody>
+</table>
+
+<div class="tip">
+  Храните манифесты Deployment в git. История ревизий Kubernetes показывает, что менялось на уровне образа и шаблона пода, но не заменяет систему контроля версий для самих манифестов.
+</div>
+
+<h2>Рекомендации</h2>
+<ul>
+  <li>Всегда задавайте readiness probe, иначе Kubernetes не сможет корректно оценить готовность новых подов.</li>
+  <li>Не используйте тег <code>latest</code>: откат и воспроизводимость ломаются, когда образ меняется под одним именем.</li>
+  <li>Для критичных сервисов ставьте <code>maxUnavailable: 0</code> и проверяйте <code>rollout status</code> в CI/CD.</li>
+  <li>Выставляйте <code>revisionHistoryLimit</code>, чтобы не копить сотни старых ReplicaSet.</li>
+</ul>
+
+</div>
+</body>
+</html>

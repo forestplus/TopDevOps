@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dockerfile: справочник инструкций и значений</title>
+<style>
+  :root {
+    --paper: #fbfaf5;
+    --ink: #1f2a44;
+    --blue: #1e4fa3;
+    --green: #2e7d4f;
+    --red: #b5232b;
+    --line: #c9d3e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #1b1f27; --ink: #e6e9ef; --blue: #7fa8ff; --green: #7fd6a0; --red: #ff7b7b; --line: #3a4352; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { text-align: center; color: var(--blue); font-size: 26px; margin: 0 0 6px; }
+  .lead { text-align: center; opacity: 0.8; margin: 0 0 24px; }
+  h2 {
+    color: var(--green);
+    border-bottom: 2px solid var(--line);
+    padding-bottom: 4px;
+    font-size: 19px;
+    margin: 30px 0 12px;
+  }
+  p { margin: 8px 0; }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    color: var(--red);
+    font-size: 13px;
+    background: rgba(127,127,127,0.12);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background: rgba(127,127,127,0.08);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    margin: 10px 0;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--line); padding: 7px 9px; vertical-align: top; text-align: left; }
+  th { color: var(--blue); }
+  td.cmd { font-family: Consolas, "Courier New", monospace; color: var(--red); white-space: nowrap; }
+  ul { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .tip {
+    border-left: 4px solid var(--green);
+    padding: 8px 12px;
+    background: rgba(46,125,79,0.08);
+    border-radius: 4px;
+    margin: 12px 0;
+  }
+  .warn {
+    border-left: 4px solid var(--red);
+    padding: 8px 12px;
+    background: rgba(181,35,43,0.07);
+    border-radius: 4px;
+    margin: 12px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Dockerfile: справочник инструкций и значений</h1>
+<p class="lead">Что означает каждая инструкция, какие у неё значения и флаги, и как писать Dockerfile правильно</p>
+
+<h2>Общие правила</h2>
+<ul>
+  <li>Инструкции пишутся в верхнем регистре по соглашению (<code>FROM</code>, <code>RUN</code>), но Docker их принимает в любом регистре.</li>
+  <li>Каждая инструкция создаёт новый слой. Объединяйте связанные команды через <code>&amp;&amp;</code>, чтобы образ был меньше.</li>
+  <li>Порядок влияет на кеш сборки: то, что меняется чаще, ставьте ниже. Сначала копируйте файлы зависимостей, потом код.</li>
+  <li>Строка, начинающаяся с <code>#</code>, — комментарий. Длинную инструкцию можно переносить символом <code>\</code>.</li>
+</ul>
+
+<h2>Инструкции</h2>
+<table>
+  <thead><tr><th>Инструкция</th><th>Назначение</th><th>Пример</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">FROM</td><td>Базовый образ, с которого начинается сборка. Обязательна первой (кроме ARG перед ней).</td><td><code>FROM python:3.12-slim AS build</code></td></tr>
+    <tr><td class="cmd">RUN</td><td>Выполняет команду во время сборки и фиксирует результат в слое.</td><td><code>RUN apt-get update &amp;&amp; apt-get install -y curl</code></td></tr>
+    <tr><td class="cmd">CMD</td><td>Команда по умолчанию при запуске контейнера. Переопределяется аргументами <code>docker run</code>. В файле допускается одна.</td><td><code>CMD ["nginx", "-g", "daemon off;"]</code></td></tr>
+    <tr><td class="cmd">ENTRYPOINT</td><td>Основная команда контейнера. Аргументы из <code>docker run</code> добавляются к ней, а не заменяют.</td><td><code>ENTRYPOINT ["python", "app.py"]</code></td></tr>
+    <tr><td class="cmd">COPY</td><td>Копирует файлы из контекста сборки в образ.</td><td><code>COPY requirements.txt /app/</code></td></tr>
+    <tr><td class="cmd">ADD</td><td>Как COPY, но умеет брать URL и распаковывать tar-архивы. Для обычного копирования используйте COPY.</td><td><code>ADD archive.tar.gz /opt/</code></td></tr>
+    <tr><td class="cmd">WORKDIR</td><td>Рабочая папка для последующих RUN, CMD, COPY. Создаётся, если её нет.</td><td><code>WORKDIR /app</code></td></tr>
+    <tr><td class="cmd">ENV</td><td>Переменная окружения, сохраняется в образе и в контейнере.</td><td><code>ENV APP_ENV=production</code></td></tr>
+    <tr><td class="cmd">ARG</td><td>Переменная только на этапе сборки. Можно передать через <code>--build-arg</code>. Видна в <code>docker history</code>, поэтому секреты через ARG не передавайте.</td><td><code>ARG VERSION=1.0</code></td></tr>
+    <tr><td class="cmd">EXPOSE</td><td>Документирует порт, который слушает приложение. Сам по себе порт не публикует, для этого нужен <code>-p</code>.</td><td><code>EXPOSE 8080</code></td></tr>
+    <tr><td class="cmd">USER</td><td>Пользователь, от имени которого выполняются RUN, CMD и ENTRYPOINT.</td><td><code>USER 10001:10001</code></td></tr>
+    <tr><td class="cmd">VOLUME</td><td>Объявляет точку монтирования для данных. Том создаётся при запуске контейнера.</td><td><code>VOLUME ["/var/lib/data"]</code></td></tr>
+    <tr><td class="cmd">LABEL</td><td>Метаданные в виде ключ-значение.</td><td><code>LABEL maintainer="ops@example.com" version="1.0"</code></td></tr>
+    <tr><td class="cmd">HEALTHCHECK</td><td>Команда проверки здоровья контейнера. Значение <code>NONE</code> отключает проверку из базового образа.</td><td><code>HEALTHCHECK CMD curl -f http://localhost:8080/health || exit 1</code></td></tr>
+    <tr><td class="cmd">SHELL</td><td>Меняет оболочку для RUN, CMD и ENTRYPOINT в shell-форме.</td><td><code>SHELL ["/bin/bash", "-c"]</code></td></tr>
+    <tr><td class="cmd">STOPSIGNAL</td><td>Сигнал, которым останавливается контейнер (по умолчанию SIGTERM).</td><td><code>STOPSIGNAL SIGQUIT</code></td></tr>
+    <tr><td class="cmd">ONBUILD</td><td>Инструкция, которая выполнится, когда этот образ используют как базовый в другом Dockerfile.</td><td><code>ONBUILD COPY . /src</code></td></tr>
+    <tr><td class="cmd">MAINTAINER</td><td>Устарела. Используйте <code>LABEL maintainer=...</code>.</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<h2>Формы записи: exec и shell</h2>
+<p>У CMD, ENTRYPOINT и RUN есть два способа записи, и разница важна.</p>
+<ul>
+  <li><strong>Exec-форма</strong> в виде JSON-массива: <code>CMD ["node", "server.js"]</code>. Процесс запускается напрямую, без оболочки, и получает сигналы остановки (SIGTERM) сам. Рекомендуемая форма.</li>
+  <li><strong>Shell-форма</strong> без кавычек и скобок: <code>CMD node server.js</code>. Команда запускается через <code>/bin/sh -c</code>, и сигналы может получить оболочка, а не приложение. Подстановка переменных (<code>$HOME</code>) работает только в ней.</li>
+</ul>
+
+<h2>Флаги инструкций</h2>
+<table>
+  <thead><tr><th>Флаг</th><th>Где используется</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">--platform=linux/amd64</td><td>FROM</td><td>Выбор архитектуры базового образа, например для сборки под ARM.</td></tr>
+    <tr><td class="cmd">--from=build</td><td>COPY</td><td>Копирует файлы из другого этапа сборки, а не из контекста.</td></tr>
+    <tr><td class="cmd">--chown=app:app</td><td>COPY, ADD</td><td>Задаёт владельца скопированных файлов.</td></tr>
+    <tr><td class="cmd">--chmod=755</td><td>COPY, ADD</td><td>Задаёт права скопированных файлов.</td></tr>
+    <tr><td class="cmd">--interval=30s</td><td>HEALTHCHECK</td><td>Как часто выполнять проверку (по умолчанию 30s).</td></tr>
+    <tr><td class="cmd">--timeout=3s</td><td>HEALTHCHECK</td><td>Сколько ждать ответа проверки (по умолчанию 30s).</td></tr>
+    <tr><td class="cmd">--start-period=10s</td><td>HEALTHCHECK</td><td>Период прогрева: ошибки в это время не засчитываются (по умолчанию 0s).</td></tr>
+    <tr><td class="cmd">--retries=3</td><td>HEALTHCHECK</td><td>Сколько неудач подряд считаются нездоровьем (по умолчанию 3).</td></tr>
+    <tr><td class="cmd">--mount=type=cache,target=/root/.cache/pip</td><td>RUN</td><td>Кеш между сборками, который не попадает в слой образа.</td></tr>
+    <tr><td class="cmd">--network=none</td><td>RUN</td><td>Запуск команды без сети, например для проверки.</td></tr>
+  </tbody>
+</table>
+
+<h2>Значения для HEALTHCHECK</h2>
+<p>Проверка выполняет команду, и её код возврата решает судьбу контейнера: <code>0</code> означает «здоров», <code>1</code> — «нездоров». Статусы видны в <code>docker ps</code> как <code>healthy</code>, <code>unhealthy</code> или <code>starting</code>.</p>
+<pre>HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:8080/health || exit 1</pre>
+<p>Если базовый образ не содержит curl, используйте wget или проверку через свой код.</p>
+
+<h2>Многоэтапная сборка</h2>
+<p>Сборка в несколько этапов позволяет компилировать код с инструментами, а в итоговый образ копировать только результат. Образ становится меньше и безопаснее, потому что компиляторов в нём нет.</p>
+<pre>FROM golang:1.23 AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -o /out/app ./cmd/app
+
+FROM gcr.io/distroless/static-debian12
+COPY --from=build /out/app /app
+USER nonroot:nonroot
+ENTRYPOINT ["/app"]</pre>
+
+<h2>Пример хорошего Dockerfile для Python</h2>
+<pre>FROM python:3.12-slim
+
+WORKDIR /app
+
+# Сначала зависимости: этот слой кешируется, пока не меняется requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Код меняется часто, поэтому копируем его после зависимостей
+COPY . .
+
+RUN useradd --uid 10001 appuser
+USER 10001
+
+EXPOSE 8000
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]</pre>
+
+<h2>.dockerignore</h2>
+<p>Файл <code>.dockerignore</code> в корне контекста исключает ненужные файлы из сборки. Это ускоряет сборку и не даёт попасть в образ секретам и служебным папкам.</p>
+<pre>.git
+node_modules
+*.log
+.env
+__pycache__</pre>
+
+<div class="warn">
+  Не кладите секреты в ENV, ARG или прямо в файлы, которые копируются в образ. Они сохраняются в слоях, и их видно через <code>docker history</code> и <code>docker inspect</code>. Для секретов используйте монтирование при сборке (<code>RUN --mount=type=secret</code>) или переменные среды при запуске.
+</div>
+
+<div class="tip">
+  Запускайте приложение не от root (инструкция USER), используйте конкретные теги базовых образов и держите итоговый образ минимальным. Проверить, что получилось, поможет <code>docker history myapp</code>, который покажет размер каждого слоя.
+</div>
+
+</div>
+</body>
+</html>

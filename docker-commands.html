@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker: основные команды и полезные приёмы</title>
+<style>
+  :root {
+    --paper: #fbfaf5;
+    --ink: #1f2a44;
+    --blue: #1e4fa3;
+    --green: #2e7d4f;
+    --red: #b5232b;
+    --line: #c9d3e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #1b1f27; --ink: #e6e9ef; --blue: #7fa8ff; --green: #7fd6a0; --red: #ff7b7b; --line: #3a4352; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { text-align: center; color: var(--blue); font-size: 26px; margin: 0 0 6px; }
+  .lead { text-align: center; opacity: 0.8; margin: 0 0 24px; }
+  h2 {
+    color: var(--green);
+    border-bottom: 2px solid var(--line);
+    padding-bottom: 4px;
+    font-size: 19px;
+    margin: 30px 0 12px;
+  }
+  p { margin: 8px 0; }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    color: var(--red);
+    font-size: 13px;
+    background: rgba(127,127,127,0.12);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background: rgba(127,127,127,0.08);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    margin: 10px 0;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+  th, td { border: 1px solid var(--line); padding: 7px 9px; vertical-align: top; text-align: left; }
+  th { color: var(--blue); }
+  ul { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .tip {
+    border-left: 4px solid var(--green);
+    padding: 8px 12px;
+    background: rgba(46,125,79,0.08);
+    border-radius: 4px;
+    margin: 12px 0;
+  }
+  .warn {
+    border-left: 4px solid var(--red);
+    padding: 8px 12px;
+    background: rgba(181,35,43,0.07);
+    border-radius: 4px;
+    margin: 12px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Docker: основные команды и полезные приёмы</h1>
+<p class="lead">Шпаргалка для повседневной работы с образами, контейнерами, томами и сетями</p>
+
+<h2>Образы</h2>
+<table>
+  <thead><tr><th>Задача</th><th>Команда</th></tr></thead>
+  <tbody>
+    <tr><td>Скачать образ</td><td><code>docker pull nginx:1.27</code></td></tr>
+    <tr><td>Список локальных образов</td><td><code>docker images</code></td></tr>
+    <tr><td>Собрать образ из Dockerfile в текущей папке</td><td><code>docker build -t myapp:1.0 .</code></td></tr>
+    <tr><td>Собрать без кеша</td><td><code>docker build --no-cache -t myapp:1.0 .</code></td></tr>
+    <tr><td>Добавить тег к существующему образу</td><td><code>docker tag myapp:1.0 registry.example.com/myapp:1.0</code></td></tr>
+    <tr><td>Отправить образ в реестр</td><td><code>docker push registry.example.com/myapp:1.0</code></td></tr>
+    <tr><td>Посмотреть слои образа и размер каждого</td><td><code>docker history myapp:1.0</code></td></tr>
+    <tr><td>Удалить образ</td><td><code>docker rmi myapp:1.0</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Контейнеры</h2>
+<table>
+  <thead><tr><th>Задача</th><th>Команда</th></tr></thead>
+  <tbody>
+    <tr><td>Запустить контейнер в фоне с портом и именем</td><td><code>docker run -d -p 8080:80 --name web nginx:1.27</code></td></tr>
+    <tr><td>Одноразовый запуск, контейнер удалится после выхода</td><td><code>docker run --rm -it alpine sh</code></td></tr>
+    <tr><td>Передать переменные окружения</td><td><code>docker run -e APP_ENV=prod -e DB_HOST=db web-app</code></td></tr>
+    <tr><td>Запущенные контейнеры</td><td><code>docker ps</code></td></tr>
+    <tr><td>Все контейнеры, включая остановленные</td><td><code>docker ps -a</code></td></tr>
+    <tr><td>Логи, последние 100 строк и слежение</td><td><code>docker logs -f --tail 100 web</code></td></tr>
+    <tr><td>Логи только за последние 10 минут</td><td><code>docker logs --since 10m web</code></td></tr>
+    <tr><td>Зайти внутрь работающего контейнера</td><td><code>docker exec -it web sh</code></td></tr>
+    <tr><td>Выполнить одну команду без входа</td><td><code>docker exec web cat /etc/nginx/nginx.conf</code></td></tr>
+    <tr><td>Остановить, запустить, перезапустить</td><td><code>docker stop web</code>, <code>docker start web</code>, <code>docker restart web</code></td></tr>
+    <tr><td>Процессы внутри контейнера</td><td><code>docker top web</code></td></tr>
+    <tr><td>Потребление CPU и памяти в реальном времени</td><td><code>docker stats</code></td></tr>
+    <tr><td>Подробные метаданные (IP, монтирования, переменные)</td><td><code>docker inspect web</code></td></tr>
+    <tr><td>Скопировать файл из контейнера на хост</td><td><code>docker cp web:/etc/nginx/nginx.conf ./nginx.conf</code></td></tr>
+    <tr><td>Удалить контейнер</td><td><code>docker rm web</code> (для работающего добавьте <code>-f</code>)</td></tr>
+  </tbody>
+</table>
+
+<h2>Тома и сети</h2>
+<table>
+  <thead><tr><th>Задача</th><th>Команда</th></tr></thead>
+  <tbody>
+    <tr><td>Именованный том для данных</td><td><code>docker run -d -v pgdata:/var/lib/postgresql/data postgres:16</code></td></tr>
+    <tr><td>Примонтировать папку с хоста (только чтение)</td><td><code>docker run -v $(pwd)/config:/app/config:ro myapp</code></td></tr>
+    <tr><td>Список томов и сетей</td><td><code>docker volume ls</code>, <code>docker network ls</code></td></tr>
+    <tr><td>Создать свою сеть и подключить контейнеры по имени</td><td><code>docker network create backend</code>, затем <code>--network backend</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Docker Compose</h2>
+<table>
+  <thead><tr><th>Задача</th><th>Команда</th></tr></thead>
+  <tbody>
+    <tr><td>Поднять стек в фоне</td><td><code>docker compose up -d</code></td></tr>
+    <tr><td>Пересобрать образы и поднять</td><td><code>docker compose up -d --build</code></td></tr>
+    <tr><td>Статус сервисов</td><td><code>docker compose ps</code></td></tr>
+    <tr><td>Логи одного сервиса</td><td><code>docker compose logs -f web</code></td></tr>
+    <tr><td>Остановить и удалить контейнеры и сети</td><td><code>docker compose down</code></td></tr>
+    <tr><td>То же, но с томами (данные удалятся)</td><td><code>docker compose down -v</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Полезные приёмы</h2>
+<ul>
+  <li><strong>Форматирование вывода.</strong> Оставить только нужные колонки: <code>docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"</code>.</li>
+  <li><strong>Быстро найти, что занимает место:</strong> <code>docker system df</code> покажет объём образов, контейнеров, томов и кеша сборки.</li>
+  <li><strong>Остановить все контейнеры разом:</strong> <code>docker stop $(docker ps -q)</code>.</li>
+  <li><strong>Удалить только остановленные контейнеры и висячие образы:</strong> <code>docker container prune</code> и <code>docker image prune</code>.</li>
+  <li><strong>Ограничить ресурсы</strong>, чтобы один контейнер не съел весь хост: <code>docker run --memory=512m --cpus=1 myapp</code>.</li>
+  <li><strong>Автоперезапуск</strong> после падения или перезагрузки хоста: <code>docker run -d --restart unless-stopped myapp</code>.</li>
+  <li><strong>Посмотреть IP контейнера:</strong> <code>docker inspect -f '{{.NetworkSettings.IPAddress}}' web</code>.</li>
+  <li><strong>Выполнить команду в копии образа,</strong> не меняя его: <code>docker run --rm -it --entrypoint sh myapp:1.0</code>.</li>
+</ul>
+
+<div class="warn">
+  <code>docker system prune -a --volumes</code> удаляет все неиспользуемые образы, контейнеры, сети и тома. Тома содержат данные баз, и их не вернуть. Перед такой очисткой проверьте, что важные данные сохранены.
+</div>
+
+<div class="tip">
+  Для воспроизводимости используйте конкретные теги (<code>nginx:1.27</code>, а не <code>latest</code>) и, где нужно, digest вида <code>image@sha256:...</code>. Тогда одна и та же команда даст один и тот же образ на любой машине.
+</div>
+
+</div>
+</body>
+</html>

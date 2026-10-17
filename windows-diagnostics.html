@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windows: диагностика системы из командной строки</title>
+<style>
+  :root {
+    --paper: #fbfaf5;
+    --ink: #1f2a44;
+    --blue: #1e4fa3;
+    --green: #2e6b47;
+    --red: #b5232b;
+    --line: #c9d3e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #1b1f27; --ink: #e6e9ef; --blue: #7fa8ff; --green: #7fd6a0; --red: #ff7b7b; --line: #3a4352; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { text-align: center; color: var(--blue); font-size: 26px; margin: 0 0 6px; }
+  .lead { text-align: center; opacity: 0.8; margin: 0 0 24px; }
+  h2 {
+    color: var(--green);
+    border-bottom: 2px solid var(--line);
+    padding-bottom: 4px;
+    font-size: 19px;
+    margin: 30px 0 12px;
+  }
+  p { margin: 8px 0; }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    color: var(--red);
+    font-size: 13px;
+    background: rgba(127,127,127,0.12);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background: rgba(127,127,127,0.08);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    margin: 10px 0;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+  th, td { border: 1px solid var(--line); padding: 7px 9px; vertical-align: top; text-align: left; }
+  th { color: var(--blue); }
+  ul { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .tip {
+    border-left: 4px solid var(--green);
+    padding: 8px 12px;
+    background: rgba(46,107,71,0.08);
+    border-radius: 4px;
+    margin: 12px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Windows: диагностика системы из командной строки</h1>
+<p class="lead">Быстрые проверки сети, процессов и системных файлов без графического интерфейса</p>
+
+<h2>С чего начать</h2>
+<p>Откройте командную строку от имени администратора: нажмите Win, введите <code>cmd</code>, выберите «Запуск от имени администратора». Большинство команды ниже работают и без прав администратора, но команды для восстановления системы требуют их обязательно.</p>
+<p>Порядок простой: сначала понять, что сломано (сеть, процесс, диск или системные файлы), затем проверить конкретную часть и только потом что-то менять.</p>
+
+<h2>Сеть</h2>
+<table>
+  <thead><tr><th>Симптом</th><th>Команда</th><th>Что смотреть</th></tr></thead>
+  <tbody>
+    <tr><td>Не открываются сайты, хотя интернет есть</td><td><code>ipconfig /all</code></td><td>Корректны ли IPv4-адрес, шлюз и DNS-серверы</td></tr>
+    <tr><td>Проверка связи с шлюзом и внешним узлом</td><td><code>ping -n 4 8.8.8.8</code></td><td>Есть ли ответы и нет ли потерь пакетов</td></tr>
+    <tr><td>Сайт открывается по IP, но не по имени</td><td><code>nslookup example.com</code></td><td>Возвращает ли DNS-сервер корректный адрес</td></tr>
+    <tr><td>Сбит кеш DNS после смены записей</td><td><code>ipconfig /flushdns</code></td><td>Сообщение об успешной очистке кеша</td></tr>
+    <tr><td>Нужно обновить IP-адрес от DHCP</td><td><code>ipconfig /release</code> и затем <code>ipconfig /renew</code></td><td>Получен ли новый адрес от сервера</td></tr>
+    <tr><td>Где маршрут ломается</td><td><code>tracert example.com</code></td><td>На каком узле пропадают ответы</td></tr>
+    <tr><td>Какой процесс занимает порт</td><td><code>netstat -ano | findstr :8080</code></td><td>Номер PID в последнем столбце, затем его имя через <code>tasklist</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Процессы</h2>
+<p>Чтобы найти процесс по имени и узнать его PID, используйте фильтр:</p>
+<pre>tasklist /FI "IMAGENAME eq notepad.exe"</pre>
+<p>Если программа зависла, завершите её по имени образа или по PID:</p>
+<pre>taskkill /IM notepad.exe /F
+taskkill /PID 4312 /F</pre>
+<p>Ключ <code>/F</code> принудительно завершает процесс без сохранения данных, поэтому используйте его только когда обычное завершение не помогает.</p>
+
+<h2>Системные файлы</h2>
+<p>Если Windows ведёт себя странно, а причина неясна, сначала проверьте целостность образа системы, затем файлов:</p>
+<pre>DISM /Online /Cleanup-Image /CheckHealth
+DISM /Online /Cleanup-Image /RestoreHealth
+sfc /scannow</pre>
+<p>Порядок важен: <code>sfc</code> берёт эталонные файлы из хранилища компонентов, поэтому сначала стоит восстановить само хранилище через DISM. Перезагрузите компьютер после завершения.</p>
+
+<h2>Диски</h2>
+<table>
+  <thead><tr><th>Задача</th><th>Команда</th></tr></thead>
+  <tbody>
+    <tr><td>Проверить диск на ошибки без исправления</td><td><code>chkdsk C:</code></td></tr>
+    <tr><td>Проверить и исправить ошибки (диск должен быть не занят)</td><td><code>chkdsk C: /f</code></td></tr>
+    <tr><td>Посмотреть список дисков и разделов</td><td><code>diskpart</code>, затем <code>list disk</code> и <code>list volume</code></td></tr>
+    <tr><td>Оценить фрагментацию без дефрагментации</td><td><code>defrag C: /A</code></td></tr>
+  </tbody>
+</table>
+<p>Команда <code>chkdsk C: /f</code> для системного диска попросит перезагрузку, так как диск занят самой системой.</p>
+
+<h2>Версия и состояние системы</h2>
+<pre>systeminfo | findstr /B /C:"Версия ОС" /C:"Время загрузки системы"
+winver</pre>
+<p>Если нужны более подробные данные в PowerShell, используйте CIM-командлеты вместо устаревшей утилиты wmic:</p>
+<pre>Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version, LastBootUpTime</pre>
+
+<div class="tip">
+  Перед сложными действиями (чистка реестра, изменение политик, форматирование) создайте точку восстановления или резервную копию. Команды из этой статьи безопасны для чтения, но <code>chkdsk /f</code>, <code>taskkill /F</code> и изменения сети могут прервать работу.
+</div>
+
+<h2>Памятка</h2>
+<ul>
+  <li>Сначала диагностика (<code>ipconfig</code>, <code>tasklist</code>, <code>systeminfo</code>), потом исправление.</li>
+  <li>Для восстановления системы: DISM, затем sfc, затем перезагрузка.</li>
+  <li>Для сетевых проблем проверяйте по слоям: адрес, шлюз, DNS, маршрут.</li>
+</ul>
+
+</div>
+</body>
+</html>
