@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ansible: простой путь к автоматизации</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --red:#b5232b; --green:#2e7d4f; --line:#c9d3e6; --code:#f1f4fa; }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --red:#ff7b7b; --green:#7fd6a0; --line:#3a4352; --code:#242a36; }
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:16px; line-height:1.65; }
+  .wrap { max-width:900px; margin:0 auto; }
+  h1 { text-align:center; color:var(--blue); font-size:30px; margin:0 0 6px; }
+  .lead { text-align:center; color:var(--green); font-size:17px; margin:0 0 24px; }
+  h2 { color:var(--green); font-size:22px; margin:36px 0 12px; border-bottom:2px solid var(--line); padding-bottom:4px; }
+  h3 { color:var(--blue); font-size:18px; margin:22px 0 8px; }
+  p { margin:8px 0; }
+  ul, ol { margin:6px 0 6px 22px; padding:0; }
+  li { margin:5px 0; }
+  code { font-family:Consolas,"Courier New",monospace; color:var(--red); font-size:14px; background:rgba(127,127,127,.12); padding:1px 5px; border-radius:3px; }
+  pre { background:var(--code); border:1px solid var(--line); border-radius:6px; padding:12px 14px; overflow-x:auto; }
+  pre code { color:var(--ink); background:none; padding:0; font-size:13.5px; line-height:1.5; }
+  .toc { border:2px solid var(--line); border-radius:8px; padding:14px 18px; }
+  .toc h2 { margin:0 0 8px; border:none; font-size:18px; }
+  .toc ol { margin:0 0 0 20px; }
+  .toc li { margin:3px 0; }
+  .toc a { color:var(--blue); text-decoration:none; border-bottom:1px dashed var(--blue); }
+  .toc a:hover { color:var(--green); }
+  .tip { border-left:4px solid var(--green); background:rgba(46,125,79,.08); padding:8px 12px; margin:12px 0; border-radius:4px; }
+  .warn { border-left:4px solid var(--red); background:rgba(181,35,43,.07); padding:8px 12px; margin:12px 0; border-radius:4px; }
+  .tip b, .warn b { display:block; margin-bottom:2px; }
+  figure { margin:16px auto; text-align:center; }
+  figure svg { max-width:100%; height:auto; }
+  figcaption { font-size:14px; opacity:.75; margin-top:6px; }
+  table { border-collapse:collapse; width:100%; margin:10px 0; font-size:15px; }
+  th, td { border:1px solid var(--line); padding:6px 9px; text-align:left; vertical-align:top; }
+  th { color:var(--blue); }
+  .top { font-size:14px; margin-top:10px; display:inline-block; }
+  .top a { color:var(--blue); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1 id="top">Ansible: простой путь к автоматизации</h1>
+<p class="lead">Как настраивать десятки серверов одной командой, без ручной работы и без агентов</p>
+
+<div class="toc">
+  <h2>Содержание</h2>
+  <ol>
+    <li><a href="#s1">Что такое Ansible и зачем он нужен</a></li>
+    <li><a href="#s2">Как устроен Ansible: главные понятия</a></li>
+    <li><a href="#s3">Установка</a></li>
+    <li><a href="#s4">Инвентарь (inventory): список ваших серверов</a></li>
+    <li><a href="#s5">Ad-hoc команды: быстрые действия в одну строку</a></li>
+    <li><a href="#s6">Модули: «кирпичики» Ansible</a></li>
+    <li><a href="#s7">Плейбуки: сценарии автоматизации</a></li>
+    <li><a href="#s8">Переменные, условия, циклы и handlers</a></li>
+    <li><a href="#s9">Шаблоны Jinja2</a></li>
+    <li><a href="#s10">Роли: порядок в большом проекте</a></li>
+    <li><a href="#s11">Секреты: ansible-vault</a></li>
+    <li><a href="#s12">Лайфхаки</a></li>
+    <li><a href="#s13">Частые ошибки и как их избежать</a></li>
+    <li><a href="#s14">Шпаргалка команд</a></li>
+  </ol>
+</div>
+
+<h2 id="s1">1. Что такое Ansible и зачем он нужен</h2>
+<p>Представьте, что у вас 20 серверов, и на каждом нужно установить nginx, поменять один конфиг и перезапустить сервис. Зайти на каждый сервер вручную по SSH и набрать команды — это долго, и легко где-то ошибиться. Ansible делает это за вас: вы описываете, <b>каким должен быть сервер</b>, а Ansible сам подключается и приводит его к этому виду.</p>
+<p>Ключевые особенности:</p>
+<ul>
+  <li><b>Без агентов.</b> На управляемых серверах ничего устанавливать не нужно. Достаточно SSH и Python.</li>
+  <li><b>Понятный язык.</b> Сценарии пишутся в YAML, его читает даже человек, далёкий от программирования.</li>
+  <li><b>Идемпотентность.</b> Если сервер уже в нужном состоянии, Ansible ничего не меняет. Можно запускать один и тот же сценарий сколько угодно раз.</li>
+  <li><b>Огромный набор модулей.</b> Есть готовые модули для apt, yum, docker, файлов, пользователей, облаков AWS, Azure, GCP и многого другого.</li>
+</ul>
+
+<div class="tip"><b>Простыми словами</b>Ansible — это «рецепт» для серверов. Вы пишете рецепт один раз, а потом применяете его к любому количеству машин.</div>
+
+<h2 id="s2">2. Как устроен Ansible: главные понятия</h2>
+<p>Ansible состоит из нескольких простых частей. Их легко запомнить, если представить схему:</p>
+
+<figure>
+<svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+  <rect x="20" y="90" width="200" height="90" rx="10" fill="#1e4fa3"/>
+  <text x="120" y="125" fill="#fff" font-size="17" text-anchor="middle" font-weight="bold">Control node</text>
+  <text x="120" y="150" fill="#dfe8ff" font-size="13" text-anchor="middle">ваш компьютер или сервер</text>
+  <text x="120" y="168" fill="#dfe8ff" font-size="13" text-anchor="middle">(с установленным Ansible)</text>
+
+  <line x1="220" y1="135" x2="330" y2="60" stroke="#2e7d4f" stroke-width="3"/>
+  <line x1="220" y1="135" x2="330" y2="135" stroke="#2e7d4f" stroke-width="3"/>
+  <line x1="220" y1="135" x2="330" y2="210" stroke="#2e7d4f" stroke-width="3"/>
+  <text x="275" y="85" fill="#2e7d4f" font-size="13" text-anchor="middle">SSH</text>
+
+  <rect x="330" y="30" width="170" height="60" rx="8" fill="#2e7d4f"/>
+  <text x="415" y="66" fill="#fff" font-size="15" text-anchor="middle">web1</text>
+  <rect x="330" y="105" width="170" height="60" rx="8" fill="#2e7d4f"/>
+  <text x="415" y="141" fill="#fff" font-size="15" text-anchor="middle">web2</text>
+  <rect x="330" y="180" width="170" height="60" rx="8" fill="#2e7d4f"/>
+  <text x="415" y="216" fill="#fff" font-size="15" text-anchor="middle">db1</text>
+
+  <rect x="550" y="60" width="150" height="130" rx="10" fill="none" stroke="#b5232b" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="625" y="95" fill="#b5232b" font-size="14" text-anchor="middle" font-weight="bold">Плейбук</text>
+  <text x="625" y="120" fill="#b5232b" font-size="13" text-anchor="middle">что сделать</text>
+  <text x="625" y="140" fill="#b5232b" font-size="13" text-anchor="middle">и на каких</text>
+  <text x="625" y="160" fill="#b5232b" font-size="13" text-anchor="middle">серверах</text>
+</svg>
+<figcaption>Control node по SSH управляет серверами, а плейбук описывает нужное состояние</figcaption>
+</figure>
+
+<ul>
+  <li><b>Control node</b> — машина, с которой вы запускаете Ansible. Обычно это ваш ноутбук или отдельный сервер.</li>
+  <li><b>Managed nodes</b> — серверы, которыми управляете. Ansible подключается к ним по SSH.</li>
+  <li><b>Inventory</b> — список серверов с группами, например «веб-серверы» и «базы данных».</li>
+  <li><b>Module</b> — готовое действие: установить пакет, скопировать файл, перезапустить сервис.</li>
+  <li><b>Task</b> — один шаг, который вызывает модуль.</li>
+  <li><b>Play</b> — набор задач для определённой группы серверов.</li>
+  <li><b>Playbook</b> — файл с одним или несколькими play. Это главный сценарий.</li>
+  <li><b>Role</b> — аккуратно упакованный набор задач, файлов и шаблонов, который можно переиспользовать.</li>
+</ul>
+
+<h2 id="s3">3. Установка</h2>
+<p>Ansible устанавливается на control node. Серверы, которыми вы управляете, ставить ничего не нужно.</p>
+<h3>Ubuntu / Debian</h3>
+<pre><code>sudo apt update
+sudo apt install -y ansible
+ansible --version</code></pre>
+<h3>Через pip (любая система с Python)</h3>
+<pre><code>python3 -m pip install --user ansible
+ansible --version</code></pre>
+<div class="tip"><b>Лайфхак</b>Если нужна свежая версия, ставьте через pip в виртуальное окружение: <code>python3 -m venv ~/ansible-venv</code>, затем <code>source ~/ansible-venv/bin/activate</code> и <code>pip install ansible</code>.</div>
+
+<h3>Подготовка SSH</h3>
+<p>Ansible работает по SSH, поэтому удобнее всего зайти на серверы по ключу, без пароля:</p>
+<pre><code>ssh-keygen -t ed25519
+ssh-copy-id ubuntu@192.168.1.10
+ssh ubuntu@192.168.1.10   # должно войти без пароля</code></pre>
+
+<h2 id="s4">4. Инвентарь (inventory): список ваших серверов</h2>
+<p>Инвентарь — это файл, в котором перечислены серверы и группы. Самый простой вариант — формат INI:</p>
+<pre><code># inventory.ini
+[webservers]
+web1 ansible_host=192.168.1.10
+web2 ansible_host=192.168.1.11
+
+[dbservers]
+db1 ansible_host=192.168.1.20
+
+[all:vars]
+ansible_user=ubuntu
+ansible_ssh_private_key_file=~/.ssh/id_ed25519</code></pre>
+
+<div class="tip"><b>Проверьте, что связь есть</b>Командой <code>ansible all -i inventory.ini -m ping</code> вы увидите, отвечает ли каждый сервер.</div>
+
+<h3>Группы и переменные в инвентаре</h3>
+<p>Один сервер может входить в несколько групп. Это удобно: например, сервер может быть и веб-сервером, и сервером мониторинга. Переменные для группы пишутся в секции <code>[имя_группы:vars]</code>.</p>
+<pre><code>[production:children]
+webservers
+dbservers
+
+[webservers:vars]
+http_port=80</code></pre>
+<p>Группа <code>production</code> объединяет другие группы. Так удобно разделять окружения: production, staging, test.</p>
+
+<div class="warn"><b>Осторожно</b>Не храните пароли в открытом виде в инвентаре. Для секретов используйте ansible-vault (раздел 11).</div>
+
+<h2 id="s5">5. Ad-hoc команды: быстрые действия в одну строку</h2>
+<p>Ad-hoc команда — это разовое действие без сценария. Например, проверить, что серверы живы, или посмотреть аптайм. Общий вид:</p>
+<pre><code>ansible &lt;группа_или_хост&gt; -i inventory.ini -m &lt;модуль&gt; -a "&lt;аргументы&gt;"</code></pre>
+<p>Примеры:</p>
+<pre><code># Проверить связь со всеми серверами
+ansible all -i inventory.ini -m ping
+
+# Узнать время работы системы на веб-серверах
+ansible webservers -i inventory.ini -m shell -a "uptime"
+
+# Установить htop на всех серверах (с правами sudo)
+ansible all -i inventory.ini -m apt -a "name=htop state=present" --become
+
+# Перезапустить nginx только на web1
+ansible web1 -i inventory.ini -m service -a "name=nginx state=restarted" --become
+
+# Скопировать файл на все веб-серверы
+ansible webservers -i inventory.ini -m copy -a "src=./index.html dest=/var/www/html/" --become
+
+# Посмотреть факты о сервере (ОС, IP, память и т.д.)
+ansible web1 -i inventory.ini -m setup | less</code></pre>
+
+<div class="tip"><b>Лайфхак</b>Ad-hoc удобен для разовых задач, но для всего, что нужно повторять, пишите плейбуки. Ad-hoc команду легко забыть, плейбук всегда можно открыть и посмотреть.</div>
+
+<h2 id="s6">6. Модули: «кирпичики» Ansible</h2>
+<p>Модуль — это готовый инструмент для конкретного действия. Вы не пишете команду вида <code>apt install nginx</code> вручную, а вызываете модуль, который сам всё правильно сделает. Вот основные модули, которые понадобятся чаще всего:</p>
+<table>
+  <tr><th>Задача</th><th>Модуль</th><th>Пример использования</th></tr>
+  <tr><td>Пакеты (Debian/Ubuntu)</td><td><code>ansible.builtin.apt</code></td><td>установить nginx</td></tr>
+  <tr><td>Пакеты (RHEL/CentOS)</td><td><code>ansible.builtin.dnf</code></td><td>установить httpd</td></tr>
+  <tr><td>Сервисы</td><td><code>ansible.builtin.service</code></td><td>запустить и включить в автозагрузку</td></tr>
+  <tr><td>Копирование файла</td><td><code>ansible.builtin.copy</code></td><td>отправить конфиг на сервер</td></tr>
+  <tr><td>Шаблон с переменными</td><td><code>ansible.builtin.template</code></td><td>конфиг с IP и портом из переменных</td></tr>
+  <tr><td>Пользователи</td><td><code>ansible.builtin.user</code></td><td>создать пользователя deploy</td></tr>
+  <tr><td>Директории и файлы</td><td><code>ansible.builtin.file</code></td><td>создать папку, поменять права</td></tr>
+  <tr><td>Команды</td><td><code>ansible.builtin.command</code>, <code>shell</code></td><td>выполнить произвольную команду</td></tr>
+  <tr><td>Docker-контейнеры</td><td><code>community.docker.docker_container</code></td><td>запустить контейнер</td></tr>
+</table>
+
+<div class="tip"><b>Лайфхак: полные имена модулей (FQCN)</b>Всегда пишите модуль с полным именем, например <code>ansible.builtin.apt</code>, а не просто <code>apt</code>. Так код понятен и не сломается, если модуль переедет в другую коллекцию.</div>
+
+<h2 id="s7">7. Плейбуки: сценарии автоматизации</h2>
+<p>Плейбук — это YAML-файл, в котором описано, что сделать и на каких серверах. Сначала посмотрим схему:</p>
+
+<figure>
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+  <rect x="10" y="60" width="130" height="80" rx="8" fill="#1e4fa3"/>
+  <text x="75" y="95" fill="#fff" font-size="15" text-anchor="middle" font-weight="bold">Плейбук</text>
+  <text x="75" y="118" fill="#dfe8ff" font-size="12" text-anchor="middle">site.yml</text>
+  <polygon points="150,100 170,100 165,94 175,100 165,106 170,100" fill="#2e7d4f"/>
+  <rect x="180" y="60" width="130" height="80" rx="8" fill="#2e7d4f"/>
+  <text x="245" y="95" fill="#fff" font-size="15" text-anchor="middle" font-weight="bold">Play</text>
+  <text x="245" y="118" fill="#dfe8ff" font-size="12" text-anchor="middle">для группы hosts</text>
+  <polygon points="320,100 340,100 335,94 345,100 335,106 340,100" fill="#2e7d4f"/>
+  <rect x="350" y="60" width="130" height="80" rx="8" fill="#b5232b"/>
+  <text x="415" y="95" fill="#fff" font-size="15" text-anchor="middle" font-weight="bold">Tasks</text>
+  <text x="415" y="118" fill="#ffe3e3" font-size="12" text-anchor="middle">шаг за шагом</text>
+  <polygon points="490,100 510,100 505,94 515,100 505,106 510,100" fill="#2e7d4f"/>
+  <rect x="520" y="60" width="180" height="80" rx="8" fill="#6a4fb3"/>
+  <text x="610" y="95" fill="#fff" font-size="15" text-anchor="middle" font-weight="bold">Модули</text>
+  <text x="610" y="118" fill="#eae3ff" font-size="12" text-anchor="middle">apt, service, copy...</text>
+  <text x="360" y="180" fill="#1f2a44" font-size="13" text-anchor="middle">Плейбук содержит play, play содержит tasks, каждая task вызывает модуль</text>
+</svg>
+<figcaption>Структура плейбука: от файла к конкретному действию</figcaption>
+</figure>
+
+<h3>Первый плейбук: установка nginx</h3>
+<p>Создайте файл <code>site.yml</code>:</p>
+<pre><code>---
+- name: Установить и запустить nginx
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: Обновить список пакетов и установить nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: true
+
+    - name: Запустить nginx и включить автозапуск
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true</code></pre>
+<p>Запуск:</p>
+<pre><code># Сначала посмотрите, что будет изменено, ничего не меняя
+ansible-playbook -i inventory.ini site.yml --check --diff
+
+# Теперь выполните
+ansible-playbook -i inventory.ini site.yml</code></pre>
+<p>Что значит каждая строка:</p>
+<ul>
+  <li><code>---</code> — начало YAML-файла.</li>
+  <li><code>name</code> — понятное название. Оно выводится в консоли, поэтому пишите его так, чтобы было ясно, что происходит.</li>
+  <li><code>hosts</code> — на каких серверах (группа из инвентаря).</li>
+  <li><code>become: true</code> — выполнять с правами sudo.</li>
+  <li><code>tasks</code> — список шагов.</li>
+  <li><code>state: present</code> — пакет должен быть установлен. Если уже установлен, Ansible ничего не делает.</li>
+</ul>
+
+<div class="tip"><b>Ключевая идея: идемпотентность</b>Запустите плейбук второй раз. Вы увидите, что задачи помечены как <code>ok</code>, а не <code>changed</code>. Это значит, что сервер уже в нужном состоянии, и Ansible ничего не трогал.</div>
+
+<h3>Пример: настройка сайта с шаблоном и перезапуском</h3>
+<pre><code>---
+- name: Настроить веб-сервер
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: Скопировать страницу сайта
+      ansible.builtin.copy:
+        src: files/index.html
+        dest: /var/www/html/index.html
+        mode: "0644"
+      notify: Перезапустить nginx
+
+  handlers:
+    - name: Перезапустить nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted</code></pre>
+<p>Handler выполняется только тогда, когда задача сообщила об изменении (<code>changed</code>). Если файл не менялся, nginx не перезапустится. Это экономит время и не мешает работе сайта лишний раз.</p>
+
+<div class="tip"><b>Лайфхак: проверка без изменений</b><code>--check</code> показывает, что Ansible собирается сделать, но ничего не меняет. <code>--diff</code> дополнительно покажет, как изменится содержимое файлов. Используйте эту пару перед каждым запуском на production.</div>
+
+<h2 id="s8">8. Переменные, условия, циклы и handlers</h2>
+
+<h3>Переменные</h3>
+<p>Переменные позволяют не писать одно и то же значение в разных местах. Их можно задать в плейбуке, в инвентаре или в отдельных файлах.</p>
+<pre><code>- name: Настроить сайт
+  hosts: webservers
+  become: true
+
+  vars:
+    site_name: "Мой сайт"
+    site_port: 8080
+
+  tasks:
+    - name: Показать значение переменной
+      ansible.builtin.debug:
+        msg: "Сайт {{ site_name }} будет на порту {{ site_port }}"</code></pre>
+<p>Двойные фигурные скобки <code>{{ ... }}</code> означают «подставь значение переменной».</p>
+
+<h3>Факты: что Ansible знает о сервере</h3>
+<p>Перед запуском задач Ansible автоматически собирает <b>факты</b> — информацию о сервере: ОС, версию, IP, объём памяти. Их можно использовать в условиях:</p>
+<pre><code>- name: Установить nginx только на Ubuntu
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+  when: ansible_distribution == "Ubuntu"</code></pre>
+
+<h3>Условия (when)</h3>
+<pre><code>- name: Перезагрузить только если нужно
+  ansible.builtin.reboot:
+  when: kernel_updated is defined and kernel_updated</code></pre>
+
+<h3>Циклы (loop)</h3>
+<p>Вместо пяти одинаковых задач можно написать одну:</p>
+<pre><code>- name: Установить несколько пакетов
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - git
+    - curl
+    - htop
+    - vim</code></pre>
+
+<h3>Теги</h3>
+<p>Теги позволяют запускать только часть плейбука:</p>
+<pre><code>- name: Установить nginx
+  ansible.builtin.apt:
+    name: nginx
+  tags: [install, nginx]</code></pre>
+<pre><code># Выполнить только задачи с тегом install
+ansible-playbook -i inventory.ini site.yml --tags install
+
+# Пропустить задачи с тегом install
+ansible-playbook -i inventory.ini site.yml --skip-tags install</code></pre>
+
+<h2 id="s9">9. Шаблоны Jinja2</h2>
+<p>Шаблон — это файл-заготовка с переменными. Ansible подставляет туда нужные значения и отправляет готовый файл на сервер. Расширение обычно <code>.j2</code>.</p>
+<pre><code># templates/nginx.conf.j2
+server {
+    listen {{ site_port }};
+    server_name {{ inventory_hostname }};
+
+    root /var/www/{{ site_name | lower | replace(' ', '-') }};
+}</code></pre>
+<p>Задача, которая использует шаблон:</p>
+<pre><code>- name: Скопировать конфиг nginx
+  ansible.builtin.template:
+    src: templates/nginx.conf.j2
+    dest: /etc/nginx/sites-available/default
+  notify: Перезапустить nginx</code></pre>
+
+<div class="tip"><b>Лайфхак</b>Если нужно вывести переменную с пустым значением по умолчанию, используйте фильтр: <code>{{ my_var | default('значение') }}</code>.</div>
+
+<h2 id="s10">10. Роли: порядок в большом проекте</h2>
+<p>Когда плейбуков становится много, удобно разложить всё по <b>ролям</b>. Роль — это стандартная структура папок, которую Ansible понимает сам.</p>
+<pre><code>roles/
+└── nginx/
+    ├── tasks/
+    │   └── main.yml        # основные задачи
+    ├── handlers/
+    │   └── main.yml        # обработчики (перезапуск)
+    ├── templates/
+    │   └── nginx.conf.j2   # шаблоны
+    ├── files/
+    │   └── index.html      # обычные файлы
+    ├── defaults/
+    │   └── main.yml        # переменные по умолчанию
+    └── vars/
+        └── main.yml        # переменные с высоким приоритетом</code></pre>
+<p>Теперь главный плейбук становится коротким:</p>
+<pre><code>---
+- name: Настроить веб-серверы
+  hosts: webservers
+  become: true
+  roles:
+    - nginx</code></pre>
+<p>Создать пустую роль со всей структурой можно одной командой:</p>
+<pre><code>ansible-galaxy init roles/nginx</code></pre>
+
+<div class="tip"><b>Лайфхак</b>Не копируйте роли вручную. Посмотрите готовые на Ansible Galaxy (<code>ansible-galaxy search nginx</code>) и берите за основу проверенные решения.</div>
+
+<h2 id="s11">11. Секреты: ansible-vault</h2>
+<p>Пароли, ключи и токены нельзя хранить в открытом виде в репозитории. Ansible Vault шифрует файлы.</p>
+<pre><code># Создать зашифрованный файл
+ansible-vault create group_vars/all/secrets.yml
+
+# Зашифровать существующий файл
+ansible-vault encrypt secrets.yml
+
+# Посмотреть содержимое
+ansible-vault view secrets.yml
+
+# Изменить
+ansible-vault edit secrets.yml
+
+# Запустить плейбук, который использует секреты
+ansible-playbook -i inventory.ini site.yml --ask-vault-pass</code></pre>
+<p>Содержимое секретного файла (до шифрования):</p>
+<pre><code>db_password: "очень_длинный_пароль"</code></pre>
+<p>Чтобы пароль не попадал в логи, добавьте в задачу:</p>
+<pre><code>- name: Настроить базу данных
+  ansible.builtin.command: "setup-db --password {{ db_password }}"
+  no_log: true</code></pre>
+
+<div class="warn"><b>Важно</b>Файл с паролем для vault (например, <code>.vault_pass</code>) не должен попадать в git. Добавьте его в <code>.gitignore</code>.</div>
+
+<h2 id="s12">12. Лайфхаки</h2>
+<ul>
+  <li><b>Ставьте <code>--check --diff</code> перед каждым запуском</b> на боевых серверах. Это самая полезная привычка.</li>
+  <li><b>Используйте <code>--limit</code>, чтобы запускать на одном сервере:</b> <code>ansible-playbook site.yml --limit web1</code>. Удобно для теста.</li>
+  <li><b>Создайте <code>ansible.cfg</code> в папке проекта</b>, чтобы не писать одни и те же параметры каждый раз:
+<pre><code>[defaults]
+inventory = inventory.ini
+forks = 20
+
+[ssh_connection]
+pipelining = True</code></pre>
+  <code>forks</code> — сколько серверов обрабатывать параллельно. <code>pipelining</code> ускоряет SSH.</li>
+  <li><b>Проверяйте код линтером:</b> <code>pip install ansible-lint</code>, затем <code>ansible-lint site.yml</code>. Он подскажет ошибки и плохие практики.</li>
+  <li><b>Смотрите документацию прямо в терминале:</b> <code>ansible-doc ansible.builtin.apt</code>.</li>
+  <li><b>Отладка:</b> добавьте <code>-v</code>, <code>-vv</code> или <code>-vvv</code>, чтобы увидеть подробности выполнения.</li>
+  <li><b>Смотрите, что знает Ansible о хосте:</b> <code>ansible-inventory -i inventory.ini --list</code>.</li>
+  <li><b>Используйте <code>debug</code> для проверки переменных:</b>
+<pre><code>- name: Показать переменную
+  ansible.builtin.debug:
+    var: site_port</code></pre></li>
+  <li><b>Не бойтесь повторного запуска.</b> Идемпотентность — ваш главный друг. Плейбук можно запускать много раз подряд.</li>
+</ul>
+
+<h2 id="s13">13. Частые ошибки и как их избежать</h2>
+<table>
+  <tr><th>Ошибка</th><th>Почему возникает</th><th>Что делать</th></tr>
+  <tr><td><code>UNREACHABLE! ... Permission denied</code></td><td>Не настроен SSH-ключ или неверный пользователь</td><td>Проверьте <code>ssh user@host</code> вручную, поправьте <code>ansible_user</code></td></tr>
+  <tr><td><code>Missing sudo password</code></td><td>Нужны права root, а пароль не передан</td><td>Добавьте <code>--ask-become-pass</code> или настройте sudo без пароля для пользователя</td></tr>
+  <tr><td><code>couldn't resolve module/action</code></td><td>Опечатка в имени модуля или не установлена коллекция</td><td>Проверьте имя через <code>ansible-doc</code>, установите коллекцию через <code>ansible-galaxy collection install</code></td></tr>
+  <tr><td>Ошибка отступов в YAML</td><td>YAML чувствителен к пробелам</td><td>Используйте 2 пробела, не табы. Проверяйте <code>ansible-lint</code></td></tr>
+  <tr><td>Задача всегда <code>changed</code></td><td>Команда <code>shell</code> или <code>command</code> каждый раз что-то меняет</td><td>Используйте специализированный модуль или добавьте <code>changed_when</code> и <code>creates</code></td></tr>
+  <tr><td>Handler не сработал</td><td>Имя в <code>notify</code> не совпадает с именем handler</td><td>Имена должны совпадать посимвольно</td></tr>
+</table>
+
+<h2 id="s14">14. Шпаргалка команд</h2>
+<table>
+  <tr><th>Команда</th><th>Что делает</th></tr>
+  <tr><td><code>ansible --version</code></td><td>Версия Ansible и пути к конфигам</td></tr>
+  <tr><td><code>ansible all -i inv.ini -m ping</code></td><td>Проверить связь с серверами</td></tr>
+  <tr><td><code>ansible-inventory -i inv.ini --list</code></td><td>Показать весь инвентарь</td></tr>
+  <tr><td><code>ansible-doc &lt;модуль&gt;</code></td><td>Справка по модулю с примерами</td></tr>
+  <tr><td><code>ansible-playbook site.yml --check --diff</code></td><td>Посмотреть изменения без их применения</td></tr>
+  <tr><td><code>ansible-playbook site.yml --limit web1</code></td><td>Запустить только на одном сервере</td></tr>
+  <tr><td><code>ansible-playbook site.yml --tags install</code></td><td>Запустить только задачи с тегом</td></tr>
+  <tr><td><code>ansible-playbook site.yml --ask-vault-pass</code></td><td>Запустить с зашифрованными секретами</td></tr>
+  <tr><td><code>ansible-playbook site.yml -vvv</code></td><td>Подробный вывод для отладки</td></tr>
+  <tr><td><code>ansible-galaxy init roles/имя</code></td><td>Создать структуру роли</td></tr>
+  <tr><td><code>ansible-vault create файл.yml</code></td><td>Создать зашифрованный файл</td></tr>
+  <tr><td><code>ansible-lint site.yml</code></td><td>Проверить плейбук на ошибки и плохие практики</td></tr>
+</table>
+
+<p class="top"><a href="#top">↑ Наверх</a></p>
+
+</div>
+</body>
+</html>
