@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>«Всё в Одном» DevOps guide. DevOps of all Commands Cheat</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --red:#b5232b; --green:#2e7d4f; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --red:#ff7b7b; --green:#7fd6a0; --line:#3a4352; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  h1 { text-align:center; color:var(--blue); font-size:24px; margin:0 0 6px; }
+  .subtitle { text-align:center; color:var(--green); margin:0 0 24px; }
+  .intro { max-width:900px; margin:0 auto 24px; }
+  .toc { max-width:900px; margin:0 auto 28px; border:2px solid var(--line); border-radius:8px; padding:12px 16px; }
+  .toc a { color:var(--blue); text-decoration:none; margin-right:10px; white-space:nowrap; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:1100px; margin:0 auto; }
+  .card { border:2px solid var(--line); border-radius:8px; padding:14px 16px 10px; }
+  .card.wide { grid-column:1 / -1; }
+  .card h2 { margin:-26px 0 8px; display:inline-block; background:var(--paper); padding:0 8px; font-size:16px; color:var(--green); }
+  .card p.desc { margin:0 0 8px; opacity:.85; }
+  ul.cmds { list-style:none; padding:0; margin:0; }
+  ul.cmds li { margin:6px 0; }
+  code { font-family:Consolas,"Courier New",monospace; color:var(--red); font-size:13px; background:rgba(127,127,127,.12); padding:1px 4px; border-radius:3px; }
+  .ex { display:block; margin-left:14px; font-size:12.5px; opacity:.8; }
+  .ex code { color:var(--green); background:none; }
+  .note { border-left:3px solid var(--red); padding:6px 10px; margin:6px 0; font-size:13px; }
+  @media (max-width:760px) { .grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<h1>«All in One/Всё в Одном» DevOps guide. DevOps of all Commands Cheat</h1>
+
+<div class="intro">
+  <p>Linux — основа DevOps: как швейцарский нож для серверов. Git — «машина времени» для кода. Docker упаковывает приложения в переносимые контейнеры. Kubernetes управляет контейнерами в кластере, Helm устанавливает приложения в Kubernetes, а Terraform описывает инфраструктуру в виде кода.</p>
+</div>
+
+<div class="toc">
+  <a href="#linux">Linux</a>
+  <a href="#git">Git</a>
+  <a href="#github">GitHub</a>
+  <a href="#docker">Docker</a>
+  <a href="#k8s">Kubernetes</a>
+  <a href="#helm">Helm</a>
+  <a href="#terraform">Terraform</a>
+  <a href="#notes">Примечания</a>
+</div>
+
+<div class="grid">
+
+<!-- ============ LINUX ============ -->
+<div class="card" id="linux">
+  <h2>1. Базовые команды Linux</h2>
+  <ul class="cmds">
+    <li><code>pwd</code> — вывести текущий рабочий каталог</li>
+    <li><code>ls</code> — вывести список файлов и каталогов</li>
+    <li><code>cd</code> — сменить каталог</li>
+    <li><code>touch</code> — создать пустой файл</li>
+    <li><code>mkdir</code> — создать каталог</li>
+    <li><code>rm</code> — удалить файлы или каталоги</li>
+    <li><code>rmdir</code> — удалить пустой каталог</li>
+    <li><code>cp</code> — копировать файлы или каталоги</li>
+    <li><code>mv</code> — переместить или переименовать файлы и каталоги</li>
+    <li><code>cat</code> — вывести содержимое файла</li>
+    <li><code>echo</code> — вывести строку текста</li>
+    <li><code>clear</code> — очистить экран терминала</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>2. Промежуточные команды Linux</h2>
+  <ul class="cmds">
+    <li><code>chmod</code> — изменить права доступа к файлам</li>
+    <li><code>chown</code> — изменить владельца файла</li>
+    <li><code>find</code> — искать файлы и каталоги</li>
+    <li><code>grep</code> — искать текст в файле</li>
+    <li><code>wc</code> — подсчитать строки, слова и символы</li>
+    <li><code>head</code> — вывести первые строки файла</li>
+    <li><code>tail</code> — вывести последние строки файла</li>
+    <li><code>sort</code> — отсортировать содержимое файла</li>
+    <li><code>uniq</code> — удалить повторяющиеся строки</li>
+    <li><code>diff</code> — построчно сравнить два файла</li>
+    <li><code>tar</code> — упаковать файлы в архив tar</li>
+    <li><code>zip/unzip</code> — сжать и распаковать ZIP-файлы</li>
+    <li><code>df</code> — показать использование дискового пространства</li>
+    <li><code>du</code> — показать размер каталога</li>
+    <li><code>top</code> — отслеживать процессы в реальном времени</li>
+    <li><code>ps</code> — показать активные процессы</li>
+    <li><code>kill</code> — завершить процесс по PID</li>
+    <li><code>ping</code> — проверить сетевое соединение</li>
+    <li><code>wget</code> — скачать файлы из интернета</li>
+    <li><code>curl</code> — передать данные на сервер или с сервера</li>
+    <li><code>scp</code> — безопасно копировать файлы между системами</li>
+    <li><code>rsync</code> — синхронизировать файлы и каталоги</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>3. Продвинутые команды Linux</h2>
+  <ul class="cmds">
+    <li><code>awk</code> — обработка текста и поиск по шаблону</li>
+    <li><code>sed</code> — потоковый редактор для фильтрации и преобразования текста</li>
+    <li><code>cut</code> — вырезать фрагменты из каждой строки файла</li>
+    <li><code>tr</code> — заменить или удалить символы</li>
+    <li><code>xargs</code> — построить и выполнить командную строку из стандартного ввода</li>
+    <li><code>ln</code> — создать символьные или жёсткие ссылки</li>
+    <li><code>df -h</code> — использование диска в удобочитаемом виде</li>
+    <li><code>free</code> — показать использование памяти</li>
+    <li><code>iostat</code> — статистика CPU и ввода-вывода</li>
+    <li><code>netstat</code> — сетевая статистика (современная замена: <code>ss</code>)</li>
+    <li><code>ifconfig/ip</code> — настройка сетевых интерфейсов (современная замена: <code>ip</code>)</li>
+    <li><code>iptables</code> — настройка правил файрвола</li>
+    <li><code>systemctl</code> — управление systemd и сервисами</li>
+    <li><code>journalctl</code> — просмотр системных логов</li>
+    <li><code>crontab</code> — планирование регулярных задач</li>
+    <li><code>at</code> — планирование задач на определённое время</li>
+    <li><code>uptime</code> — время работы системы</li>
+    <li><code>whoami</code> — показать текущего пользователя</li>
+    <li><code>users</code> — список пользователей, вошедших в систему</li>
+    <li><code>hostname</code> — показать или задать имя хоста</li>
+    <li><code>env</code> — показать переменные окружения</li>
+    <li><code>export</code> — задать переменные окружения</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>4. Сетевые команды</h2>
+  <ul class="cmds">
+    <li><code>ip addr</code> — показать или настроить IP-адреса</li>
+    <li><code>ip route</code> — показать или изменить таблицы маршрутизации</li>
+    <li><code>traceroute</code> — путь пакетов до узла</li>
+    <li><code>nslookup</code> — запрос DNS-записей</li>
+    <li><code>dig</code> — запрос к DNS-серверам</li>
+    <li><code>ssh</code> — подключение к удалённому серверу по SSH</li>
+    <li><code>ftp</code> — передача файлов по протоколу FTP</li>
+    <li><code>nmap</code> — сканирование сети и обнаружение узлов</li>
+    <li><code>telnet</code> — связь с удалёнными узлами</li>
+    <li><code>netcat (nc)</code> — чтение и запись данных по сети</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>5. Работа с файлами и поиск</h2>
+  <ul class="cmds">
+    <li><code>locate</code> — быстро найти файлы по базе данных</li>
+    <li><code>stat</code> — подробная информация о файле</li>
+    <li><code>tree</code> — вывести каталоги в виде дерева</li>
+    <li><code>file</code> — определить тип файла</li>
+    <li><code>basename</code> — извлечь имя файла из пути</li>
+    <li><code>dirname</code> — извлечь каталог из пути</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>6. Мониторинг системы</h2>
+  <ul class="cmds">
+    <li><code>vmstat</code> — статистика виртуальной памяти</li>
+    <li><code>htop</code> — интерактивный просмотрщик процессов (альтернатива <code>top</code>)</li>
+    <li><code>lsof</code> — список открытых файлов</li>
+    <li><code>dmesg</code> — сообщения кольцевого буфера ядра</li>
+    <li><code>iotop</code> — дисковый ввод-вывод по процессам в реальном времени</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>7. Управление пакетами и дисками</h2>
+  <ul class="cmds">
+    <li><code>apt</code> — менеджер пакетов для Debian-подобных систем</li>
+    <li><code>yum/dnf</code> — менеджер пакетов для RHEL-подобных систем</li>
+    <li><code>snap</code> — управление snap-пакетами</li>
+    <li><code>rpm</code> — управление RPM-пакетами</li>
+    <li><code>mount/umount</code> — смонтировать или размонтировать файловые системы</li>
+    <li><code>fsck</code> — проверить и восстановить файловую систему</li>
+    <li><code>mkfs</code> — создать файловую систему</li>
+    <li><code>blkid</code> — информация о блочных устройствах</li>
+    <li><code>lsblk</code> — список блочных устройств</li>
+    <li><code>parted</code> — интерактивное управление разделами</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>8. Скрипты и автоматизация</h2>
+  <ul class="cmds">
+    <li><code>bash</code> — интерпретатор команд и оболочка для скриптов</li>
+    <li><code>sh</code> — устаревший интерпретатор shell</li>
+    <li><code>cron</code> — автоматизация задач</li>
+    <li><code>alias</code> — создание сокращений для команд</li>
+    <li><code>source</code> — выполнить команды из файла в текущей оболочке</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>9. Разработка и отладка</h2>
+  <ul class="cmds">
+    <li><code>gcc</code> — компиляция программ на C</li>
+    <li><code>make</code> — сборка и управление проектами</li>
+    <li><code>strace</code> — трассировка системных вызовов и сигналов</li>
+    <li><code>gdb</code> — отладка программ</li>
+    <li><code>git</code> — система контроля версий</li>
+    <li><code>vim/nano</code> — текстовые редакторы для скриптов и правок</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>10. Прочие полезные команды</h2>
+  <ul class="cmds">
+    <li><code>date</code> — показать или задать системные дату и время</li>
+    <li><code>cal</code> — показать календарь</li>
+    <li><code>man</code> — показать справку по команде</li>
+    <li><code>history</code> — показать ранее выполненные команды</li>
+  </ul>
+</div>
+
+<!-- ============ GIT ============ -->
+<div class="card wide" id="git">
+  <h2>11. Git: основы</h2>
+  <p class="desc">Git — «машина времени» для кода: отслеживает изменения, помогает работать в команде без конфликтов и откатывать ошибки.</p>
+  <ul class="cmds">
+    <li><code>git init</code> — инициализирует новый репозиторий в текущем каталоге<span class="ex">Пример: <code>git init</code></span></li>
+    <li><code>git clone</code> — копирует удалённый репозиторий на локальную машину<span class="ex">Пример: <code>git clone https://github.com/user/repo.git</code></span></li>
+    <li><code>git status</code> — состояние рабочего каталога и области подготовки<span class="ex">Пример: <code>git status</code></span></li>
+    <li><code>git add</code> — добавляет изменения в область подготовки<span class="ex">Пример: <code>git add file.txt</code></span></li>
+    <li><code>git commit</code> — фиксирует изменения в репозитории<span class="ex">Пример: <code>git commit -m "Initial commit"</code></span></li>
+    <li><code>git config</code> — настройки пользователя, например имя и email<span class="ex">Пример: <code>git config --global user.name "Your Name"</code></span></li>
+    <li><code>git log</code> — история коммитов<span class="ex">Пример: <code>git log</code></span></li>
+    <li><code>git show</code> — подробная информация о коммите<span class="ex">Пример: <code>git show &lt;commit-hash&gt;</code></span></li>
+    <li><code>git diff</code> — изменения между коммитами, рабочим каталогом и областью подготовки<span class="ex">Пример: <code>git diff</code></span></li>
+    <li><code>git reset</code> — убирает файлы из области подготовки или откатывает коммиты<span class="ex">Пример: <code>git reset HEAD file.txt</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>12. Ветки и слияние</h2>
+  <ul class="cmds">
+    <li><code>git branch</code> — список веток или создание новой<span class="ex">Пример: <code>git branch feature-branch</code></span></li>
+    <li><code>git checkout</code> — переключение веток или восстановление файлов<span class="ex">Пример: <code>git checkout feature-branch</code></span></li>
+    <li><code>git switch</code> — переключение веток (современная замена <code>checkout</code>)<span class="ex">Пример: <code>git switch feature-branch</code></span></li>
+    <li><code>git merge</code> — объединяет изменения из одной ветки в другую<span class="ex">Пример: <code>git merge feature-branch</code></span></li>
+    <li><code>git rebase</code> — переносит коммиты одной ветки поверх другой<span class="ex">Пример: <code>git rebase main</code></span></li>
+    <li><code>git cherry-pick</code> — применяет отдельный коммит из одной ветки в другую<span class="ex">Пример: <code>git cherry-pick &lt;commit-hash&gt;</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>13. Удалённые репозитории</h2>
+  <ul class="cmds">
+    <li><code>git remote</code> — управление подключениями к удалённым репозиториям<span class="ex">Пример: <code>git remote add origin https://github.com/user/repo.git</code></span></li>
+    <li><code>git push</code> — отправляет изменения в удалённый репозиторий<span class="ex">Пример: <code>git push origin main</code></span></li>
+    <li><code>git pull</code> — получает и объединяет изменения из удалённого репозитория<span class="ex">Пример: <code>git pull origin main</code></span></li>
+    <li><code>git fetch</code> — загружает изменения без слияния<span class="ex">Пример: <code>git fetch origin</code></span></li>
+    <li><code>git remote -v</code> — список URL удалённых репозиториев<span class="ex">Пример: <code>git remote -v</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>14. Stash и очистка</h2>
+  <ul class="cmds">
+    <li><code>git stash</code> — временно сохраняет незафиксированные изменения<span class="ex">Пример: <code>git stash</code></span></li>
+    <li><code>git stash pop</code> — применяет сохранённые изменения и удаляет их из списка<span class="ex">Пример: <code>git stash pop</code></span></li>
+    <li><code>git stash list</code> — список всех stash<span class="ex">Пример: <code>git stash list</code></span></li>
+    <li><code>git clean</code> — удаляет неотслеживаемые файлы из рабочего каталога<span class="ex">Пример: <code>git clean -f</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>15. Теги</h2>
+  <ul class="cmds">
+    <li><code>git tag</code> — создаёт тег для коммита<span class="ex">Пример: <code>git tag -a v1.0 -m "Version 1.0"</code></span></li>
+    <li><code>git tag -d</code> — удаляет тег<span class="ex">Пример: <code>git tag -d v1.0</code></span></li>
+    <li><code>git push --tags</code> — отправляет теги в удалённый репозиторий<span class="ex">Пример: <code>git push origin --tags</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>16. Продвинутые команды Git</h2>
+  <ul class="cmds">
+    <li><code>git bisect</code> — находит коммит, который внёс ошибку<span class="ex">Пример: <code>git bisect start</code></span></li>
+    <li><code>git blame</code> — показывает коммит и автора каждой строки файла<span class="ex">Пример: <code>git blame file.txt</code></span></li>
+    <li><code>git reflog</code> — журнал изменений вершин веток<span class="ex">Пример: <code>git reflog</code></span></li>
+    <li><code>git submodule</code> — внешние репозитории как подмодули<span class="ex">Пример: <code>git submodule add https://github.com/user/repo.git</code></span></li>
+    <li><code>git archive</code> — архив файлов репозитория<span class="ex">Пример: <code>git archive --format=zip HEAD &gt; archive.zip</code></span></li>
+    <li><code>git gc</code> — очистка ненужных файлов и оптимизация репозитория<span class="ex">Пример: <code>git gc</code></span></li>
+  </ul>
+</div>
+
+<!-- ============ GITHUB ============ -->
+<div class="card" id="github">
+  <h2>17. Команды GitHub (gh CLI)</h2>
+  <ul class="cmds">
+    <li><code>gh auth login</code> — вход в GitHub через командную строку<span class="ex">Пример: <code>gh auth login</code></span></li>
+    <li><code>gh repo clone</code> — клонирование репозитория GitHub<span class="ex">Пример: <code>gh repo clone user/repo</code></span></li>
+    <li><code>gh issue list</code> — список задач (issues) в репозитории<span class="ex">Пример: <code>gh issue list</code></span></li>
+    <li><code>gh pr create</code> — создание pull request<span class="ex">Пример: <code>gh pr create --title "New Feature" --body "Description of the feature"</code></span></li>
+    <li><code>gh repo create</code> — создание нового репозитория на GitHub<span class="ex">Пример: <code>gh repo create my-repo</code></span></li>
+  </ul>
+</div>
+
+<!-- ============ DOCKER ============ -->
+<div class="card wide" id="docker">
+  <h2>18. Docker: основы</h2>
+  <p class="desc">Docker упаковывает приложения в переносимые контейнеры — как транспортные контейнеры для софта. Команды помогают собирать, отправлять и запускать приложения одинаково в любой среде.</p>
+  <ul class="cmds">
+    <li><code>docker --version</code> — версия установленного Docker<span class="ex">Пример: <code>docker --version</code></span></li>
+    <li><code>docker info</code> — общая информация о Docker: количество контейнеров и образов<span class="ex">Пример: <code>docker info</code></span></li>
+    <li><code>docker pull</code> — загрузка образа из реестра (по умолчанию Docker Hub)<span class="ex">Пример: <code>docker pull ubuntu:latest</code></span></li>
+    <li><code>docker images</code> — список загруженных образов<span class="ex">Пример: <code>docker images</code></span></li>
+    <li><code>docker run</code> — создаёт и запускает контейнер из образа<span class="ex">Пример: <code>docker run -it ubuntu bash</code></span></li>
+    <li><code>docker ps</code> — список запущенных контейнеров<span class="ex">Пример: <code>docker ps</code></span></li>
+    <li><code>docker ps -a</code> — все контейнеры, включая остановленные<span class="ex">Пример: <code>docker ps -a</code></span></li>
+    <li><code>docker stop</code> — остановка запущенного контейнера<span class="ex">Пример: <code>docker stop container_name</code></span></li>
+    <li><code>docker start</code> — запуск остановленного контейнера<span class="ex">Пример: <code>docker start container_name</code></span></li>
+    <li><code>docker rm</code> — удаление контейнера<span class="ex">Пример: <code>docker rm container_name</code></span></li>
+    <li><code>docker rmi</code> — удаление образа<span class="ex">Пример: <code>docker rmi image_name</code></span></li>
+    <li><code>docker exec</code> — выполнение команды в запущенном контейнере<span class="ex">Пример: <code>docker exec -it container_name bash</code></span></li>
+  </ul>
+</div>
+
+<div class="card wide">
+  <h2>19. Docker: промежуточный уровень</h2>
+  <ul class="cmds">
+    <li><code>docker build</code> — сборка образа из Dockerfile<span class="ex">Пример: <code>docker build -t my_image .</code></span></li>
+    <li><code>docker commit</code> — создание образа из изменений контейнера<span class="ex">Пример: <code>docker commit container_name my_image:tag</code></span></li>
+    <li><code>docker logs</code> — логи контейнера<span class="ex">Пример: <code>docker logs container_name</code></span></li>
+    <li><code>docker inspect</code> — подробная информация об объекте (контейнере или образе)<span class="ex">Пример: <code>docker inspect container_name</code></span></li>
+    <li><code>docker stats</code> — статистика потребления ресурсов запущенными контейнерами в реальном времени<span class="ex">Пример: <code>docker stats</code></span></li>
+    <li><code>docker cp</code> — копирование файлов между контейнером и хостом<span class="ex">Пример: <code>docker cp container_name:/path/in/container /path/on/host</code></span></li>
+    <li><code>docker rename</code> — переименование контейнера<span class="ex">Пример: <code>docker rename old_name new_name</code></span></li>
+    <li><code>docker network ls</code> — список сетей Docker<span class="ex">Пример: <code>docker network ls</code></span></li>
+    <li><code>docker network create</code> — создание сети<span class="ex">Пример: <code>docker network create my_network</code></span></li>
+    <li><code>docker network inspect</code> — подробности о сети<span class="ex">Пример: <code>docker network inspect my_network</code></span></li>
+    <li><code>docker network connect</code> — подключение контейнера к сети<span class="ex">Пример: <code>docker network connect my_network container_name</code></span></li>
+    <li><code>docker volume ls</code> — список томов<span class="ex">Пример: <code>docker volume ls</code></span></li>
+    <li><code>docker volume create</code> — создание тома<span class="ex">Пример: <code>docker volume create my_volume</code></span></li>
+    <li><code>docker volume inspect</code> — подробности о томе<span class="ex">Пример: <code>docker volume inspect my_volume</code></span></li>
+    <li><code>docker volume rm</code> — удаление тома<span class="ex">Пример: <code>docker volume rm my_volume</code></span></li>
+  </ul>
+</div>
+
+<div class="card wide">
+  <h2>20. Docker: продвинутые команды, Compose и Swarm</h2>
+  <ul class="cmds">
+    <li><code>docker-compose up</code> — запуск сервисов из docker-compose.yml<span class="ex">Пример: <code>docker-compose up</code></span></li>
+    <li><code>docker-compose down</code> — остановка и удаление сервисов из docker-compose.yml<span class="ex">Пример: <code>docker-compose down</code></span></li>
+    <li><code>docker-compose logs</code> — логи сервисов Compose<span class="ex">Пример: <code>docker-compose logs</code></span></li>
+    <li><code>docker-compose exec</code> — выполнение команды в контейнере сервиса<span class="ex">Пример: <code>docker-compose exec service_name bash</code></span></li>
+    <li><code>docker save</code> — экспорт образа в tar-файл<span class="ex">Пример: <code>docker save -o my_image.tar my_image:tag</code></span></li>
+    <li><code>docker load</code> — импорт образа из tar-файла<span class="ex">Пример: <code>docker load &lt; my_image.tar</code></span></li>
+    <li><code>docker export</code> — экспорт файловой системы контейнера в tar-файл<span class="ex">Пример: <code>docker export container_name &gt; container.tar</code></span></li>
+    <li><code>docker import</code> — создание образа из экспортированного контейнера<span class="ex">Пример: <code>docker import container.tar my_new_image</code></span></li>
+    <li><code>docker system df</code> — использование диска объектами Docker<span class="ex">Пример: <code>docker system df</code></span></li>
+    <li><code>docker system prune</code> — очистка неиспользуемых ресурсов (образов, контейнеров, томов, сетей)<span class="ex">Пример: <code>docker system prune</code></span></li>
+    <li><code>docker tag</code> — присвоение образу нового тега<span class="ex">Пример: <code>docker tag old_image_name new_image_name</code></span></li>
+    <li><code>docker push</code> — загрузка образа в реестр<span class="ex">Пример: <code>docker push my_image:tag</code></span></li>
+    <li><code>docker login</code> / <code>docker logout</code> — вход и выход из реестра<span class="ex">Пример: <code>docker login</code>, <code>docker logout</code></span></li>
+    <li><code>docker swarm init</code> — инициализация кластера Docker Swarm<span class="ex">Пример: <code>docker swarm init</code></span></li>
+    <li><code>docker service create</code> — создание сервиса в режиме Swarm<span class="ex">Пример: <code>docker service create --name my_service nginx</code></span></li>
+    <li><code>docker stack deploy</code> — развёртывание стека из Compose-файла в Swarm<span class="ex">Пример: <code>docker stack deploy -c docker-compose.yml my_stack</code></span></li>
+    <li><code>docker stack rm</code> — удаление стека в Swarm<span class="ex">Пример: <code>docker stack rm my_stack</code></span></li>
+    <li><code>docker checkpoint create / ls / rm</code> — создание, список и удаление чекпоинтов контейнера<span class="ex">Пример: <code>docker checkpoint create container_name checkpoint_name</code></span></li>
+  </ul>
+</div>
+
+<!-- ============ KUBERNETES ============ -->
+<div class="card" id="k8s">
+  <h2>21. Kubernetes: основы</h2>
+  <p class="desc">Kubernetes — «дирижёр» контейнерного оркестра: автоматизирует развёртывание, масштабирование и управление приложениями в кластере серверов.</p>
+  <ul class="cmds">
+    <li><code>kubectl version</code> — версия клиента и сервера<span class="ex">Пример: <code>kubectl version --short</code></span></li>
+    <li><code>kubectl cluster-info</code> — информация о кластере<span class="ex">Пример: <code>kubectl cluster-info</code></span></li>
+    <li><code>kubectl get nodes</code> — список узлов кластера<span class="ex">Пример: <code>kubectl get nodes</code></span></li>
+    <li><code>kubectl get pods</code> — список подов в namespace default<span class="ex">Пример: <code>kubectl get pods</code></span></li>
+    <li><code>kubectl get services</code> — список сервисов в namespace default<span class="ex">Пример: <code>kubectl get services</code></span></li>
+    <li><code>kubectl get namespaces</code> — список namespace в кластере<span class="ex">Пример: <code>kubectl get namespaces</code></span></li>
+    <li><code>kubectl describe pod</code> — подробная информация о поде<span class="ex">Пример: <code>kubectl describe pod pod-name</code></span></li>
+    <li><code>kubectl logs</code> — логи пода<span class="ex">Пример: <code>kubectl logs pod-name</code></span></li>
+    <li><code>kubectl create namespace</code> — создание namespace<span class="ex">Пример: <code>kubectl create namespace my-namespace</code></span></li>
+    <li><code>kubectl delete pod</code> — удаление пода<span class="ex">Пример: <code>kubectl delete pod pod-name</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>22. Kubernetes: промежуточный уровень</h2>
+  <ul class="cmds">
+    <li><code>kubectl apply</code> — применить изменения из YAML-файла<span class="ex">Пример: <code>kubectl apply -f deployment.yaml</code></span></li>
+    <li><code>kubectl delete</code> — удалить ресурсы из YAML-файла<span class="ex">Пример: <code>kubectl delete -f deployment.yaml</code></span></li>
+    <li><code>kubectl scale</code> — масштабировать деплоймент до нужного числа реплик<span class="ex">Пример: <code>kubectl scale deployment my-deployment --replicas=3</code></span></li>
+    <li><code>kubectl expose</code> — открыть под или деплоймент как сервис<span class="ex">Пример: <code>kubectl expose deployment my-deployment --type=LoadBalancer --port=80</code></span></li>
+    <li><code>kubectl exec</code> — выполнить команду в запущенном поде<span class="ex">Пример: <code>kubectl exec -it pod-name -- /bin/bash</code></span></li>
+    <li><code>kubectl port-forward</code> — пробросить локальный порт на порт пода<span class="ex">Пример: <code>kubectl port-forward pod-name 8080:80</code></span></li>
+    <li><code>kubectl get configmaps</code> — список ConfigMap<span class="ex">Пример: <code>kubectl get configmaps</code></span></li>
+    <li><code>kubectl get secrets</code> — список Secret<span class="ex">Пример: <code>kubectl get secrets</code></span></li>
+    <li><code>kubectl edit</code> — редактирование ресурса прямо в редакторе<span class="ex">Пример: <code>kubectl edit deployment my-deployment</code></span></li>
+    <li><code>kubectl rollout status</code> — статус обновления деплоймента<span class="ex">Пример: <code>kubectl rollout status deployment/my-deployment</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>23. Kubernetes: продвинутые команды</h2>
+  <ul class="cmds">
+    <li><code>kubectl rollout undo</code> — откат деплоймента к предыдущей ревизии<span class="ex">Пример: <code>kubectl rollout undo deployment/my-deployment</code></span></li>
+    <li><code>kubectl top nodes / pods</code> — использование ресурсов узлами и подами<span class="ex">Пример: <code>kubectl top pods</code></span></li>
+    <li><code>kubectl cordon</code> — пометить узел как недоступный для планирования<span class="ex">Пример: <code>kubectl cordon node-name</code></span></li>
+    <li><code>kubectl uncordon</code> — снова разрешить планирование на узле<span class="ex">Пример: <code>kubectl uncordon node-name</code></span></li>
+    <li><code>kubectl drain</code> — безопасно вытеснить поды с узла<span class="ex">Пример: <code>kubectl drain node-name --ignore-daemonsets</code></span></li>
+    <li><code>kubectl taint</code> — добавить taint на узел для управления размещением подов<span class="ex">Пример: <code>kubectl taint nodes node-name key=value:NoSchedule</code></span></li>
+    <li><code>kubectl get events</code> — все события в кластере<span class="ex">Пример: <code>kubectl get events</code></span></li>
+    <li><code>kubectl apply -k</code> — применить ресурсы из каталога kustomization<span class="ex">Пример: <code>kubectl apply -k ./kustomization-dir/</code></span></li>
+    <li><code>kubectl config view</code> — показать kubeconfig<span class="ex">Пример: <code>kubectl config view</code></span></li>
+    <li><code>kubectl config use-context</code> — переключить активный контекст<span class="ex">Пример: <code>kubectl config use-context my-cluster</code></span></li>
+    <li><code>kubectl debug</code> — создать сессию отладки для пода<span class="ex">Пример: <code>kubectl debug pod-name</code></span></li>
+    <li><code>kubectl delete namespace</code> — удалить namespace и его ресурсы<span class="ex">Пример: <code>kubectl delete namespace my-namespace</code></span></li>
+    <li><code>kubectl patch</code> — обновить ресурс с помощью patch<span class="ex">Пример: <code>kubectl patch deployment my-deployment -p '{"spec": {"replicas": 2}}'</code></span></li>
+    <li><code>kubectl rollout history</code> — история ревизий деплоймента<span class="ex">Пример: <code>kubectl rollout history deployment my-deployment</code></span></li>
+    <li><code>kubectl autoscale</code> — автоматическое масштабирование по использованию ресурсов<span class="ex">Пример: <code>kubectl autoscale deployment my-deployment --cpu-percent=50 --min=1 --max=10</code></span></li>
+    <li><code>kubectl label</code> — добавить или изменить метку ресурса<span class="ex">Пример: <code>kubectl label pod pod-name environment=production</code></span></li>
+    <li><code>kubectl annotate</code> — добавить или изменить аннотацию ресурса<span class="ex">Пример: <code>kubectl annotate pod pod-name description="My app pod"</code></span></li>
+    <li><code>kubectl delete pv</code> — удалить PersistentVolume<span class="ex">Пример: <code>kubectl delete pv my-pv</code></span></li>
+    <li><code>kubectl get ingress</code> — список Ingress в namespace<span class="ex">Пример: <code>kubectl get ingress</code></span></li>
+    <li><code>kubectl create configmap</code> — создать ConfigMap<span class="ex">Пример: <code>kubectl create configmap my-config --from-literal=key1=value1</code></span></li>
+    <li><code>kubectl create secret</code> — создать Secret<span class="ex">Пример: <code>kubectl create secret generic my-secret --from-literal=password=myPassword</code></span></li>
+    <li><code>kubectl api-resources</code> — список ресурсов API в кластере<span class="ex">Пример: <code>kubectl api-resources</code></span></li>
+    <li><code>kubectl api-versions</code> — список поддерживаемых версий API<span class="ex">Пример: <code>kubectl api-versions</code></span></li>
+    <li><code>kubectl get crds</code> — список CustomResourceDefinition (CRD)<span class="ex">Пример: <code>kubectl get crds</code></span></li>
+  </ul>
+</div>
+
+<!-- ============ HELM ============ -->
+<div class="card wide" id="helm">
+  <h2>24. Helm: основы и работа с репозиториями</h2>
+  <p class="desc">Helm — «магазин приложений» для Kubernetes: устанавливает и обновляет сложные приложения из готовых пакетов («чартов») — примерно как apt-get для Kubernetes.</p>
+  <ul class="cmds">
+    <li><code>helm help</code> — справка по Helm CLI или по конкретной команде<span class="ex">Пример: <code>helm help</code></span></li>
+    <li><code>helm version</code> — версия клиента и сервера Helm<span class="ex">Пример: <code>helm version</code></span></li>
+    <li><code>helm repo add</code> — добавить репозиторий чартов<span class="ex">Пример: <code>helm repo add stable https://charts.helm.sh/stable</code></span></li>
+    <li><code>helm repo update</code> — обновить все репозитории чартов до последней версии<span class="ex">Пример: <code>helm repo update</code></span></li>
+    <li><code>helm repo list</code> — список добавленных репозиториев<span class="ex">Пример: <code>helm repo list</code></span></li>
+    <li><code>helm search hub</code> — поиск чартов в Helm Hub<span class="ex">Пример: <code>helm search hub nginx</code></span></li>
+    <li><code>helm search repo</code> — поиск чартов в репозиториях<span class="ex">Пример: <code>helm search repo stable/nginx</code></span></li>
+    <li><code>helm show chart</code> — метаданные и зависимости чарта<span class="ex">Пример: <code>helm show chart stable/nginx</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>25. Helm: установка и обновление чартов</h2>
+  <ul class="cmds">
+    <li><code>helm install</code> — установка чарта в кластер<span class="ex">Пример: <code>helm install my-release stable/nginx</code></span></li>
+    <li><code>helm upgrade</code> — обновление релиза до новой версии чарта<span class="ex">Пример: <code>helm upgrade my-release stable/nginx</code></span></li>
+    <li><code>helm upgrade --install</code> — установить, если нет, или обновить, если уже есть<span class="ex">Пример: <code>helm upgrade --install my-release stable/nginx</code></span></li>
+    <li><code>helm uninstall</code> — удалить релиз<span class="ex">Пример: <code>helm uninstall my-release</code></span></li>
+    <li><code>helm list</code> — список релизов в кластере<span class="ex">Пример: <code>helm list</code></span></li>
+    <li><code>helm status</code> — статус релиза<span class="ex">Пример: <code>helm status my-release</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>26. Helm: работа с чартами</h2>
+  <ul class="cmds">
+    <li><code>helm create</code> — создать новый чарт в каталоге<span class="ex">Пример: <code>helm create my-chart</code></span></li>
+    <li><code>helm lint</code> — проверка чарта на типичные ошибки<span class="ex">Пример: <code>helm lint ./my-chart</code></span></li>
+    <li><code>helm package</code> — упаковка чарта в .tgz<span class="ex">Пример: <code>helm package ./my-chart</code></span></li>
+    <li><code>helm template</code> — отрисовка YAML-манифестов без установки<span class="ex">Пример: <code>helm template my-release ./my-chart</code></span></li>
+    <li><code>helm dependency update</code> — обновить зависимости из Chart.yaml<span class="ex">Пример: <code>helm dependency update ./my-chart</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>27. Helm: откаты, история и получение данных релиза</h2>
+  <ul class="cmds">
+    <li><code>helm rollback</code> — откат релиза к предыдущей версии<span class="ex">Пример: <code>helm rollback my-release 1</code></span></li>
+    <li><code>helm history</code> — история релиза<span class="ex">Пример: <code>helm history my-release</code></span></li>
+    <li><code>helm get all</code> — вся информация о релизе (values и шаблоны)<span class="ex">Пример: <code>helm get all my-release</code></span></li>
+    <li><code>helm get values</code> — значения, использованные в релизе<span class="ex">Пример: <code>helm get values my-release</code></span></li>
+    <li><code>helm test</code> — запуск тестов чарта<span class="ex">Пример: <code>helm test my-release</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>28. Helm: репозитории чартов</h2>
+  <ul class="cmds">
+    <li><code>helm repo remove</code> — удалить репозиторий чартов<span class="ex">Пример: <code>helm repo remove stable</code></span></li>
+    <li><code>helm repo index</code> — создать или обновить index-файл репозитория<span class="ex">Пример: <code>helm repo index ./charts</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>29. Helm: значения и настройка</h2>
+  <ul class="cmds">
+    <li><code>helm install --values</code> — установка с пользовательскими значениями из файла<span class="ex">Пример: <code>helm install my-release stable/nginx --values values.yaml</code></span></li>
+    <li><code>helm upgrade --values</code> — обновление с пользовательскими значениями<span class="ex">Пример: <code>helm upgrade my-release stable/nginx --values values.yaml</code></span></li>
+    <li><code>helm install --set</code> — установка с заданием значения прямо в команде<span class="ex">Пример: <code>helm install my-release stable/nginx --set replicaCount=3</code></span></li>
+    <li><code>helm upgrade --set</code> — обновление с заданием значения в команде<span class="ex">Пример: <code>helm upgrade my-release stable/nginx --set replicaCount=5</code></span></li>
+    <li><code>helm uninstall --purge</code> — удалить релиз вместе с ресурсами и историей<span class="ex">Пример: <code>helm uninstall my-release --purge</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>30. Helm: отладка и dry-run</h2>
+  <ul class="cmds">
+    <li><code>helm template --debug</code> — отрисовка манифестов с отладочным выводом<span class="ex">Пример: <code>helm template my-release ./my-chart --debug</code></span></li>
+    <li><code>helm install --dry-run</code> — имитация установки без её выполнения<span class="ex">Пример: <code>helm install my-release stable/nginx --dry-run</code></span></li>
+    <li><code>helm upgrade --dry-run</code> — имитация обновления без его применения<span class="ex">Пример: <code>helm upgrade my-release stable/nginx --dry-run</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>31. Helm и namespace Kubernetes</h2>
+  <ul class="cmds">
+    <li><code>helm list --namespace</code> — релизы в конкретном namespace<span class="ex">Пример: <code>helm list --namespace kube-system</code></span></li>
+    <li><code>helm uninstall --namespace</code> — удалить релиз из namespace<span class="ex">Пример: <code>helm uninstall my-release --namespace kube-system</code></span></li>
+    <li><code>helm install --namespace</code> — установить чарт в namespace<span class="ex">Пример: <code>helm install my-release stable/nginx --namespace mynamespace</code></span></li>
+    <li><code>helm upgrade --namespace</code> — обновить релиз в namespace<span class="ex">Пример: <code>helm upgrade my-release stable/nginx --namespace mynamespace</code></span></li>
+    <li><code>helm list -n</code> — то же, что <code>--namespace</code>, в короткой форме<span class="ex">Пример: <code>helm list -n kube-system</code></span></li>
+    <li><code>helm install / upgrade --kube-context</code> — работа с конкретным контекстом kubeconfig<span class="ex">Пример: <code>helm install my-release stable/nginx --kube-context my-cluster</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>32. Helm: разработка чартов</h2>
+  <ul class="cmds">
+    <li><code>helm package --sign</code> — упаковка и подпись чарта GPG-ключом<span class="ex">Пример: <code>helm package ./my-chart --sign --key my-key-id</code></span></li>
+    <li><code>helm create --starter</code> — создание чарта на основе стартового шаблона<span class="ex">Пример: <code>helm create --starter https://github.com/helm/charts.git</code></span></li>
+    <li><code>helm push</code> — отправка чарта в репозиторий<span class="ex">Пример: <code>helm push ./my-chart my-repo</code></span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>33. Helm: зависимости и история</h2>
+  <ul class="cmds">
+    <li><code>helm dependency build</code> — сборка зависимостей чарта<span class="ex">Пример: <code>helm dependency build ./my-chart</code></span></li>
+    <li><code>helm dependency list</code> — список зависимостей чарта<span class="ex">Пример: <code>helm dependency list ./my-chart</code></span></li>
+    <li><code>helm rollback --recreate-pods</code> — откат с пересозданием подов<span class="ex">Пример: <code>helm rollback my-release 2 --recreate-pods</code></span></li>
+    <li><code>helm history --max</code> — ограничить число версий в истории<span class="ex">Пример: <code>helm history my-release --max 5</code></span></li>
+  </ul>
+</div>
+
+<!-- ============ TERRAFORM ============ -->
+<div class="card wide" id="terraform">
+  <h2>34. Terraform: основы</h2>
+  <p class="desc">Terraform позволяет описывать облачную инфраструктуру кодом. Вместо кликов в консолях AWS, GCP или Azure вы описываете серверы и сервисы в конфигурационных файлах.</p>
+  <ul class="cmds">
+    <li><code>terraform --help</code> — общая справка по командам Terraform CLI</li>
+    <li><code>terraform init</code> — инициализирует рабочий каталог с конфигурацией и загружает плагины провайдеров</li>
+    <li><code>terraform validate</code> — проверка конфигурационных файлов на синтаксические ошибки</li>
+    <li><code>terraform plan</code> — создаёт план: какие действия выполнит Terraform, чтобы инфраструктура соответствовала конфигурации</li>
+    <li><code>terraform apply</code> — применяет изменения для достижения желаемого состояния; перед изменениями запрашивает подтверждение</li>
+    <li><code>terraform show</code> — выводит состояние или план в удобочитаемом виде</li>
+    <li><code>terraform output</code> — выводит значения output после apply</li>
+    <li><code>terraform destroy</code> — уничтожает инфраструктуру из конфигурации; запрашивает подтверждение</li>
+    <li><code>terraform refresh</code> — обновляет файл состояния по реальной инфраструктуре без применения изменений</li>
+    <li><code>terraform taint</code> — помечает ресурс для пересоздания при следующем apply, даже если он не менялся</li>
+    <li><code>terraform untaint</code> — снимает пометку «tainted» с ресурса</li>
+    <li><code>terraform state</code> — управление файлом состояния, например перенос ресурсов между модулями</li>
+    <li><code>terraform import</code> — импорт существующей инфраструктуры под управление Terraform</li>
+    <li><code>terraform graph</code> — графическое представление ресурсов и их связей</li>
+    <li><code>terraform providers</code> — список провайдеров для текущей конфигурации</li>
+    <li><code>terraform state list</code> — список ресурсов в файле состояния</li>
+    <li><code>terraform backend</code> — настройка бэкенда для удалённого хранения состояния (например, S3 или Azure Blob Storage)</li>
+  </ul>
+</div>
+
+<!-- ============ NOTES ============ -->
+<div class="card wide" id="notes">
+  <h2>Примечания</h2>
+  <div class="note">Некоторые команды в исходной шпаргалке устарели или дублируются: <code>uptime</code>, <code>alias</code> и <code>helm repo update</code> встречаются дважды.</div>
+  <div class="note"><code>helm uninstall --purge</code> — флаг из Helm 2. В Helm 3 <code>helm uninstall</code> по умолчанию удаляет и историю релиза; чтобы её сохранить, используйте <code>--keep-history</code>.</div>
+  <div class="note">Репозиторий <code>charts.helm.sh/stable</code> из примеров Helm устарел; современные чарты берите из отдельных репозиториев (например, Bitnami).</div>
+  <div class="note"><code>netstat</code> и <code>ifconfig</code> заменены на <code>ss</code> и <code>ip</code>. В Docker <code>docker-compose</code> (v1) заменён на <code>docker compose</code> (v2).</div>
+  <div class="note"><code>terraform backend</code> — не отдельная команда: бэкенд задаётся в блоке <code>terraform {}</code> конфигурации, а <code>terraform init</code> его подключает.</div>
+</div>
+
+</div>
+</body>
+</html>
