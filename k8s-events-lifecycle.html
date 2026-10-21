@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kubernetes: события, жизненный цикл пода, хранилище и узлы</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e7d4f; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:15px; line-height:1.6; }
+  .wrap { max-width:900px; margin:0 auto; }
+  h1 { text-align:center; color:var(--blue); font-size:26px; margin:0 0 6px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 24px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:19px; margin:30px 0 12px; }
+  h3 { color:var(--blue); font-size:16px; margin:18px 0 6px; }
+  p { margin:8px 0; }
+  code { font-family:Consolas,"Courier New",monospace; color:var(--red); font-size:13px; background:rgba(127,127,127,.12); padding:1px 4px; border-radius:3px; }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:12px 14px; overflow-x:auto; margin:10px 0; }
+  table { width:100%; border-collapse:collapse; margin:10px 0; }
+  th, td { border:1px solid var(--line); padding:7px 9px; vertical-align:top; text-align:left; }
+  th { color:var(--blue); }
+  ul { padding-left:20px; }
+  li { margin:4px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,125,79,.08); border-radius:4px; margin:12px 0; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Kubernetes: события, жизненный цикл пода, хранилище и узлы</h1>
+<p class="lead">Практическая шпаргалка для инцидентов: где искать причину и как читать сигналы кластера</p>
+
+<h2>1. Начните с событий (Events)</h2>
+<p>Когда что-то ломается, Kubernetes обычно создаёт объект Event. Это не логи приложения, а сообщения компонентов кластера: планировщика, kubelet и контроллеров. Они объясняют, почему система приняла то или иное решение, а не только показывают текущее состояние.</p>
+<pre>kubectl get events -n production --sort-by=.metadata.creationTimestamp
+kubectl get events -n production --field-selector type=Warning</pre>
+<p>Часто повторяющиеся события подсказывают направление поиска:</p>
+<ul>
+  <li><strong>FailedScheduling</strong> — планировщик не нашёл подходящий узел. Причины: запросы ресурсов, nodeSelector, taints или affinity. Под даже не попал на узел.</li>
+  <li><strong>FailedMount</strong> — под назначен на узел, но не смог подключить запрошенный том. Пока том не подключён, контейнер не запустится.</li>
+</ul>
+
+<h2>2. Жизненный цикл пода</h2>
+<p>Под проходит фазы Pending, Running, Succeeded, Failed и Unknown. Большинство проблем возникает на раннем этапе, когда под либо не стартует, либо запускается и затем падает. Если под не в состоянии Running и Ready, Kubernetes обычно уже указывает причину в статусе и событиях.</p>
+<table>
+  <thead><tr><th>Фаза</th><th>Что означает</th></tr></thead>
+  <tbody>
+    <tr><td>Pending</td><td>Под принят, но ещё не запущен: ждёт планирования, загрузки образа или тома.</td></tr>
+    <tr><td>Running</td><td>Хотя бы один контейнер работает.</td></tr>
+    <tr><td>Succeeded</td><td>Все контейнеры завершились успешно (типично для Job).</td></tr>
+    <tr><td>Failed</td><td>Все контейнеры завершились, хотя бы один с ошибкой.</td></tr>
+    <tr><td>Unknown</td><td>Kubernetes не может получить состояние пода, часто из-за проблем с узлом.</td></tr>
+  </tbody>
+</table>
+
+<h3>Под не стартует: три места отказа</h3>
+<p>Запуск пода обычно ломается на одном из трёх этапов: загрузка образа, планирование или создание контейнера.</p>
+<p><strong>Ошибки загрузки образа</strong> (ErrImagePull, ImagePullBackOff). Чаще всего это опечатка в имени или теге образа. Вторая частая причина — нет учётных данных для приватного реестра. Kubernetes будет повторять попытки, и в итоге статус станет ImagePullBackOff.</p>
+<pre>kubectl describe pod &lt;pod&gt; -n &lt;ns&gt;
+kubectl get pod &lt;pod&gt; -n &lt;ns&gt; -o jsonpath='{.spec.containers[*].image}'</pre>
+<p>Проверьте имя и тег, а для приватного реестра — наличие imagePullSecrets у пода или ServiceAccount.</p>
+
+<h3>Сетевые политики</h3>
+<p>NetworkPolicy ограничивает, какие поды могут обращаться друг к другу. Если правило неверно, трафик просто отбрасывается: ни ошибки, ни записи в логах, только таймауты. Если внутри namespace связь работает, а между namespace нет, причина часто именно в политике. Проверяйте и входящие (ingress), и исходящие (egress) правила.</p>
+<pre>kubectl get networkpolicy -n &lt;ns&gt;
+kubectl describe networkpolicy &lt;name&gt; -n &lt;ns&gt;</pre>
+
+<h2>3. Постоянное хранилище</h2>
+<p>PersistentVolumeClaim, который остаётся в состоянии Pending, означает, что Kubernetes не нашёл подходящий том. В большинстве случаев дело в несоответствии StorageClass: класс не существует, не назначен по умолчанию, или не поддерживает нужный access mode или размер. Пока том не привязан, под не запустится. Сначала проверяйте PVC и события, и только потом всё остальное.</p>
+<pre>kubectl describe pvc &lt;pvc-name&gt; -n &lt;ns&gt;
+kubectl get storageclass
+kubectl get pv</pre>
+<p>Типичное событие в такой ситуации: ProvisioningFailed с сообщением, что StorageClass не найден. Исправляется указанием существующего класса или созданием недостающего.</p>
+
+<div class="tip">
+  Если хранилище требует времени на подключение, под может долго оставаться в Pending. Не спешите пересоздавать PVC: сначала посмотрите события, возможно, проблема в узле или квоте.
+</div>
+
+<h2>4. Узлы и kubelet</h2>
+<p>Kubelet — агент на каждом узле. Он взаимодействует со средой выполнения контейнеров, управляет подами, подключает тома и сообщает о состоянии узла. Если kubelet работает плохо, проблемы появляются у всех подов этого узла.</p>
+<p>Одна из частых проблем связана с PLEG (Pod Lifecycle Event Generator). Этот механизм kubelet отслеживает изменения состояния контейнеров через среду выполнения (containerd или CRI-O). Под высокой нагрузкой или при неисправном рантайме PLEG начинает отставать: в логах kubelet появляются предупреждения, статусы подов обновляются с задержкой, перезапуски занимают больше времени.</p>
+<pre>kubectl get nodes
+kubectl describe node &lt;node&gt;
+journalctl -u kubelet --since "30 min ago" --no-pager | grep -i pleg</pre>
+<p>Если в describe узла есть условия NotReady, MemoryPressure или DiskPressure, начинайте с ресурсов узла и состояния рантайма.</p>
+
+<div class="warn">
+  Не перезапускайте kubelet и не перезагружайте узел наугад: это может вызвать каскад пересоздания подов. Сначала посмотрите события и логи, затем решайте, что переводить под другой узел через cordon и drain.
+</div>
+
+<h2>5. Порядок действий при инциденте</h2>
+<ol>
+  <li>Посмотреть события в нужном namespace, отсортированные по времени.</li>
+  <li>Проверить фазу и статус пода, затем <code>kubectl describe pod</code>.</li>
+  <li>Определить этап отказа: образ, планирование, том, контейнер или сеть.</li>
+  <li>Если проблема в хранилище, проверить PVC и StorageClass.</li>
+  <li>Если проблема в сети, проверить NetworkPolicy и Service.</li>
+  <li>Если проблема общая для нескольких подов, проверить узел и kubelet.</li>
+  <li>Исправить причину и только потом перезапускать или пересоздавать поды.</li>
+</ol>
+
+<div class="tip">
+  Начинайте с событий: почти всегда Kubernetes уже записал причину. Сочетание <code>kubectl get events --sort-by=.metadata.creationTimestamp</code> и <code>kubectl describe</code> по нужному объекту закрывает большинство вопросов.
+</div>
+
+</div>
+</body>
+</html>
