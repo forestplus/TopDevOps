@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux: файловая система /proc</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
+  .wrap { max-width:980px; margin:0 auto; }
+  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
+  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
+  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
+  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
+  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Linux: файловая система /proc</h1>
+<p class="lead">Виртуальная файловая система ядра: сведения о системе, сети и процессах в виде обычных файлов</p>
+
+<h2>Что такое /proc</h2>
+<p>Каталог /proc не хранится на диске. Ядро создаёт его на лету, и каждый файл в нём отражает текущее состояние системы. Чтение файла возвращает данные, а запись в некоторые файлы меняет параметры ядра. Поэтому утилиты вроде ps, top, free и ss в основном читают именно /proc.</p>
+<p>Каталоги с числовыми именами (например, /proc/4312) соответствуют процессам с таким PID.</p>
+
+<h2>Системные файлы</h2>
+<table>
+  <thead><tr><th>Путь</th><th>Что содержит</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">/proc/cmdline</td><td>Параметры ядра, переданные при загрузке.</td></tr>
+    <tr><td class="cmd">/proc/cpuinfo</td><td>Сведения о процессоре: модель, число ядер, частота.</td></tr>
+    <tr><td class="cmd">/proc/diskstats</td><td>Статистика дисковых операций: запросы чтения и записи, объём данных, время.</td></tr>
+    <tr><td class="cmd">/proc/filesystems</td><td>Поддерживаемые типы файловых систем.</td></tr>
+    <tr><td class="cmd">/proc/interrupts</td><td>Количество прерываний по каждому ядру процессора.</td></tr>
+    <tr><td class="cmd">/proc/loadavg</td><td>Средняя нагрузка за 1, 5 и 15 минут.</td></tr>
+    <tr><td class="cmd">/proc/meminfo</td><td>Использование памяти: всего, свободно, буферы и кеш.</td></tr>
+    <tr><td class="cmd">/proc/mounts</td><td>Смонтированные файловые системы: тип и точка монтирования.</td></tr>
+    <tr><td class="cmd">/proc/stat</td><td>Общая статистика системы: процессор, прерывания, переключения контекста.</td></tr>
+    <tr><td class="cmd">/proc/swaps</td><td>Активные разделы подкачки: размер и занятое место.</td></tr>
+    <tr><td class="cmd">/proc/uptime</td><td>Время работы системы и время простоя.</td></tr>
+    <tr><td class="cmd">/proc/version</td><td>Версия ядра и сведения о сборке.</td></tr>
+  </tbody>
+</table>
+
+<h2>Сетевые файлы</h2>
+<table>
+  <thead><tr><th>Путь</th><th>Что содержит</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">/proc/net/dev</td><td>Статистика по каждому интерфейсу: пакеты и байты на приём и передачу, ошибки.</td></tr>
+    <tr><td class="cmd">/proc/net/tcp</td><td>TCP-сокеты IPv4: адреса, порты, состояния, очереди.</td></tr>
+    <tr><td class="cmd">/proc/net/route</td><td>Таблица маршрутизации IPv4.</td></tr>
+    <tr><td class="cmd">/proc/net/sockstat</td><td>Статистика сокетов: выделенные и осиротевшие.</td></tr>
+    <tr><td class="cmd">/proc/sys/net/ipv4/conf/eth0/</td><td>Настройки IPv4 для интерфейса eth0.</td></tr>
+  </tbody>
+</table>
+
+<h2>Файлы процессов: /proc/[PID]</h2>
+<table>
+  <thead><tr><th>Путь</th><th>Что содержит</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">/proc/[PID]/cmdline</td><td>Аргументы командной строки процесса.</td></tr>
+    <tr><td class="cmd">/proc/[PID]/io</td><td>Статистика ввода-вывода: прочитанные и записанные байты и операции.</td></tr>
+    <tr><td class="cmd">/proc/[PID]/maps</td><td>Карта памяти процесса: код, данные, библиотеки.</td></tr>
+    <tr><td class="cmd">/proc/[PID]/stat</td><td>Статистика процесса: время процессора, память, состояние.</td></tr>
+    <tr><td class="cmd">/proc/[PID]/status</td><td>Подробный статус: состояние, память, число потоков.</td></tr>
+    <tr><td class="cmd">/proc/[PID]/fd/</td><td>Каталог дескрипторов открытых процессом файлов.</td></tr>
+    <tr><td class="cmd">/proc/[PID]/net/</td><td>Сетевые сведения из сетевого пространства имён процесса.</td></tr>
+  </tbody>
+</table>
+
+<h2>Примеры</h2>
+<pre># Версия ядра и параметры загрузки
+cat /proc/version
+cat /proc/cmdline
+
+# Нагрузка и память
+cat /proc/loadavg
+grep -E "MemTotal|MemAvailable" /proc/meminfo
+
+# Процессор
+grep "model name" /proc/cpuinfo | head -1
+
+# Время работы системы
+cat /proc/uptime
+
+# Сетевая статистика интерфейсов
+cat /proc/net/dev
+
+# Какие файлы открыты процессом с PID 4312
+ls -l /proc/4312/fd
+
+# Сколько данных читает и пишет процесс
+cat /proc/4312/io
+
+# Состояние и потоки процесса
+grep -E "State|Threads|VmRSS" /proc/4312/status
+
+# Лимиты процесса
+cat /proc/4312/limits</pre>
+
+<h2>Полезные приёмы</h2>
+<ul>
+  <li>Чтобы узнать, какой процесс держит файл, используйте <code>ls -l /proc/*/fd</code> или <code>lsof</code>.</li>
+  <li>Для ручной проверки лимитов процесса смотрите <code>/proc/[PID]/limits</code>.</li>
+  <li>Параметры ядра можно читать и менять через <code>sysctl</code>, который работает с <code>/proc/sys</code>.</li>
+  <li>Если процесс висит, посмотрите <code>/proc/[PID]/stack</code> (нужны права root) и <code>/proc/[PID]/wchan</code>, чтобы понять, на чём он ждёт.</li>
+</ul>
+
+<div class="warn">
+  Запись в файлы /proc/sys меняет поведение ядра сразу, и изменения пропадают после перезагрузки. Постоянные настройки кладите в /etc/sysctl.d/. Не записывайте в файлы /proc наугад.
+</div>
+
+<div class="tip">
+  Для повседневной работы не обязательно читать /proc напрямую: утилиты free, uptime, ss и ps берут данные оттуда и выводят их в удобном виде. Знать /proc полезно, когда нужно быстро проверить значение без установленных инструментов, например в минимальном контейнере.
+</div>
+
+</div>
+</body>
+</html>
