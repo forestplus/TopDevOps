@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helm: основы, values, откаты и приёмы</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e7d4f; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:15px; line-height:1.6; }
+  .wrap { max-width:960px; margin:0 auto; }
+  h1 { text-align:center; color:var(--blue); font-size:26px; margin:0 0 6px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 24px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:19px; margin:30px 0 12px; }
+  h3 { color:var(--blue); font-size:16px; margin:18px 0 6px; }
+  p { margin:8px 0; }
+  code { font-family:Consolas,"Courier New",monospace; color:var(--red); font-size:13px; background:rgba(127,127,127,.12); padding:1px 4px; border-radius:3px; }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:12px 14px; overflow-x:auto; margin:10px 0; }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:14px; }
+  th, td { border:1px solid var(--line); padding:7px 9px; vertical-align:top; text-align:left; }
+  th { color:var(--blue); }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--red); white-space:nowrap; }
+  ul { padding-left:20px; }
+  li { margin:4px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,125,79,.08); border-radius:4px; margin:12px 0; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Helm: основы, values, откаты и приёмы</h1>
+<p class="lead">Helm — менеджер пакетов для Kubernetes. Чарт описывает приложение, релиз — его установку в конкретном кластере.</p>
+
+<h2>Основные понятия</h2>
+<table>
+  <thead><tr><th>Понятие</th><th>Что означает</th></tr></thead>
+  <tbody>
+    <tr><td>Chart (чарт)</td><td>Пакет: шаблоны манифестов, значения по умолчанию и метаданные.</td></tr>
+    <tr><td>Release (релиз)</td><td>Установленный экземпляр чарта с конкретным именем в namespace. Один чарт можно поставить несколько раз под разными именами.</td></tr>
+    <tr><td>Revision (ревизия)</td><td>Номер версии релиза. Каждое обновление создаёт новую ревизию, их можно откатывать.</td></tr>
+    <tr><td>Repository (репозиторий)</td><td>Место, откуда берутся чарты: HTTP-репозиторий или OCI-реестр.</td></tr>
+    <tr><td>Values (значения)</td><td>Параметры, которые подставляются в шаблоны и меняют итоговые манифесты.</td></tr>
+  </tbody>
+</table>
+
+<h2>Репозитории и поиск чартов</h2>
+<pre>helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update                       # обновить индекс всех репозиториев
+helm repo list                         # подключённые репозитории
+helm repo remove bitnami
+
+helm search repo nginx                 # поиск по подключённым репозиториям
+helm search repo nginx --versions      # все версии чарта
+helm search hub wordpress              # поиск на Artifact Hub</pre>
+
+<h2>Установка и обновление</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">helm install</td><td>Установить релиз. Имя релиза и чарт обязательны.</td></tr>
+    <tr><td class="cmd">helm install -n --create-namespace</td><td>Установить в namespace и создать его, если его нет.</td></tr>
+    <tr><td class="cmd">helm install --version</td><td>Зафиксировать версию чарта.</td></tr>
+    <tr><td class="cmd">helm upgrade</td><td>Обновить существующий релиз новой версией чарта или новыми значениями.</td></tr>
+    <tr><td class="cmd">helm upgrade --install</td><td>Установить, если релиза нет, иначе обновить. Удобно в CI, потому что команда идемпотентна.</td></tr>
+    <tr><td class="cmd">--atomic</td><td>При ошибке откатить релиз автоматически. Включает --wait.</td></tr>
+    <tr><td class="cmd">--wait / --timeout</td><td>Ждать, пока ресурсы станут готовы, с ограничением по времени (по умолчанию 5m).</td></tr>
+    <tr><td class="cmd">--dry-run</td><td>Показать, что будет создано, не применяя изменения. Добавьте --debug, чтобы увидеть итоговые значения.</td></tr>
+    <tr><td class="cmd">--reuse-values</td><td>Взять значения предыдущей ревизии и поверх них применить новые.</td></tr>
+    <tr><td class="cmd">--reset-values</td><td>Игнорировать прежние значения и использовать только новые.</td></tr>
+  </tbody>
+</table>
+
+<pre># Установка с нуля
+helm install web bitnami/nginx -n demo --create-namespace --version 15.4.0 -f values-prod.yaml
+
+# Самый частый вариант для CI/CD
+helm upgrade --install web bitnami/nginx -n demo -f values-prod.yaml --atomic --timeout 5m
+
+# Посмотреть, что изменится, без применения
+helm upgrade web bitnami/nginx -n demo -f values-prod.yaml --dry-run --debug</pre>
+
+<h2>Values: как задаются и как приоритеты</h2>
+<p>Значения можно передать несколькими способами. Приоритет от низкого к высокому:</p>
+<ol>
+  <li>values.yaml внутри самого чарта (значения по умолчанию);</li>
+  <li>файлы, переданные через <code>-f</code> или <code>--values</code>; если файлов несколько, позже указанный перекрывает ранее указанный;</li>
+  <li>параметры <code>--set</code>, <code>--set-string</code> и <code>--set-file</code> из командной строки, они имеют наивысший приоритет.</li>
+</ol>
+
+<pre># Значения из файла
+helm install web bitnami/nginx -f values-base.yaml -f values-prod.yaml
+
+# Точечная подстановка через --set
+helm upgrade web bitnami/nginx --set replicaCount=3 --set image.tag=1.27
+
+# Строка, которую Helm не должен превращать в число или bool
+helm upgrade web chart --set-string annotations.build=0042
+
+# Значение из файла (например, сертификат)
+helm upgrade web chart --set-file tls.cert=./cert.pem
+
+# Вложенные списки и значения с запятыми
+helm upgrade web chart --set 'hosts[0]=example.com,hosts[1]=www.example.com'
+helm upgrade web chart --set-json 'resources={"limits":{"memory":"512Mi"}}'</pre>
+
+<h3>Посмотреть и подготовить значения</h3>
+<pre>helm show values bitnami/nginx > default-values.yaml   # все параметры чарта с описанием
+helm get values web -n demo                             # значения текущего релиза
+helm get values web -n demo --all                       # с учётом значений по умолчанию
+helm get manifest web -n demo                           # итоговые манифесты, как они применены</pre>
+
+<div class="tip">
+  Держите в репозитории отдельный файл значений на каждое окружение (values-dev.yaml, values-prod.yaml), а общие параметры вынесите в базовый файл. Так видно, чем окружения отличаются, и меньше шансов перепутать продакшен.
+</div>
+
+<div class="warn">
+  Не храните пароли и токены в values.yaml в открытом виде. Лучше передавать секреты через Secret, который создан заранее, или через плагины для шифрования (например, helm-secrets с sops). Значения из --set видны в истории релиза.
+</div>
+
+<h2>Статус, история и откаты</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">helm list -A</td><td>Все релизы во всех namespace.</td></tr>
+    <tr><td class="cmd">helm status</td><td>Текущее состояние релиза и заметки из NOTES.txt.</td></tr>
+    <tr><td class="cmd">helm history</td><td>Все ревизии релиза: номер, дата, статус, версия чарта.</td></tr>
+    <tr><td class="cmd">helm rollback</td><td>Вернуться к указанной ревизии. Откат тоже создаёт новую ревизию.</td></tr>
+    <tr><td class="cmd">helm rollback --wait</td><td>Откатиться и дождаться готовности ресурсов.</td></tr>
+    <tr><td class="cmd">helm uninstall</td><td>Удалить релиз и его ресурсы.</td></tr>
+    <tr><td class="cmd">helm uninstall --keep-history</td><td>Удалить ресурсы, но сохранить историю релиза.</td></tr>
+  </tbody>
+</table>
+
+<pre>helm history web -n demo
+helm rollback web 3 -n demo --wait      # вернуться к ревизии 3
+helm status web -n demo
+helm get values web -n demo --revision 3  # значения конкретной ревизии</pre>
+
+<p>Откат возвращает манифесты к состоянию выбранной ревизии. Он не откатывает данные: если приложение записало миграции в базу, Helm о них не знает. Такие изменения нужно учитывать отдельно.</p>
+
+<div class="tip">
+  Ограничьте число хранимых ревизий через <code>--history-max 10</code> или в настройках CI. Иначе в Secret каждого релиза будут копиться старые манифесты, и <code>helm history</code> станет длинным.
+</div>
+
+<h2>Проверка чарта до установки</h2>
+<pre>helm lint ./mychart                                  # ошибки в структуре и шаблонах
+helm template web ./mychart -f values-prod.yaml     # отрисовать манифесты локально
+helm template web ./mychart | kubectl apply --dry-run=client -f -
+helm test web -n demo                               # запустить тесты из templates/tests/</pre>
+
+<h2>Создание своего чарта</h2>
+<pre>helm create mychart              # заготовка структуры
+helm package ./mychart          # собрать архив mychart-0.1.0.tgz
+helm dependency update ./mychart  # подтянуть зависимости из Chart.yaml
+
+# Минимальная структура
+mychart/
+  Chart.yaml        # имя, версия, описание
+  values.yaml       # значения по умолчанию
+  templates/        # шаблоны манифестов
+  charts/           # зависимости</pre>
+
+<pre># Фрагмент шаблона: значения подставляются через .Values
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-app
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    spec:
+      containers:
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"</pre>
+
+<h2>OCI-реестры</h2>
+<pre>helm registry login registry.example.com
+helm package ./mychart
+helm push mychart-0.1.0.tgz oci://registry.example.com/charts
+helm install web oci://registry.example.com/charts/mychart --version 0.1.0</pre>
+
+<h2>Лайфхаки</h2>
+<ul>
+  <li><strong>Сравнить релизы перед обновлением.</strong> Плагин helm-diff показывает разницу манифестов: <code>helm diff upgrade web bitnami/nginx -f values-prod.yaml</code>.</li>
+  <li><strong>Быстро проверить итоговые значения.</strong> <code>helm template ... -f a.yaml -f b.yaml | less</code> покажет результат без подключения к кластеру.</li>
+  <li><strong>Не забывайте про --atomic в CI.</strong> Неудачный деплой не оставит кластер в полуготовом состоянии.</li>
+  <li><strong>Фиксируйте версию чарта</strong> (--version), чтобы сборка была воспроизводимой.</li>
+  <li><strong>Переносите конфиг через файлы, а не через --set.</strong> Файлы попадают в git и видны в ревью, а длинные цепочки --set быстро становятся нечитаемыми.</li>
+  <li><strong>Используйте --namespace и --create-namespace вместе.</strong> Так релиз не попадёт случайно в default.</li>
+  <li><strong>Проверяйте схему values.</strong> Файл values.schema.json в чарте не даст передать значение нужного типа или пропустить обязательный параметр.</li>
+  <li><strong>Пробуйте чарт в kind или minikube</strong> перед продакшеном: там дешевле ошибиться.</li>
+  <li><strong>Переменные окружения в CI.</strong> Передавайте --set image.tag=$CI_COMMIT_SHORT_SHA, чтобы каждый деплой был привязан к коммиту.</li>
+</ul>
+
+<h2>Типичные ошибки</h2>
+<table>
+  <thead><tr><th>Симптом</th><th>Частая причина и решение</th></tr></thead>
+  <tbody>
+    <tr><td>Error: UPGRADE FAILED: another operation is in progress</td><td>Предыдущая операция не завершилась. Посмотрите <code>helm history</code>: если статус pending-upgrade, откатитесь к последней успешной ревизии.</td></tr>
+    <tr><td>Error: cannot re-use a name that is still in use</td><td>Релиз с таким именем уже есть. Используйте helm upgrade --install или другое имя.</td></tr>
+    <tr><td>Значение стало числом, хотя ожидалась строка</td><td>Helm приводит значение к типу. Используйте --set-string.</td></tr>
+    <tr><td>Новые значения не применились</td><td>Вы не передали --reuse-values или значения из файла перекрыты --set. Проверьте <code>helm get values --all</code>.</td></tr>
+    <tr><td>Чарт не найден в репозитории</td><td>Не выполнен <code>helm repo update</code> или не подключён нужный репозиторий.</td></tr>
+  </tbody>
+</table>
+
+<div class="tip">
+  Порядок отладки такой: <code>helm lint</code>, затем <code>helm template</code> с теми же values, затем <code>helm upgrade --dry-run --debug</code>, и только потом реальная установка. Большинство ошибок видно уже на шаге template.
+</div>
+
+</div>
+</body>
+</html>
