@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helm: подробно о values</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e7d4f; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:15px; line-height:1.6; }
+  .wrap { max-width:960px; margin:0 auto; }
+  h1 { text-align:center; color:var(--blue); font-size:26px; margin:0 0 6px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 24px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:19px; margin:30px 0 12px; }
+  h3 { color:var(--blue); font-size:16px; margin:18px 0 6px; }
+  p { margin:8px 0; }
+  code { font-family:Consolas,"Courier New",monospace; color:var(--red); font-size:13px; background:rgba(127,127,127,.12); padding:1px 4px; border-radius:3px; }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:12px 14px; overflow-x:auto; margin:10px 0; }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:14px; }
+  th, td { border:1px solid var(--line); padding:7px 9px; vertical-align:top; text-align:left; }
+  th { color:var(--blue); }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--red); white-space:nowrap; }
+  ul, ol { padding-left:22px; }
+  li { margin:4px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,125,79,.08); border-radius:4px; margin:12px 0; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Helm: подробно о values</h1>
+<p class="lead">Values — это параметры, которыми управляется чарт. Здесь разобраны приоритеты, все способы передачи, типы данных, вложенность, шаблонизация, проверка схемы и отладка</p>
+
+<h2>Что такое values</h2>
+<p>Шаблоны чарта не содержат жёстко заданных значений. Вместо этого они обращаются к объекту <code>.Values</code>, например <code>{{ .Values.replicaCount }}</code>. Значения приходят из нескольких источников, и Helm объединяет их в один итоговый объект. Одно и то же приложение можно разворачивать в разных окружениях, меняя только values.</p>
+
+<h2>Приоритет источников</h2>
+<p>Если один и тот же ключ задан в нескольких местах, побеждает источник с большим приоритетом. От низкого к высокому:</p>
+<ol>
+  <li><strong>values.yaml чарта</strong> — значения по умолчанию, которые автор чарта положил в архив;</li>
+  <li><strong>values.yaml родительского чарта</strong> — для зависимостей, их значения задаются под именем или alias зависимости;</li>
+  <li><strong>файлы через -f / --values</strong> — если указано несколько файлов, побеждает последний;</li>
+  <li><strong>--set, --set-string, --set-file, --set-json</strong> — побеждают все файлы; внутри флагов побеждает последний.</li>
+</ol>
+<pre># base.yaml задаёт replicaCount=2, prod.yaml задаёт 5, --set задаёт 7
+helm upgrade web ./chart -f base.yaml -f prod.yaml --set replicaCount=7
+# Итог: replicaCount = 7</pre>
+
+<div class="tip">
+  Чтобы понять, откуда взялось итоговое значение, сравните <code>helm show values ./chart</code> (значения по умолчанию) с <code>helm get values web --all</code> (итог для релиза).
+</div>
+
+<h2>Способы передачи значений</h2>
+<table>
+  <thead><tr><th>Флаг</th><th>Что делает</th><th>Пример</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">-f, --values</td><td>Загрузить YAML-файл. Можно повторять.</td><td><code>-f values-prod.yaml</code></td></tr>
+    <tr><td class="cmd">--set</td><td>Задать значение. Тип определяется автоматически.</td><td><code>--set replicaCount=3</code></td></tr>
+    <tr><td class="cmd">--set-string</td><td>Всегда строка, даже если похоже на число или bool.</td><td><code>--set-string build=0042</code></td></tr>
+    <tr><td class="cmd">--set-file</td><td>Содержимое файла как значение (удобно для сертификатов и скриптов).</td><td><code>--set-file tls.crt=./tls.crt</code></td></tr>
+    <tr><td class="cmd">--set-json</td><td>Значение в формате JSON, включая объекты и массивы.</td><td><code>--set-json 'limits={"cpu":"500m"}'</code></td></tr>
+    <tr><td class="cmd">--reuse-values</td><td>Взять значения предыдущей ревизии и поверх них применить новые.</td><td><code>helm upgrade web ./chart --reuse-values --set image.tag=2.0</code></td></tr>
+    <tr><td class="cmd">--reset-values</td><td>Игнорировать прежние значения релиза.</td><td><code>helm upgrade web ./chart --reset-values -f full.yaml</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Типы данных в --set</h3>
+<pre>--set port=8080           # число
+--set debug=true          # bool
+--set name=null           # null: удаляет ключ из итоговых values
+--set version=1.10        # число 1.1 (лишний ноль потеряется!)
+--set-string version=1.10 # строка "1.10"
+--set env[0].name=LOG     # элемент массива
+--set env[0].value=debug</pre>
+
+<div class="warn">
+  Классическая ловушка: <code>--set version=1.10</code> превращается в число 1.1. Для версий, кодов и идентификаторов, которые должны остаться строкой, всегда используйте <code>--set-string</code> или кавычки в YAML-файле.
+</div>
+
+<h3>Экранирование запятых и точек</h3>
+<pre># Запятая внутри значения экранируется обратной косой чертой
+--set 'hosts=a.example.com\,b.example.com'
+
+# Точка в имени ключа: экранируйте её
+--set 'annotations.kubernetes\.io/ingress\.class=nginx'</pre>
+
+<h2>Вложенность и массивы</h2>
+<p>Значения могут быть вложенными словарями и списками. Для списков Helm заменяет весь массив целиком, а не объединяет поэлементно.</p>
+<pre># values.yaml по умолчанию
+ingress:
+  enabled: false
+  hosts:
+    - host: example.local
+      paths:
+        - /
+
+# Переопределение в файле prod.yaml
+ingress:
+  enabled: true
+  hosts:
+    - host: shop.example.com
+      paths:
+        - /
+        - /api</pre>
+<p>Если в prod.yaml написать <code>hosts</code> с одним элементом, список будет заменён полностью. Это поведение удобно, но часто удивляет: если нужно добавить элемент, перепишите весь список.</p>
+
+<h3>Удаление ключа через null</h3>
+<pre># Удалить значение из чарта по умолчанию
+resources: null
+
+# То же через командную строку
+helm upgrade web ./chart --set resources=null</pre>
+
+<h2>Значения в шаблонах</h2>
+<p>В шаблонах значения обычно подставляются напрямую, но есть полезные функции.</p>
+<pre># Значение по умолчанию, если ключа нет или он пустой
+image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+
+# Обязательное значение: если его нет, рендеринг упадёт с понятным сообщением
+host: {{ required "Укажите ingress.host" .Values.ingress.host }}
+
+# Преобразование блока YAML с правильными отступами
+resources:
+  {{- toYaml .Values.resources | nindent 2 }}
+
+# Условие
+{{- if .Values.ingress.enabled }}
+kind: Ingress
+{{- end }}
+
+# Перебор списка
+{{- range .Values.ingress.hosts }}
+- host: {{ .host | quote }}
+{{- end }}</pre>
+
+<div class="tip">
+  Функция <code>quote</code> оборачивает значение в кавычки и защищает от неожиданных преобразований типов. Используйте её для строк, которые могут выглядеть как числа или булевы значения, например для тегов образов.
+</div>
+
+<h2>Значения, которые не должны попасть в шаблон</h2>
+<p>Значения из <code>.Values</code> видны всем шаблонам. Если нужна константа, которая не должна меняться через values, объявите её в шаблоне через <code>$var := ...</code> или в _helpers.tpl. Не превращайте в values всё подряд: чем больше параметров, тем сложнее сопровождать чарт.</p>
+
+<h2>Глобальные значения и зависимости</h2>
+<pre>global:
+  imageRegistry: registry.example.com
+  environment: production</pre>
+<p>Ключ <code>global</code> доступен и в основном чарте, и во всех зависимостях как <code>.Values.global</code>. Для параметров конкретной зависимости используйте её имя или alias:</p>
+<pre>postgresql:          # имя зависимости
+  auth:
+    database: shop
+db:                  # alias той же зависимости
+  auth:
+    database: shop_other</pre>
+
+<h2>Проверка схемы: values.schema.json</h2>
+<p>Файл values.schema.json в корне чарта описывает допустимые значения в формате JSON Schema. Helm проверит их при install, upgrade, lint и template. Это ловит опечатки и неверные типы до деплоя.</p>
+<pre>{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["image"],
+  "properties": {
+    "replicaCount": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 20
+    },
+    "image": {
+      "type": "object",
+      "required": ["repository", "tag"],
+      "properties": {
+        "repository": { "type": "string" },
+        "tag": { "type": "string" }
+      }
+    }
+  }
+}</pre>
+<p>Если значение не проходит проверку, Helm выдаст ошибку с путём до проблемного ключа. Для приложений с сотнями параметров это экономит много времени.</p>
+
+<h2>Секреты</h2>
+<p>Значения попадают в историю релиза: <code>helm get values</code> и Secret релиза хранят их. Поэтому пароли и токены в открытом виде в values не кладите.</p>
+<ul>
+  <li>Создайте Secret заранее и ссылайтесь на него по имени в values, например <code>existingSecret: db-credentials</code>.</li>
+  <li>Для шифрования файлов values используйте плагин helm-secrets с sops или аналогичный инструмент.</li>
+  <li>Переменные окружения CI подставляйте через <code>--set-string</code> в последний момент, не сохраняя в файлах.</li>
+</ul>
+
+<div class="warn">
+  Значение, переданное через --set, видно в <code>helm history</code> и <code>helm get values</code> любому, у кого есть доступ к namespace. Для паролей это не безопасно.
+</div>
+
+<h2>Отладка значений</h2>
+<pre># Значения по умолчанию чарта
+helm show values ./chart
+
+# Итоговые значения релиза (только переопределённые)
+helm get values web -n demo
+
+# Итоговые значения, включая значения по умолчанию
+helm get values web -n demo --all
+
+# Значения для конкретной ревизии
+helm get values web -n demo --revision 3
+
+# Отрисовать только один шаблон, чтобы проверить подстановку
+helm template web ./chart -f prod.yaml --show-only templates/deployment.yaml
+
+# Показать значения, которые получит шаблон, прямо в выводе
+helm template web ./chart -f prod.yaml --debug | less</pre>
+
+<h2>Типичные ошибки</h2>
+<table>
+  <thead><tr><th>Симптом</th><th>Причина и решение</th></tr></thead>
+  <tbody>
+    <tr><td>Значение из -f не применилось</td><td>Его перекрыл --set. Проверьте порядок и флаги.</td></tr>
+    <tr><td>Список стал короче, чем ожидалось</td><td>Массивы заменяются целиком. Перепишите полный список.</td></tr>
+    <tr><td>Число стало 1.1 вместо 1.10</td><td>Используйте --set-string или кавычки в YAML.</td></tr>
+    <tr><td>nil pointer evaluating interface {}</td><td>Обращение к вложенному ключу, которого нет. Используйте default или проверку через if.</td></tr>
+    <tr><td>Ошибка schema validation</td><td>Значение не соответствует values.schema.json. Сообщение содержит путь к ключу.</td></tr>
+    <tr><td>Пустой блок в манифесте</td><td>Значение равно null или пустой строке. Проверьте условие if и функцию default.</td></tr>
+  </tbody>
+</table>
+
+<h2>Рекомендуемая структура файлов</h2>
+<pre>chart/
+  values.yaml              # безопасные значения по умолчанию
+  values.schema.json       # проверка типов и обязательных полей
+environments/
+  base.yaml                # общие параметры для всех окружений
+  dev.yaml                 # переопределения для разработки
+  prod.yaml                # переопределения для продакшена
+secrets/
+  prod.enc.yaml            # зашифрованные секреты (sops)</pre>
+
+<div class="tip">
+  Держите values.yaml чарта как документацию: каждый параметр снабжайте комментарием. Тогда <code>helm show values</code> становится справочником, и команде не нужно читать шаблоны, чтобы понять, что можно настроить.
+</div>
+
+</div>
+</body>
+</html>

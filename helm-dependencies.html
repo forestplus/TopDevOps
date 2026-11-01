@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helm: зависимости чартов и каталог charts/</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e7d4f; --red:#b5232b; --line:#c9d3e6; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:15px; line-height:1.6; }
+  .wrap { max-width:960px; margin:0 auto; }
+  h1 { text-align:center; color:var(--blue); font-size:26px; margin:0 0 6px; }
+  .lead { text-align:center; opacity:.8; margin:0 0 24px; }
+  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:19px; margin:30px 0 12px; }
+  h3 { color:var(--blue); font-size:16px; margin:18px 0 6px; }
+  p { margin:8px 0; }
+  code { font-family:Consolas,"Courier New",monospace; color:var(--red); font-size:13px; background:rgba(127,127,127,.12); padding:1px 4px; border-radius:3px; }
+  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:12px 14px; overflow-x:auto; margin:10px 0; }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:14px; }
+  th, td { border:1px solid var(--line); padding:7px 9px; vertical-align:top; text-align:left; }
+  th { color:var(--blue); }
+  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--red); white-space:nowrap; }
+  ul, ol { padding-left:22px; }
+  li { margin:4px 0; }
+  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,125,79,.08); border-radius:4px; margin:12px 0; }
+  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Helm: зависимости чартов и каталог charts/</h1>
+<p class="lead">Как один чарт использует другие чарты: что лежит в charts/, как объявлять зависимости, как управлять ими и передавать значения</p>
+
+<h2>Зачем нужны зависимости</h2>
+<p>Приложение часто требует вспомогательные сервисы: базу данных, кеш, брокер сообщений. Вместо того чтобы копировать их манифесты в свой чарт, можно подключить готовые чарты как зависимости. Helm установит их вместе с основным релизом, а их параметры будет можно настроить из одного файла values.</p>
+
+<h2>Структура каталога charts/</h2>
+<pre>mychart/
+  Chart.yaml          # метаданные и список зависимостей
+  Chart.lock          # зафиксированные версии зависимостей (создаётся командой)
+  values.yaml         # значения по умолчанию для самого чарта и его зависимостей
+  templates/          # шаблоны манифестов основного чарта
+  charts/             # скачанные зависимости в виде архивов .tgz
+    redis-18.6.1.tgz
+    postgresql-15.5.0.tgz</pre>
+<p>Каталог <code>charts/</code> содержит саму установленную зависимость, которую Helm упакует вместе с основным чартом. Вручную файлы там обычно не правят: их заполняет команда <code>helm dependency</code>, исходя из Chart.yaml.</p>
+
+<div class="warn">
+  Не редактируйте архивы в charts/ руками. Они перезаписываются при каждом <code>helm dependency update</code>. Изменять поведение зависимости нужно через её values в основном values.yaml.
+</div>
+
+<h2>Объявление зависимостей в Chart.yaml</h2>
+<pre>apiVersion: v2
+name: shop
+version: 1.4.0
+description: Интернет-магазин: backend, база и кеш
+dependencies:
+  - name: postgresql
+    version: "15.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+    alias: db
+  - name: redis
+    version: "18.6.1"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: cache.enabled
+    tags:
+      - cache
+  - name: common
+    version: "2.x.x"
+    repository: "oci://registry.example.com/charts"</pre>
+
+<h3>Поля зависимости</h3>
+<table>
+  <thead><tr><th>Поле</th><th>Назначение</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">name</td><td>Имя чарта в репозитории. Обязательно.</td></tr>
+    <tr><td class="cmd">version</td><td>Версия или диапазон версий (SemVer). Например, <code>"15.x.x"</code> или <code>"~18.6.0"</code>.</td></tr>
+    <tr><td class="cmd">repository</td><td>Адрес: HTTP-репозиторий, OCI-реестр (<code>oci://</code>) или локальный путь (<code>file://../common</code>).</td></tr>
+    <tr><td class="cmd">condition</td><td>Путь к булеву значению в values. Если значение false, зависимость не ставится.</td></tr>
+    <tr><td class="cmd">tags</td><td>Метки. Зависимость включается или выключается по тегу через значение <code>tags.<имя></code>.</td></tr>
+    <tr><td class="cmd">alias</td><td>Другое имя, под которым зависимость видна в values и шаблонах. Удобно, если один чарт подключён дважды.</td></tr>
+    <tr><td class="cmd">import-values</td><td>Какие значения подчинённого чарта экспортировать в родительский.</td></tr>
+  </tbody>
+</table>
+
+<h2>Команды управления зависимостями</h2>
+<table>
+  <thead><tr><th>Команда</th><th>Что делает</th></tr></thead>
+  <tbody>
+    <tr><td class="cmd">helm dependency list</td><td>Показывает зависимости и их статус: установлена ли нужная версия, ок ли архив.</td></tr>
+    <tr><td class="cmd">helm dependency update</td><td>Разрешает версии по диапазонам, скачивает архивы в charts/ и обновляет Chart.lock.</td></tr>
+    <tr><td class="cmd">helm dependency build</td><td>Восстанавливает charts/ точно по Chart.lock, без поиска новых версий. Так собирают воспроизводимые сборки.</td></tr>
+  </tbody>
+</table>
+
+<pre>helm dependency list ./shop
+helm dependency update ./shop    # после изменения версий в Chart.yaml
+helm dependency build ./shop     # в CI, чтобы взять ровно то, что зафиксировано
+helm package ./shop              # архив включит содержимое charts/</pre>
+
+<h3>Chart.lock</h3>
+<p>Файл Chart.lock фиксирует конкретные версии и хеши зависимостей. Его нужно коммитить в git. Если lock-файл расходится с Chart.yaml, Helm предупредит, и команду <code>helm dependency update</code> придётся выполнить заново.</p>
+
+<div class="tip">
+  В CI используйте <code>helm dependency build</code>, а не update: сборка берёт зафиксированные версии и не зависит от того, что появилось в репозитории за последний час.
+</div>
+
+<h2>Значения для зависимостей</h2>
+<p>Параметры зависимости задаются в values основного чарта под её именем (или alias). Всё, что находится под ключом с именем зависимости, передаётся в её шаблоны как её собственные values.</p>
+<pre># values.yaml основного чарта
+replicaCount: 2
+
+db:                      # alias зависимости postgresql
+  enabled: true
+  auth:
+    database: shop
+    username: shop_user
+  primary:
+    persistence:
+      size: 20Gi
+
+cache:
+  enabled: true
+redis:                   # имя зависимости redis, condition: cache.enabled
+  architecture: standalone
+  auth:
+    enabled: false</pre>
+
+<h3>Глобальные значения</h3>
+<p>Ключ <code>global</code> доступен всем чартам, включая зависимости. Удобно для общих параметров: имени хранилища, реестра образов, меток окружения.</p>
+<pre>global:
+  imageRegistry: registry.example.com
+  storageClass: fast-ssd</pre>
+<p>В шаблоне зависимости <code>.Values.global.storageClass</code> будет тем же значением, что и в родительском чарте. Используйте global только для действительно общих параметров: иначе зависимости станут сильно связаны.</p>
+
+<h3>Экспорт значений через import-values</h3>
+<p>Иногда родительскому чарту нужны значения из зависимости, например адрес сервиса. Их можно экспортировать:</p>
+<pre>dependencies:
+  - name: postgresql
+    version: "15.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    import-values:
+      - child: primary.service    # путь в values зависимости
+        parent: dbService         # куда положить в values родителя</pre>
+
+<h2>Включение и отключение зависимостей</h2>
+<pre># Не ставить redis
+helm install shop ./shop --set cache.enabled=false
+
+# Выключить по тегу: все зависимости с тегом cache
+helm install shop ./shop --set tags.cache=false
+
+# Проверить, какие чарты будут отрисованы
+helm template shop ./shop --set cache.enabled=false | grep -c "kind:"</pre>
+
+<div class="tip">
+  Условие <code>condition</code> удобнее тегов: оно указывает конкретный ключ. Теги нужны, когда одной логической функции соответствует несколько зависимостей, например «все компоненты мониторинга».
+</div>
+
+<h2>Отладка зависимостей</h2>
+<table>
+  <thead><tr><th>Симптом</th><th>Что проверить</th></tr></thead>
+  <tbody>
+    <tr><td>Error: found in Chart.yaml, but missing in charts/ directory</td><td>Не выполнен <code>helm dependency update</code> или <code>build</code>, архив не скачан.</td></tr>
+    <tr><td>Error: the lock file is out of sync</td><td>Версии в Chart.yaml изменены без обновления Chart.lock. Выполните <code>helm dependency update</code>.</td></tr>
+    <tr><td>Значения не доходят до зависимости</td><td>Ключ в values записан не под именем или alias зависимости. Сверьте с <code>helm show values</code> архива.</td></tr>
+    <tr><td>Зависимость не устанавливается</td><td>Значение в condition равно false или тег выключен. Проверьте <code>helm get values --all</code>.</td></tr>
+    <tr><td>Репозиторий недоступен</td><td>Проверьте адрес и <code>helm repo add</code> для HTTP-репозитория; для OCI выполните <code>helm registry login</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Локальные зависимости</h2>
+<p>Общую часть можно вынести в отдельный чарт и подключить по локальному пути. Это удобно для библиотек шаблонов, например для общих меток и имён.</p>
+<pre>dependencies:
+  - name: common
+    version: "0.1.0"
+    repository: "file://../common"</pre>
+<p>После этого выполните <code>helm dependency update</code>: Helm упакует локальный чарт в charts/. Изменения в <code>../common</code> попадут в зависимость только после повторного update.</p>
+
+<h2>Пример: полный цикл</h2>
+<pre># 1. Добавляем зависимость в Chart.yaml и настраиваем её values
+# 2. Подтягиваем архивы и фиксируем версии
+helm dependency update ./shop
+git add shop/Chart.yaml shop/Chart.lock
+
+# 3. Проверяем шаблоны, включая зависимости
+helm lint ./shop
+helm template shop ./shop -f values-prod.yaml | less
+
+# 4. Собираем архив и устанавливаем
+helm package ./shop
+helm upgrade --install shop ./shop -n shop --create-namespace --atomic</pre>
+
+</div>
+</body>
+</html>
