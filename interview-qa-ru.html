@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevOps / SRE / DevSecOps: вопросы и ответы для собеседований</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --red:#b5232b; --green:#2e7d4f; --line:#c9d3e6; --code:#f1f4fa; }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --red:#ff7b7b; --green:#7fd6a0; --line:#3a4352; --code:#242a36; }
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:16px; line-height:1.6; }
+  .wrap { max-width:920px; margin:0 auto; }
+  h1 { text-align:center; color:var(--blue); font-size:30px; margin:0 0 6px; }
+  .lead { text-align:center; color:var(--green); margin:0 0 20px; }
+  h2 { color:var(--green); font-size:22px; margin:36px 0 10px; border-bottom:2px solid var(--line); padding-bottom:4px; }
+  h3 { color:var(--blue); font-size:17px; margin:22px 0 6px; }
+  p { margin:8px 0; }
+  ul, ol { margin:6px 0 6px 22px; padding:0; }
+  li { margin:4px 0; }
+  code { font-family:Consolas,"Courier New",monospace; color:var(--red); font-size:14px; background:rgba(127,127,127,.12); padding:1px 5px; border-radius:3px; }
+  pre { background:var(--code); border:1px solid var(--line); border-radius:6px; padding:10px 12px; overflow-x:auto; }
+  pre code { color:var(--ink); background:none; padding:0; font-size:13.5px; }
+  .toc { border:2px solid var(--line); border-radius:8px; padding:14px 18px; }
+  .toc h2 { margin:0 0 8px; border:none; font-size:18px; }
+  .toc ol { margin:0 0 0 20px; columns:2; column-gap:28px; }
+  .toc li { margin:3px 0; break-inside:avoid; }
+  .toc a { color:var(--blue); text-decoration:none; border-bottom:1px dashed var(--blue); }
+  .controls { text-align:center; margin:18px 0 4px; }
+  .controls button { font:inherit; color:var(--blue); background:none; border:1px solid var(--blue); border-radius:6px; padding:6px 14px; cursor:pointer; margin:0 4px; }
+  details { border:1px solid var(--line); border-radius:6px; padding:8px 12px; margin:8px 0; background:rgba(127,127,127,.03); }
+  details[open] { background:rgba(127,127,127,.07); }
+  summary { cursor:pointer; font-weight:600; color:var(--ink); }
+  summary::marker { color:var(--green); }
+  details > div { margin-top:8px; }
+  .tip { border-left:4px solid var(--green); background:rgba(46,125,79,.08); padding:8px 12px; margin:12px 0; border-radius:4px; }
+  .warn { border-left:4px solid var(--red); background:rgba(181,35,43,.07); padding:8px 12px; margin:12px 0; border-radius:4px; }
+  figure { margin:14px auto; text-align:center; }
+  figure svg { max-width:100%; height:auto; }
+  figcaption { font-size:14px; opacity:.75; margin-top:6px; }
+  table { border-collapse:collapse; width:100%; margin:10px 0; font-size:15px; }
+  th, td { border:1px solid var(--line); padding:6px 9px; text-align:left; vertical-align:top; }
+  th { color:var(--blue); }
+  .top { font-size:14px; margin-top:12px; display:inline-block; }
+  .top a { color:var(--blue); text-decoration:none; }
+  @media (max-width:700px) { .toc ol { columns:1; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1 id="top">DevOps / SRE / DevSecOps: вопросы и ответы</h1>
+<p class="lead">Гайд, который можно открыть перед техническим собеседованием</p>
+
+<div class="toc">
+  <h2>Содержание</h2>
+  <ol>
+    <li><a href="#g1">Модель ОС и Linux</a></li>
+    <li><a href="#g2">Сети</a></li>
+    <li><a href="#g3">Git</a></li>
+    <li><a href="#g4">Docker и контейнеры</a></li>
+    <li><a href="#g5">Kubernetes</a></li>
+    <li><a href="#g6">CI/CD</a></li>
+    <li><a href="#g7">Ansible и Terraform</a></li>
+    <li><a href="#g8">Мониторинг и наблюдаемость</a></li>
+    <li><a href="#g9">SRE: надёжность и процессы</a></li>
+    <li><a href="#g10">DevSecOps: безопасность</a></li>
+    <li><a href="#g11">Каверзные вопросы</a></li>
+    <li><a href="#g12">Поведенческие вопросы</a></li>
+    <li><a href="#g13">Как отвечать на собеседовании</a></li>
+  </ol>
+</div>
+
+<div class="controls">
+  <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true)">Раскрыть все</button>
+  <button onclick="document.querySelectorAll('details').forEach(d=>d.open=false)">Свернуть все</button>
+</div>
+
+<!-- ================= 1. LINUX ================= -->
+<h2 id="g1">1. Модель ОС и Linux</h2>
+
+<figure>
+<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+  <rect x="40" y="20" width="640" height="60" rx="8" fill="#6a4fb3"/>
+  <text x="360" y="45" fill="#fff" font-size="16" text-anchor="middle" font-weight="bold">Пользовательское пространство (user space)</text>
+  <text x="360" y="67" fill="#eae3ff" font-size="13" text-anchor="middle">приложения: nginx, python, bash, kubectl, ваш сервис</text>
+
+  <rect x="40" y="95" width="640" height="60" rx="8" fill="#1e4fa3"/>
+  <text x="360" y="120" fill="#fff" font-size="16" text-anchor="middle" font-weight="bold">Системные вызовы (syscalls)</text>
+  <text x="360" y="142" fill="#dfe8ff" font-size="13" text-anchor="middle">read, write, open, fork, execve, socket: единственный «мост» в ядро</text>
+
+  <rect x="40" y="170" width="640" height="60" rx="8" fill="#2e7d4f"/>
+  <text x="360" y="195" fill="#fff" font-size="16" text-anchor="middle" font-weight="bold">Ядро (kernel)</text>
+  <text x="360" y="217" fill="#e3f5ea" font-size="13" text-anchor="middle">планировщик, память, файловые системы, сеть, драйверы</text>
+
+  <rect x="40" y="245" width="640" height="40" rx="8" fill="#b5232b"/>
+  <text x="360" y="271" fill="#fff" font-size="16" text-anchor="middle" font-weight="bold">Железо: CPU, RAM, диск, сетевая карта</text>
+</svg>
+<figcaption>Упрощённая модель: приложения не работают с железом напрямую, они обращаются к ядру через системные вызовы</figcaption>
+</figure>
+
+<details><summary>Чем отличаются user space и kernel space и почему это важно?</summary><div>
+<p>Ядро работает в привилегированном режиме и управляет железом. Пользовательские программы работают в ограниченном режиме и обращаются к ядру через системные вызовы. Если программа падает, обычно падает только она, а не вся система. Если же падает ядро, это kernel panic.</p>
+<p>Практическое значение: когда вы видите, что процесс «висит», важно понять, где он застрял, в коде приложения или в вызове ядра. Это делается через <code>strace</code> или состояние процесса в <code>ps</code>.</p>
+</div></details>
+
+<details><summary>Что такое процесс и поток? Чем отличается fork от exec?</summary><div>
+<ul>
+  <li><b>Процесс</b> — запущенная программа со своим адресным пространством и набором ресурсов (файловых дескрипторов, PID).</li>
+  <li><b>Поток</b> — ветка выполнения внутри процесса. Потоки одного процесса делят память.</li>
+  <li><b>fork()</b> создаёт копию текущего процесса с новым PID.</li>
+  <li><b>exec()</b> заменяет содержимое процесса новой программой, PID остаётся прежним.</li>
+</ul>
+<p>Так работает запуск команд в shell: сначала fork, затем exec.</p>
+</div></details>
+
+<details><summary>Какие бывают состояния процессов?</summary><div>
+<table>
+  <tr><th>Код</th><th>Состояние</th><th>Что значит</th></tr>
+  <tr><td>R</td><td>Running / Runnable</td><td>Выполняется или ждёт процессора</td></tr>
+  <tr><td>S</td><td>Sleeping (interruptible)</td><td>Ждёт события, например ответа сети. Обычное состояние</td></tr>
+  <tr><td>D</td><td>Uninterruptible sleep</td><td>Ждёт ввода-вывода, прервать нельзя. Частая причина высокого load average</td></tr>
+  <tr><td>T</td><td>Stopped</td><td>Остановлен сигналом, например Ctrl+Z</td></tr>
+  <tr><td>Z</td><td>Zombie</td><td>Завершился, но родитель не забрал его статус через wait()</td></tr>
+</table>
+</div></details>
+
+<details><summary>Что такое load average и как его правильно читать?</summary><div>
+<p>Load average показывает среднюю длину очереди задач за 1, 5 и 15 минут. В очередь попадают процессы в состоянии R и D.</p>
+<ul>
+  <li>Сравнивайте значение с <b>количеством ядер</b> (<code>nproc</code>). Load 4 на 4 ядрах — система загружена полностью, load 8 — перегружена.</li>
+  <li>Высокий load при низком CPU часто означает ожидание диска (состояние D). Смотрите <code>iostat -x 1</code> или <code>vmstat 1</code>.</li>
+  <li>Рост 1-минутного load при стабильном 15-минутном — всплеск. Рост всех трёх — длительная проблема.</li>
+</ul>
+<pre><code>uptime              # load average
+nproc               # количество ядер
+vmstat 1 5          # поле wa — ожидание I/O, поле r — очередь
+iostat -x 1         # загрузка дисков</code></pre>
+</div></details>
+
+<details><summary>Как смотреть использование CPU и памяти? Что такое top, и как читать его вывод?</summary><div>
+<p><code>top</code> — интерактивный монитор процессов. Важные поля:</p>
+<ul>
+  <li><b>us</b> — CPU в пользовательских программах; <b>sy</b> — CPU в ядре;</li>
+  <li><b>wa</b> — CPU простаивает в ожидании диска. Высокое значение — проблема с I/O;</li>
+  <li><b>st</b> — steal time, в виртуалке значит, что гипервизор отбирает CPU;</li>
+  <li><b>RES</b> — реально занятая физическая память процессом; <b>VIRT</b> — виртуальный размер, обычно сильно больше и мало о чём говорит;</li>
+  <li><b>%MEM</b>, <b>%CPU</b> — доля ресурсов.</li>
+</ul>
+<p>Горячие клавиши: <code>1</code> — показать каждое ядро, <code>M</code> — сортировка по памяти, <code>P</code> — по CPU, <code>k</code> — убить процесс.</p>
+<div class="tip"><b>Лайфхак</b>Вместо top на сервере чаще используют <code>htop</code> (удобнее) или <code>btop</code>. На проде для быстрой картины подойдёт <code>top -bn1 | head -20</code>.</div>
+</div></details>
+
+<details><summary>Чем free отличается от available? Почему память «кончилась», хотя free почти нулевой?</summary><div>
+<p>Linux использует свободную память под кэш и буферы. Это нормально: память, которая не нужна приложениям, заполняется кэшем диска. Поэтому:</p>
+<ul>
+  <li><b>free</b> — полностью свободная память, она почти всегда мала. Это не признак проблемы.</li>
+  <li><b>available</b> — оценка того, сколько памяти можно выделить новым приложениям без свопа. Смотрите на это значение.</li>
+</ul>
+<pre><code>free -h
+# колонка available — главное число</code></pre>
+</div></details>
+
+<details><summary>Что такое OOM killer и почему процесс внезапно умирает с кодом 137?</summary><div>
+<p>Когда памяти не хватает, ядро вызывает OOM killer и убивает процесс с наибольшим «весом». Код выхода 137 = 128 + 9 (SIGKILL). В контейнерах это частая история: процесс упёрся в memory limit.</p>
+<pre><code>dmesg -T | grep -i "killed process"
+journalctl -k | grep -i oom</code></pre>
+</div></details>
+
+<details><summary>Как найти, кто занимает место на диске, если df показывает 100%, а du не видит такого объёма?</summary><div>
+<p>Классическая ситуация: процесс открыл лог-файл, его удалили, но процесс продолжает писать в него. Место не освобождается, пока процесс не закрыл файл.</p>
+<pre><code>df -h                     # общий объём и заполненность
+du -xh / --max-depth=1 | sort -h | tail   # крупнейшие каталоги
+lsof +L1                  # удалённые, но открытые файлы</code></pre>
+<p>Решение: перезапустить процесс или очистить лог через <code>truncate -s 0 файл</code>, если он ещё нужен.</p>
+<div class="tip"><b>Ещё одна частая причина</b>Кончились inode, а не место: <code>df -i</code>. Тогда много мелких файлов, например в каталоге сессий или кэша.</div>
+</div></details>
+
+<details><summary>Какие сигналы бывают? Чем kill отличается от kill -9?</summary><div>
+<ul>
+  <li><b>SIGTERM (15)</b> — мягкая просьба завершиться. Процесс может корректно закрыть соединения. Это значение по умолчанию у <code>kill</code>.</li>
+  <li><b>SIGKILL (9)</b> — принудительное завершение, процесс не может его перехватить. Использовать только если SIGTERM не помог.</li>
+  <li><b>SIGHUP (1)</b> — часто используется, чтобы перечитать конфиг (например, nginx).</li>
+  <li><b>SIGINT (2)</b> — Ctrl+C.</li>
+</ul>
+<div class="warn"><b>Осторожно</b>SIGKILL не даёт процессу записать данные и освободить ресурсы. Всегда сначала пробуйте SIGTERM.</div>
+</div></details>
+
+<details><summary>Что такое zombie-процесс и как от него избавиться?</summary><div>
+<p>Zombie — это процесс, который завершился, но его родитель не вызвал wait() и не забрал код возврата. Сам зомби не занимает CPU и память, но занимает запись в таблице процессов.</p>
+<p>Избавиться можно, исправив родительский процесс или перезапустив его. Убить зомби через kill нельзя, он уже мёртв.</p>
+</div></details>
+
+<details><summary>Какие права доступа у файлов и что делает chmod 755 или chown?</summary><div>
+<p>Права делятся на три группы: владелец, группа, остальные. Каждая группа имеет r (4), w (2) и x (1).</p>
+<ul>
+  <li><code>chmod 755 file</code> — владелец rwx, группа и остальные rx;</li>
+  <li><code>chmod 600 key.pem</code> — только владелец читает и пишет (так и должны храниться ключи);</li>
+  <li><code>chown user:group file</code> — смена владельца.</li>
+</ul>
+<p>Для каталогов x означает право войти в каталог.</p>
+</div></details>
+
+<details><summary>Что такое inode и чем он отличается от имени файла?</summary><div>
+<p>Inode хранит метаданные файла: владельца, права, размер, адреса блоков на диске. Имя файла — это просто ссылка на inode, которая лежит в каталоге. Поэтому одно и то же содержимое может иметь несколько имён (hard link).</p>
+<p>Hard link и symbolic link: hard link указывает на тот же inode, symlink — на путь. Если удалить исходный файл, symlink станет битым.</p>
+</div></details>
+
+<details><summary>Как посмотреть, какие порты слушает сервер и какой процесс их занимает?</summary><div>
+<pre><code>ss -tulpn          # современная замена netstat
+# -t tcp, -u udp, -l слушающие, -p процесс, -n без DNS</code></pre>
+<p>Команда <code>lsof -i :80</code> показывает то же самое для конкретного порта.</p>
+</div></details>
+
+<details><summary>Как работают systemd-сервисы и где смотреть логи?</summary><div>
+<pre><code>systemctl status nginx          # состояние и последние строки лога
+systemctl restart nginx
+systemctl enable nginx          # автозапуск
+journalctl -u nginx -f          # логи сервиса в реальном времени
+journalctl -u nginx --since "1 hour ago"</code></pre>
+</div></details>
+
+<details><summary>Что такое переменные окружения, PATH и почему cron работает иначе, чем ваш терминал?</summary><div>
+<p>Cron запускает задачи с минимальным окружением: без вашего PATH, без профиля shell. Поэтому команда, которая работает в терминале, в cron может «не найтись». Решение: указывать полные пути (<code>/usr/bin/python3</code>) или явно задавать PATH в crontab.</p>
+</div></details>
+
+<details><summary>Что такое file descriptor и почему появляется «too many open files»?</summary><div>
+<p>Каждый открытый файл, сокет или канал получает числовой дескриптор. У процесса есть лимит (<code>ulimit -n</code>). Если приложение не закрывает соединения, лимит быстро заканчивается.</p>
+<pre><code>ulimit -n                       # текущий лимит
+ls /proc/PID/fd | wc -l         # сколько дескрипторов использует процесс</code></pre>
+</div></details>
+
+<p class="top"><a href="#top">↑ Наверх</a></p>
+
+<!-- ================= 2. NETWORKING ================= -->
+<h2 id="g2">2. Сети</h2>
+
+<details><summary>Что происходит, когда вы вводите адрес сайта в браузере?</summary><div>
+<ol>
+  <li>Браузер проверяет кэш DNS, затем спрашивает резолвер (обычно у провайдера или 8.8.8.8).</li>
+  <li>Резолвер через цепочку серверов получает IP-адрес домена.</li>
+  <li>Клиент устанавливает TCP-соединение: трёхстороннее рукопожатие SYN → SYN-ACK → ACK.</li>
+  <li>Для HTTPS выполняется TLS-рукопожатие: проверка сертификата, согласование ключей.</li>
+  <li>Отправляется HTTP-запрос, сервер возвращает ответ.</li>
+  <li>Браузер загружает ресурсы и отображает страницу.</li>
+</ol>
+<p>Этот ответ хорош тем, что показывает весь путь. Интервьюер часто задаёт этот вопрос, чтобы понять ширину знаний.</p>
+</div></details>
+
+<details><summary>Чем TCP отличается от UDP? Когда что использовать?</summary><div>
+<table>
+  <tr><th></th><th>TCP</th><th>UDP</th></tr>
+  <tr><td>Соединение</td><td>Устанавливается (handshake)</td><td>Нет</td></tr>
+  <tr><td>Надёжность</td><td>Гарантирует доставку и порядок</td><td>Нет гарантий</td></tr>
+  <tr><td>Скорость</td><td>Ниже из-за контроля</td><td>Выше, меньше накладных расходов</td></tr>
+  <tr><td>Примеры</td><td>HTTP, SSH, базы данных</td><td>DNS, видеозвонки, метрики (StatsD)</td></tr>
+</table>
+</div></details>
+
+<details><summary>Что такое DNS и как понять, почему имя не резолвится?</summary><div>
+<p>DNS превращает имена в IP. Типы записей: A (IPv4), AAAA (IPv6), CNAME (алиас), MX (почта), TXT (проверки, SPF), NS (серверы зоны).</p>
+<pre><code>dig example.com A +short
+dig @8.8.8.8 example.com        # спросить конкретный DNS
+nslookup example.com
+cat /etc/resolv.conf            # какой резолвер используется</code></pre>
+<p>В Kubernetes имена сервисов резолвятся через CoreDNS: <code>service.namespace.svc.cluster.local</code>.</p>
+</div></details>
+
+<details><summary>Что такое порт, сокет и NAT?</summary><div>
+<ul>
+  <li><b>Порт</b> — число 0–65535, которое различает сервисы на одном IP. Известные: 22 SSH, 80 HTTP, 443 HTTPS, 53 DNS.</li>
+  <li><b>Сокет</b> — пара IP:порт плюс протокол. Соединение однозначно задаётся четвёркой адресов и портов.</li>
+  <li><b>NAT</b> — подмена адресов на границе сети: много внутренних хостов выходят в интернет через один внешний IP.</li>
+</ul>
+</div></details>
+
+<details><summary>Как читать CIDR, например 10.0.1.0/24?</summary><div>
+<p>Число после слеша — это количество бит, отведённых под сеть. /24 даёт 256 адресов, из них 254 пригодны для хостов (первый адрес — сеть, последний — broadcast).</p>
+<table>
+  <tr><th>Маска</th><th>Адресов</th></tr>
+  <tr><td>/24</td><td>256</td></tr>
+  <tr><td>/16</td><td>65 536</td></tr>
+  <tr><td>/28</td><td>16</td></tr>
+</table>
+<p>Частые ошибки: перекрывающиеся подсети при VPN и в Kubernetes, неправильная маска на маршрутизаторе.</p>
+</div></details>
+
+<details><summary>Чем отличаются HTTP-коды 4xx и 5xx? Что означают 502, 503, 504?</summary><div>
+<ul>
+  <li><b>4xx</b> — ошибка клиента: 400 неверный запрос, 401 нет аутентификации, 403 нет прав, 404 не найдено, 429 слишком много запросов.</li>
+  <li><b>5xx</b> — ошибка сервера: 500 внутренняя ошибка, 502 плохой ответ от upstream, 503 сервис недоступен, 504 upstream не ответил вовремя.</li>
+</ul>
+<p>Для DevOps важно: 502 и 504 на балансировщике часто означают, что приложение упало или медленно отвечает. Сначала проверяйте поды или процесс за балансировщиком.</p>
+</div></details>
+
+<details><summary>Как диагностировать сетевую проблему по шагам?</summary><div>
+<ol>
+  <li><code>ping</code> — есть ли связь по IP вообще (учтите, что ICMP может быть закрыт).</li>
+  <li><code>dig</code> или <code>nslookup</code> — резолвится ли имя.</li>
+  <li><code>nc -vz host 443</code> или <code>curl -v</code> — открыт ли порт и отвечает ли сервис.</li>
+  <li><code>traceroute</code> / <code>mtr</code> — где теряются пакеты или растёт задержка.</li>
+  <li><code>ss -tanp</code> — состояния соединений на своей стороне.</li>
+  <li><code>tcpdump -i any port 443</code> — что реально уходит в сеть.</li>
+  <li>Файрвол и правила: <code>iptables -L -n</code>, security group в облаке.</li>
+</ol>
+<div class="tip"><b>Как отвечать</b>Покажите методичность: идите от уровня к уровню (связность → DNS → порт → приложение → правила). Интервьюеру важен не набор команд, а порядок мышления.</div>
+</div></details>
+
+<details><summary>Что означает TIME_WAIT и почему их много на сервере?</summary><div>
+<p>После закрытия TCP-соединения сторона, которая закрыла первой, держит сокет в состоянии TIME_WAIT около минуты. Это нужно, чтобы поздние пакеты не попали в новое соединение. Много TIME_WAIT — нормально для сервера с короткими HTTP-запросами. Опасно, когда исчерпываются порты.</p>
+<pre><code>ss -s          # сводка по состояниям сокетов</code></pre>
+</div></details>
+
+<details><summary>Чем latency отличается от throughput?</summary><div>
+<ul>
+  <li><b>Latency</b> — время одного запроса, задержка (миллисекунды).</li>
+  <li><b>Throughput</b> — сколько данных или запросов в секунду проходит через систему.</li>
+</ul>
+<p>Канал 1 Гбит/с с пингом 200 мс может иметь высокую пропускную способность, но медленный отклик на каждый запрос. Для API важнее latency, для бэкапов — throughput.</p>
+</div></details>
+
+<details><summary>Чем iptables отличается от nftables и зачем нужна iptables в Kubernetes?</summary><div>
+<p>iptables и nftables — инструменты фильтрации и NAT в ядре. nftables — современный преемник с единым синтаксисом. Kubernetes через kube-proxy создаёт правила, чтобы перенаправлять трафик на сервисы и поды. Поэтому проблемы сервисов часто лежат в правилах NAT.</p>
+</div></details>
+
+<!-- ================= 3. GIT ================= -->
+<h2 id="g3">3. Git</h2>
+
+<details><summary>Чем merge отличается от rebase?</summary><div>
+<ul>
+  <li><b>merge</b> создаёт коммит слияния и сохраняет полную историю ветвления. Безопасен для общих веток.</li>
+  <li><b>rebase</b> переписывает ваши коммиты поверх другой базы, история становится линейной. Не делайте rebase того, что уже отправлено в общую ветку: переписанная история сломает работу коллег.</li>
+</ul>
+<div class="tip"><b>Правило</b>Локальную ветку можно перебазировать, общую — только merge.</div>
+</div></details>
+
+<details><summary>Чем reset отличается от revert?</summary><div>
+<ul>
+  <li><b>reset</b> двигает указатель ветки назад и может удалить коммиты. Меняет историю. Опасен для общих веток.</li>
+  <li><b>revert</b> создаёт новый коммит, который отменяет изменения. История сохраняется. Безопасен для публичной истории.</li>
+</ul>
+<p>Режимы reset: <code>--soft</code> оставляет изменения в индексе, <code>--mixed</code> (по умолчанию) — в рабочей копии, <code>--hard</code> удаляет их.</p>
+</div></details>
+
+<details><summary>Чем fetch отличается от pull?</summary><div>
+<p><code>fetch</code> только скачивает изменения и обновляет удалённые ссылки (origin/main). <code>pull</code> = fetch + merge (или rebase). Привычка делать fetch, смотреть, и только потом merge, помогает не получить неожиданный конфликт.</p>
+</div></details>
+
+<details><summary>Что такое detached HEAD и как из него выйти?</summary><div>
+<p>HEAD указывает не на ветку, а прямо на коммит. Так бывает после <code>git checkout коммит</code>. Новые коммиты останутся «висящими» и потеряются при переключении. Чтобы не потерять работу, создайте ветку: <code>git switch -c новая-ветка</code>.</p>
+</div></details>
+
+<details><summary>Что такое stash и когда он нужен?</summary><div>
+<p>Stash временно прячет незакоммиченные изменения, чтобы переключиться на другую задачу. <code>git stash</code> сохраняет, <code>git stash pop</code> возвращает, <code>git stash list</code> показывает список.</p>
+</div></details>
+
+<details><summary>Как найти коммит, который сломал сборку?</summary><div>
+<pre><code>git bisect start
+git bisect bad            # текущий коммит сломан
+git bisect good v1.2.0    # последний рабочий
+# Git предложит коммиты, вы отмечаете good или bad, пока не найдёт виновника
+git bisect reset</code></pre>
+<p>Для автоматического поиска можно передать скрипт: <code>git bisect run ./test.sh</code>.</p>
+</div></details>
+
+<details><summary>Что такое git reflog и когда он спасает?</summary><div>
+<p>Reflog записывает все перемещения HEAD локально. Если вы случайно сделали <code>reset --hard</code>, коммит можно вернуть через reflog. Это страховка, а не замена нормальной работы с ветками.</p>
+<pre><code>git reflog
+git reset --hard HEAD@{2}</code></pre>
+</div></details>
+
+<details><summary>Что такое .gitignore и почему секреты в git — это проблема даже после удаления?</summary><div>
+<p>.gitignore указывает, какие файлы не отслеживать. Но если секрет уже попал в коммит, удаление файла в новом коммите его не спрячет: он остаётся в истории.</p>
+<div class="warn"><b>Что делать</b>Сразу смените секрет, потом очистите историю инструментами вроде git filter-repo. Просто удалить файл недостаточно.</div>
+</div></details>
+
+<!-- ================= 4. DOCKER ================= -->
+<h2 id="g4">4. Docker и контейнеры</h2>
+
+<details><summary>В чём разница между образом (image) и контейнером?</summary><div>
+<p>Образ — неизменяемый шаблон, набор слоёв с файлами и метаданными. Контейнер — запущенный экземпляр образа с собственным слоем для записи. Из одного образа можно запустить много контейнеров.</p>
+<p>Аналогия: образ — это класс, контейнер — объект.</p>
+</div></details>
+
+<details><summary>Что такое слои образа и почему порядок команд в Dockerfile важен?</summary><div>
+<p>Каждая инструкция Dockerfile создаёт слой. Docker кэширует слои: если слой не изменился, он берётся из кэша. Поэтому частые изменения (код) ставят в конец, а редкие (установка зависимостей) — в начало.</p>
+<pre><code># Плохо: любое изменение кода пересобирает pip install
+COPY . /app
+RUN pip install -r requirements.txt
+
+# Лучше: зависимости кэшируются отдельно
+COPY requirements.txt /app/
+RUN pip install -r /app/requirements.txt
+COPY . /app</code></pre>
+</div></details>
+
+<details><summary>Чем CMD отличается от ENTRYPOINT?</summary><div>
+<ul>
+  <li><b>ENTRYPOINT</b> задаёт основную программу контейнера.</li>
+  <li><b>CMD</b> задаёт аргументы по умолчанию, которые можно переопределить при запуске.</li>
+</ul>
+<p>Если указаны оба, CMD становится аргументами для ENTRYPOINT. Типичный приём: ENTRYPOINT ["python"], CMD ["app.py"].</p>
+</div></details>
+
+<details><summary>Чем volume отличается от bind mount?</summary><div>
+<ul>
+  <li><b>Volume</b> создаёт Docker, данные хранятся под его управлением, удобен для баз данных.</li>
+  <li><b>Bind mount</b> монтирует конкретный каталог хоста, удобен для разработки.</li>
+</ul>
+<p>Данные в контейнере без volume пропадают при удалении контейнера.</p>
+</div></details>
+
+<details><summary>Почему контейнер сразу завершается после запуска?</summary><div>
+<p>Контейнер живёт, пока работает его главный процесс (PID 1). Если процесс завершился, контейнер останавливается. Частые причины:</p>
+<ul>
+  <li>приложение запускается в фоне (демонизируется), и PID 1 завершается;</li>
+  <li>ошибка в конфиге или отсутствует переменная окружения;</li>
+  <li>в ENTRYPOINT/CMD неверный путь.</li>
+</ul>
+<pre><code>docker logs CONTAINER        # причина обычно здесь
+docker run -it IMAGE sh      # зайти и проверить вручную</code></pre>
+</div></details>
+
+<details><summary>Что такое multi-stage build и зачем он нужен?</summary><div>
+<p>Сборка в одном образе с компилятором и инструментами раздувает размер. Multi-stage: первый этап собирает приложение, второй копирует только готовый результат в лёгкий базовый образ. Итоговый образ меньше и безопаснее, потому что в нём нет компиляторов.</p>
+</div></details>
+
+<details><summary>Почему использовать тег latest — плохая идея?</summary><div>
+<p>latest не означает «последняя стабильная версия», это просто тег по умолчанию. Образ под этим тегом может измениться, и вы получите разные версии на разных серверах. Используйте конкретные версии (<code>nginx:1.27.2</code>), а лучше digest (<code>@sha256:...</code>).</p>
+</div></details>
+
+<details><summary>Какие сетевые режимы есть у Docker?</summary><div>
+<ul>
+  <li><b>bridge</b> — режим по умолчанию, контейнеры в виртуальной сети хоста;</li>
+  <li><b>host</b> — контейнер использует сеть хоста напрямую;</li>
+  <li><b>none</b> — без сети;</li>
+  <li><b>overlay</b> — для нескольких хостов в Swarm.</li>
+</ul>
+</div></details>
+
+<details><summary>Что такое cgroups и namespaces и как они связаны с контейнерами?</summary><div>
+<p>Контейнер — это не виртуальная машина, а обычный процесс Linux, изолированный двумя механизмами:</p>
+<ul>
+  <li><b>Namespaces</b> изолируют видимость: свои PID, сеть, файловая система, имена хоста.</li>
+  <li><b>Cgroups</b> ограничивают ресурсы: CPU, память, ввод-вывод. Здесь работают лимиты Docker и Kubernetes.</li>
+</ul>
+<p>Поэтому контейнер быстрый и легковесный, но ядро у него общее с хостом.</p>
+</div></details>
+
+<!-- ================= 5. KUBERNETES ================= -->
+<h2 id="g5">5. Kubernetes</h2>
+
+<figure>
+<svg viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+  <rect x="200" y="10" width="320" height="50" rx="8" fill="#1e4fa3"/>
+  <text x="360" y="32" fill="#fff" font-size="15" text-anchor="middle" font-weight="bold">Control plane</text>
+  <text x="360" y="50" fill="#dfe8ff" font-size="12" text-anchor="middle">API server, etcd, scheduler, controller manager</text>
+  <line x1="360" y1="60" x2="160" y2="120" stroke="#2e7d4f" stroke-width="2.5"/>
+  <line x1="360" y1="60" x2="560" y2="120" stroke="#2e7d4f" stroke-width="2.5"/>
+  <rect x="40" y="120" width="240" height="140" rx="8" fill="none" stroke="#2e7d4f" stroke-width="2"/>
+  <text x="160" y="142" fill="#2e7d4f" font-size="14" text-anchor="middle" font-weight="bold">Worker node 1</text>
+  <rect x="60" y="155" width="90" height="45" rx="6" fill="#6a4fb3"/>
+  <text x="105" y="182" fill="#fff" font-size="12" text-anchor="middle">Pod A</text>
+  <rect x="165" y="155" width="90" height="45" rx="6" fill="#6a4fb3"/>
+  <text x="210" y="182" fill="#fff" font-size="12" text-anchor="middle">Pod B</text>
+  <text x="160" y="225" fill="#1f2a44" font-size="12" text-anchor="middle">kubelet, kube-proxy</text>
+  <rect x="440" y="120" width="240" height="140" rx="8" fill="none" stroke="#2e7d4f" stroke-width="2"/>
+  <text x="560" y="142" fill="#2e7d4f" font-size="14" text-anchor="middle" font-weight="bold">Worker node 2</text>
+  <rect x="460" y="155" width="90" height="45" rx="6" fill="#6a4fb3"/>
+  <text x="505" y="182" fill="#fff" font-size="12" text-anchor="middle">Pod A</text>
+  <rect x="565" y="155" width="90" height="45" rx="6" fill="#6a4fb3"/>
+  <text x="610" y="182" fill="#fff" font-size="12" text-anchor="middle">Pod C</text>
+  <text x="560" y="225" fill="#1f2a44" font-size="12" text-anchor="middle">kubelet, kube-proxy</text>
+  <text x="360" y="300" fill="#1f2a44" font-size="13" text-anchor="middle"> </text>
+</svg>
+<figcaption>Control plane принимает решения, worker-узлы запускают поды</figcaption>
+</figure>
+
+<details><summary>Что такое под, и почему Kubernetes работает с подами, а не с контейнерами?</summary><div>
+<p>Под — минимальная единица развёртывания. В нём один или несколько контейнеров, которые делят сеть (один IP) и могут делить тома. Контейнеры внутри пода видят друг друга через localhost. Поды эфемерны: их можно пересоздать, и у них меняется IP.</p>
+</div></details>
+
+<details><summary>Чем Deployment отличается от ReplicaSet, StatefulSet, DaemonSet, Job и CronJob?</summary><div>
+<table>
+  <tr><th>Ресурс</th><th>Для чего</th></tr>
+  <tr><td>ReplicaSet</td><td>Поддерживает нужное число одинаковых подов. Обычно не создают напрямую</td></tr>
+  <tr><td>Deployment</td><td>Stateless-приложения: обновления, откаты, управление ReplicaSet</td></tr>
+  <tr><td>StatefulSet</td><td>Stateful-приложения: стабильные имена подов и своё хранилище на каждый</td></tr>
+  <tr><td>DaemonSet</td><td>По одному поду на каждом узле: агенты логов, мониторинга</td></tr>
+  <tr><td>Job</td><td>Задача, которая выполняется до успешного завершения</td></tr>
+  <tr><td>CronJob</td><td>Job по расписанию</td></tr>
+</table>
+</div></details>
+
+<details><summary>Какие типы Service существуют?</summary><div>
+<ul>
+  <li><b>ClusterIP</b> — доступ только внутри кластера (по умолчанию);</li>
+  <li><b>NodePort</b> — открывает порт на каждом узле;</li>
+  <li><b>LoadBalancer</b> — создаёт внешний балансировщик у облака;</li>
+  <li><b>ExternalName</b> — DNS-алиас на внешнее имя.</li>
+</ul>
+<p>Для HTTP часто удобнее один Ingress вместо множества LoadBalancer.</p>
+</div></details>
+
+<details><summary>Что такое Ingress и чем он отличается от Service?</summary><div>
+<p>Service — это внутренняя точка доступа к подам с балансировкой. Ingress — правила маршрутизации HTTP/HTTPS снаружи: по доменам и путям, с TLS. Для работы Ingress нужен контроллер (nginx ingress, Traefik и другие).</p>
+</div></details>
+
+<details><summary>Чем отличаются liveness, readiness и startup probes?</summary><div>
+<ul>
+  <li><b>liveness</b> — жив ли процесс. Провал приводит к перезапуску контейнера.</li>
+  <li><b>readiness</b> — готов ли принимать трафик. Провал убирает под из балансировки, но не перезапускает.</li>
+  <li><b>startup</b> — для медленно стартующих приложений: пока не пройдёт, liveness и readiness не проверяются.</li>
+</ul>
+<div class="warn"><b>Частая ошибка</b>Слишком строгий liveness, который проверяет зависимости, например базу. Тогда при сбое базы все поды перезапускаются и становится хуже. Для зависимостей нужен readiness.</div>
+</div></details>
+
+<details><summary>Чем requests отличаются от limits? Что такое QoS-класс?</summary><div>
+<ul>
+  <li><b>requests</b> — гарантированный минимум, по которому планировщик выбирает узел;</li>
+  <li><b>limits</b> — верхняя граница. Превышение CPU ведёт к троттлингу, превышение памяти — к OOMKill.</li>
+</ul>
+<p>QoS-классы: <b>Guaranteed</b> (requests = limits), <b>Burstable</b> (что-то задано), <b>BestEffort</b> (ничего не задано). При нехватке ресурсов первыми убиваются BestEffort.</p>
+</div></details>
+
+<details><summary>Почему под застрял в Pending и как это проверить?</summary><div>
+<pre><code>kubectl describe pod POD_NAME      # раздел Events
+kubectl get events --sort-by=.lastTimestamp</code></pre>
+<p>Частые причины: не хватает CPU или памяти на узлах для requests, не подходит nodeSelector или affinity, taint без toleration, PVC не привязан к тому.</p>
+</div></details>
+
+<details><summary>Что означает CrashLoopBackOff и как разбираться?</summary><div>
+<p>Контейнер падает, Kubernetes его перезапускает с растущей паузой. Смотрим:</p>
+<pre><code>kubectl logs POD_NAME --previous     # логи упавшего контейнера
+kubectl describe pod POD_NAME        # код выхода, OOMKilled, probe failures</code></pre>
+</div></details>
+
+<details><summary>Чем ConfigMap отличается от Secret? Secret зашифрован?</summary><div>
+<p>ConfigMap хранит несекретную конфигурацию. Secret — для паролей и ключей. Но по умолчанию Secret хранится в etcd в base64, а это кодирование, а не шифрование. Чтобы защитить, включайте шифрование at rest в etcd, ограничивайте RBAC и используйте внешние хранилища секретов (Vault, External Secrets).</p>
+</div></details>
+
+<details><summary>Как работает rolling update и как его настроить?</summary><div>
+<p>Deployment заменяет поды постепенно. Два параметра:</p>
+<ul>
+  <li><b>maxSurge</b> — сколько подов можно создать сверх нужного числа;</li>
+  <li><b>maxUnavailable</b> — сколько подов может быть недоступно одновременно.</li>
+</ul>
+<pre><code>strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0   # без простоя</code></pre>
+<pre><code>kubectl rollout status deployment/app
+kubectl rollout undo deployment/app</code></pre>
+</div></details>
+
+<details><summary>Что такое PV, PVC и StorageClass?</summary><div>
+<ul>
+  <li><b>PV</b> — реальное хранилище, выделенное кластеру;</li>
+  <li><b>PVC</b> — запрос пода на хранилище определённого размера и типа;</li>
+  <li><b>StorageClass</b> — правила динамического создания PV, например SSD или HDD.</li>
+</ul>
+</div></details>
+
+<details><summary>Чем Namespace отличается от кластера и для чего нужны Taint и Toleration?</summary><div>
+<ul>
+  <li><b>Namespace</b> — логическое разделение ресурсов внутри одного кластера. Не даёт полной изоляции узлов.</li>
+  <li><b>Taint</b> на узле отталкивает поды. <b>Toleration</b> в поде разрешает на него попасть. Используется для выделенных узлов, например с GPU.</li>
+</ul>
+</div></details>
+
+<details><summary>Что такое RBAC и какое главное правило безопасности?</summary><div>
+<p>RBAC определяет, кто и что может делать: Role и ClusterRole задают права, RoleBinding и ClusterRoleBinding назначают их пользователям или ServiceAccount. Главное правило: принцип минимальных прав. Не давайте cluster-admin приложениям, а ServiceAccount по умолчанию не должен иметь лишних прав.</p>
+<pre><code>kubectl auth can-i list pods --as=system:serviceaccount:app:default</code></pre>
+</div></details>
+
+<details><summary>Как работает HPA и почему он может не масштабировать?</summary><div>
+<p>Horizontal Pod Autoscaler меняет число реплик по метрикам, обычно CPU. Частые причины, почему он не работает: не заданы requests (без них нельзя посчитать процент), не установлен metrics-server, метрика стабильно ниже порога.</p>
+<pre><code>kubectl get hpa
+kubectl top pods</code></pre>
+</div></details>
+
+<details><summary>Опишите, что происходит при kubectl apply -f deployment.yaml</summary><div>
+<ol>
+  <li>kubectl отправляет манифест в API server.</li>
+  <li>API server проверяет запрос, аутентификацию и RBAC, и записывает объект в etcd.</li>
+  <li>Controller manager видит новый Deployment и создаёт ReplicaSet, затем ReplicaSet создаёт поды.</li>
+  <li>Scheduler выбирает узел для каждого пода по requests, affinity, taints.</li>
+  <li>kubelet на узле запускает контейнеры через container runtime.</li>
+  <li>kube-proxy и CoreDNS обновляют сетевые правила и имена, чтобы трафик пошёл на новый под.</li>
+</ol>
+<p>Это отличный вопрос, потому что по нему видно, понимает ли кандидат архитектуру, а не только команды.</p>
+</div></details>
+
+<p class="top"><a href="#top">↑ Наверх</a></p>
+
+<!-- ================= 6. CI/CD ================= -->
+<h2 id="g6">6. CI/CD</h2>
+
+<details><summary>В чём разница между Continuous Integration, Continuous Delivery и Continuous Deployment?</summary><div>
+<ul>
+  <li><b>CI</b> — частое слияние кода в общую ветку, автоматическая сборка и тесты при каждом изменении;</li>
+  <li><b>Continuous Delivery</b> — артефакт всегда готов к выкладке, но в продакшн выкатывает человек, часто по кнопке;</li>
+  <li><b>Continuous Deployment</b> — каждое изменение, прошедшее все проверки, автоматически уходит в продакшн.</li>
+</ul>
+</div></details>
+
+<details><summary>Почему артефакт должен собираться один раз?</summary><div>
+<p>Если пересобирать образ под каждое окружение, в staging и production окажутся немного разные сборки, и баг, найденный в тестах, может не воспроизвестись в продакшне. Правильно: собрать один раз, пометить версией или digest, и продвигать этот же артефакт по окружениям.</p>
+</div></details>
+
+<details><summary>Чем Blue/Green отличается от Canary?</summary><div>
+<ul>
+  <li><b>Blue/Green</b> — две одинаковые среды. Трафик переключается целиком. Откат — переключить обратно. Требует вдвое больше ресурсов.</li>
+  <li><b>Canary</b> — новая версия получает небольшой процент трафика, он постепенно растёт. Позволяет поймать проблему на реальных пользователях с малым риском.</li>
+</ul>
+</div></details>
+
+<details><summary>Как правильно хранить секреты в пайплайне?</summary><div>
+<ul>
+  <li>Используйте встроенные secrets CI-системы или внешний менеджер (Vault, AWS Secrets Manager).</li>
+  <li>Не выводите секреты в лог: маскируйте их, не печатайте переменные через echo.</li>
+  <li>Выдавайте короткоживущие токены и минимальные права.</li>
+  <li>Никогда не кладите секреты в репозиторий, даже в приватный.</li>
+</ul>
+</div></details>
+
+<details><summary>Что такое pipeline as code и почему это хорошо?</summary><div>
+<p>Описание пайплайна хранится в репозитории вместе с кодом: Jenkinsfile, .gitlab-ci.yml, workflow в GitHub Actions. Изменения проходят ревью, история видна в git, и пайплайн воспроизводим. Пайплайн, настроенный кликами в интерфейсе, сложно аудировать и восстановить.</p>
+</div></details>
+
+<details><summary>Как откатиться, если релиз сломал продакшн?</summary><div>
+<ol>
+  <li>Быстрый откат: вернуть предыдущий известный артефакт (<code>kubectl rollout undo</code>, переключение Blue/Green, деплой прошлого тега).</li>
+  <li>Потом разобраться в причине, не торопясь, и выпустить исправление через обычный пайплайн.</li>
+</ol>
+<p>Ключевой принцип: сначала восстановить сервис, потом искать виноватого. Если откат невозможен, нужен план миграции назад, например для схемы базы.</p>
+</div></details>
+
+<details><summary>Что такое feature flags и зачем они нужны?</summary><div>
+<p>Флаг позволяет включать или выключать функцию без нового деплоя. Код с новой функцией можно выкатить в продакшн, а показывать пользователям постепенно или только тестовой группе. Это снижает риск релиза.</p>
+</div></details>
+
+<!-- ================= 7. ANSIBLE / TERRAFORM ================= -->
+<h2 id="g7">7. Ansible и Terraform</h2>
+
+<details><summary>В чём разница между Ansible и Terraform?</summary><div>
+<ul>
+  <li><b>Terraform</b> описывает инфраструктуру: создать сеть, виртуалки, базу. Декларативен, хранит state-файл с текущим состоянием.</li>
+  <li><b>Ansible</b> настраивает то, что уже существует: пакеты, конфиги, сервисы. Процедурен по духу, но задачи идемпотентны, state-файла нет.</li>
+</ul>
+<p>Типичная связка: Terraform поднимает серверы, Ansible их настраивает.</p>
+</div></details>
+
+<details><summary>Что такое идемпотентность и почему это важно?</summary><div>
+<p>Операция идемпотентна, если многократный запуск даёт тот же результат, что и однократный. В Ansible модули проверяют текущее состояние и меняют только то, что отличается. Так можно безопасно перезапускать плейбук после сбоя.</p>
+</div></details>
+
+<details><summary>Что такое state-файл в Terraform и почему его нельзя терять?</summary><div>
+<p>State хранит соответствие между описанием в коде и реальными ресурсами. Без него Terraform не знает, что уже создано, и может создать дубликаты или удалить лишнее. Хранить его нужно удалённо, с блокировкой (например, S3 с DynamoDB или Terraform Cloud), потому что два одновременных apply испортят состояние.</p>
+<div class="warn"><b>Важно</b>State может содержать секреты в открытом виде. Ограничивайте доступ к бэкенду.</div>
+</div></details>
+
+<details><summary>Что такое drift и как его обнаружить?</summary><div>
+<p>Drift — расхождение между кодом и реальной инфраструктурой, например если кто-то поменял правило файрвола вручную. Обнаруживается через <code>terraform plan</code>: план покажет, что Terraform хочет вернуть к описанию. Регулярные plan в CI помогают ловить дрейф рано.</p>
+</div></details>
+
+<details><summary>Чем plan отличается от apply?</summary><div>
+<p><code>plan</code> ничего не меняет, показывает, что будет создано, изменено и удалено. <code>apply</code> выполняет план. Хорошая практика: сохранять план в файл (<code>terraform plan -out=tfplan</code>) и применять именно его, чтобы между проверкой и применением ничего не поменялось.</p>
+</div></details>
+
+<details><summary>Чем count отличается от for_each?</summary><div>
+<p><code>count</code> создаёт ресурсы по индексу: удаление элемента из середины сдвигает остальные и приводит к пересозданию. <code>for_each</code> использует ключи, поэтому удаление одного элемента не трогает остальные. Для большинства случаев предпочтительнее for_each.</p>
+</div></details>
+
+<details><summary>Как в Ansible устроен механизм секретов?</summary><div>
+<p>Ansible Vault шифрует файлы с переменными. Пароль от vault передаётся через <code>--ask-vault-pass</code> или файл, который не должен попадать в git. Для параметров задачи с секретами используется <code>no_log: true</code>.</p>
+</div></details>
+
+<details><summary>Push или pull модель: что выбрать и чем они отличаются?</summary><div>
+<ul>
+  <li><b>Push</b> — управляющий узел сам подключается к серверам и применяет конфигурацию (Ansible, Terraform). Просто в настройке, но нужен доступ к серверам.</li>
+  <li><b>Pull</b> — агент на сервере сам забирает конфигурацию (Puppet, Chef, GitOps-инструменты вроде Argo CD). Лучше масштабируется и не требует входящих подключений.</li>
+</ul>
+</div></details>
+
+<!-- ================= 8. MONITORING ================= -->
+<h2 id="g8">8. Мониторинг и наблюдаемость</h2>
+
+<details><summary>В чём разница между мониторингом и наблюдаемостью (observability)?</summary><div>
+<p>Мониторинг отвечает на заранее известные вопросы: «жив ли сервис», «не превышен ли порог». Наблюдаемость позволяет задавать новые вопросы о системе, которые не предусмотрели заранее, опираясь на метрики, логи и трассировки.</p>
+</div></details>
+
+<details><summary>Что такое три столпа наблюдаемости?</summary><div>
+<ul>
+  <li><b>Метрики</b> — числа во времени: загрузка CPU, RPS, задержка. Дёшевы и хорошо агрегируются.</li>
+  <li><b>Логи</b> — записи о событиях с подробностями. Нужны для разбора конкретных случаев.</li>
+  <li><b>Трассировки</b> — путь одного запроса через сервисы. Показывают, где тратится время.</li>
+</ul>
+</div></details>
+
+<details><summary>Как работает Prometheus и чем он отличается от push-систем?</summary><div>
+<p>Prometheus сам опрашивает (pull) HTTP-эндпоинты приложений и сохраняет метрики во временной базе. Плюсы: контроль частоты опроса, легко понять, что цель недоступна (метрика up = 0). Для коротких задач есть Pushgateway.</p>
+</div></details>
+
+<details><summary>Какие типы метрик бывают?</summary><div>
+<ul>
+  <li><b>Counter</b> — только растёт, например число запросов. Берём rate(), а не сырое значение;</li>
+  <li><b>Gauge</b> — может расти и падать, например память или число соединений;</li>
+  <li><b>Histogram / Summary</b> — распределение, например задержки, для расчёта перцентилей.</li>
+</ul>
+<pre><code>rate(http_requests_total[5m])
+histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))</code></pre>
+</div></details>
+
+<details><summary>Что такое методы RED и USE?</summary><div>
+<ul>
+  <li><b>RED</b> (для сервисов): Rate — запросов в секунду, Errors — доля ошибок, Duration — задержка;</li>
+  <li><b>USE</b> (для ресурсов): Utilization — загрузка, Saturation — очередь ожидания, Errors — ошибки.</li>
+</ul>
+<p>RED смотрит на опыт пользователя, USE — на состояние железа и ресурсов.</p>
+</div></details>
+
+<details><summary>Как не утонуть в алертах?</summary><div>
+<ul>
+  <li>Алерт должен требовать действия. Если его можно просто игнорировать, он вредит.</li>
+  <li>Алертить на симптомы для пользователя (высокая ошибка, медленный ответ), а не на каждую причину (CPU 70%).</li>
+  <li>Добавлять runbook со ссылкой и первыми шагами к каждому алерту.</li>
+  <li>Группировать и подавлять дубликаты, настраивать паузы.</li>
+</ul>
+</div></details>
+
+<details><summary>Почему важно синхронизировать время на серверах?</summary><div>
+<p>Логи, трассировки, сертификаты, TOTP и Kerberos зависят от времени. Если часы расходятся, по логам невозможно восстановить порядок событий, а TLS может отказаться работать. Используйте NTP или chrony и проверяйте <code>timedatectl</code>.</p>
+</div></details>
+
+<!-- ================= 9. SRE ================= -->
+<h2 id="g9">9. SRE: надёжность и процессы</h2>
+
+<details><summary>Что такое SLI, SLO, SLA и error budget?</summary><div>
+<ul>
+  <li><b>SLI</b> (Service Level Indicator) — измеряемый показатель, например доля успешных запросов за окно времени.</li>
+  <li><b>SLO</b> (Objective) — внутренняя целевая планка, например 99.9% успешных запросов в месяц.</li>
+  <li><b>SLA</b> — договорное обязательство перед клиентом, часто со штрафами. Обычно мягче SLO.</li>
+  <li><b>Error budget</b> — допустимый запас ошибок: 100% минус SLO. Пока бюджет есть, можно выкатывать риск. Если бюджет исчерпан, приоритет переходит к стабильности.</li>
+</ul>
+<div class="tip"><b>Пример</b>SLO 99.9% в месяце даёт бюджет около 43 минут недоступности. Это хороший способ обсуждать риск с бизнесом на языке цифр.</div>
+</div></details>
+
+<details><summary>Что такое toil и как с ним бороться?</summary><div>
+<p>Toil — ручная, повторяющаяся, не приносящая долгосрочной пользы работа, которая растёт вместе с сервисом. Например, ручной перезапуск упавшего сервиса каждую ночь. Бороться: автоматизировать, устранять первопричину, ограничивать долю времени на toil (часто ориентир до половины времени SRE).</p>
+</div></details>
+
+<details><summary>Чем MTTD, MTTR и MTBF отличаются?</summary><div>
+<ul>
+  <li><b>MTTD</b> — среднее время обнаружения проблемы;</li>
+  <li><b>MTTR</b> — среднее время восстановления (часто его трактуют как repair, но важно уточнить, что именно);</li>
+  <li><b>MTBF</b> — среднее время между отказами.</li>
+</ul>
+<p>Для современных сервисов ключевой метрикой чаще называют MTTR: как быстро возвращаемся в норму.</p>
+</div></details>
+
+<details><summary>Что такое blameless postmortem?</summary><div>
+<p>Разбор инцидента без поиска виноватого. Фокус на системе: почему процесс позволил ошибке случиться и почему её не поймали раньше. Структура: краткое описание, таймлайн, влияние, корневая причина, что сработало хорошо, action items с владельцами и сроками.</p>
+</div></details>
+
+<details><summary>Как организовать on-call, чтобы он не выгорал?</summary><div>
+<ul>
+  <li>Ротация с понятным графиком и эскалацией;</li>
+  <li>Алерты только на действия, runbook на каждый;</li>
+  <li>Компенсация или отгулы после тяжёлых ночей;</li>
+  <li>Регулярный разбор шума: какие алерты будили зря, их надо убрать.</li>
+</ul>
+</div></details>
+
+<details><summary>Что такое canary-анализ и SLO-based alerting?</summary><div>
+<p>Canary-анализ сравнивает метрики новой и старой версии на небольшом трафике и решает, продолжать ли выкат. SLO-based alerting поднимает тревогу, когда скорость расходования error budget слишком высока, а не на каждую ошибку. Это уменьшает шум и привязывает алерты к влиянию на пользователей.</p>
+</div></details>
+
+<!-- ================= 10. DEVSECOPS ================= -->
+<h2 id="g10">10. DevSecOps: безопасность</h2>
+
+<details><summary>Что такое shift left и что значит DevSecOps?</summary><div>
+<p>Shift left — переносить проверки безопасности раньше в цикл разработки: в IDE, в pull request, в сборку. DevSecOps — безопасность как часть общего процесса, а не отдельный этап в конце, который всех тормозит.</p>
+</div></details>
+
+<details><summary>Чем SAST, DAST, SCA отличаются друг от друга?</summary><div>
+<ul>
+  <li><b>SAST</b> — статический анализ исходного кода, ищет уязвимости без запуска. Пример: Semgrep, SonarQube.</li>
+  <li><b>DAST</b> — динамическое тестирование работающего приложения, атакует его снаружи. Пример: OWASP ZAP.</li>
+  <li><b>SCA</b> — анализ зависимостей на известные уязвимости CVE. Пример: Snyk, Trivy, Dependabot.</li>
+</ul>
+</div></details>
+
+<details><summary>Как безопасно собрать Docker-образ?</summary><div>
+<ul>
+  <li>Минимальный базовый образ (distroless, alpine или slim) и конкретные версии;</li>
+  <li>Не запускать от root: директива <code>USER</code>;</li>
+  <li>Не класть секреты в образ, передавать их при запуске;</li>
+  <li>Сканировать образ (Trivy, Grype) в пайплайне и блокировать критичные уязвимости;</li>
+  <li>Подписывать образы (cosign) и проверять подпись при деплое;</li>
+  <li>Multi-stage build, чтобы не тянуть компиляторы в продакшн.</li>
+</ul>
+</div></details>
+
+<details><summary>Что такое принцип least privilege и как его применить?</summary><div>
+<p>Каждому пользователю, сервису и процессу даётся только минимально необходимый набор прав. На практике: отдельные сервисные аккаунты для каждого приложения, RBAC в Kubernetes без cluster-admin, IAM-роли с узкими политиками в облаке, запрет root в контейнерах.</p>
+</div></details>
+
+<details><summary>Что такое supply chain security и SBOM?</summary><div>
+<p>Атаки на цепочку поставок: злоумышленник подменяет зависимость или сборку. Защита: фиксировать версии, проверять хеши и подписи, вести SBOM (Software Bill of Materials), то есть список всех компонентов. SBOM помогает быстро понять, затронуты ли вы новой уязвимостью.</p>
+</div></details>
+
+<details><summary>Как защитить сеть в Kubernetes?</summary><div>
+<ul>
+  <li>NetworkPolicy: по умолчанию запретить весь трафик и разрешать нужное;</li>
+  <li>Pod Security Standards: запретить privileged-контейнеры и hostPath;</li>
+  <li>mTLS между сервисами (например, через service mesh);</li>
+  <li>Шифрование etcd и ограничение доступа к API server;</li>
+  <li>Аудит действий через audit log.</li>
+</ul>
+</div></details>
+
+<details><summary>Как управлять секретами и их ротацией?</summary><div>
+<ul>
+  <li>Хранить в специальном менеджере секретов, а не в коде и переменных пайплайна;</li>
+  <li>Выдавать динамические или короткоживущие учётные данные;</li>
+  <li>Автоматически ротировать по расписанию и сразу после подозрения на утечку;</li>
+  <li>Вести аудит доступа к секретам.</li>
+</ul>
+</div></details>
+
+<details><summary>Что делать, если нашли секрет в репозитории?</summary><div>
+<ol>
+  <li>Считать секрет скомпрометированным и немедленно отозвать или сменить его.</li>
+  <li>Проверить логи доступа: использовался ли он кем-то.</li>
+  <li>Удалить из истории репозитория, но это вторично.</li>
+  <li>Добавить сканирование секретов в pre-commit и в пайплайн (gitleaks, trufflehog).</li>
+</ol>
+</div></details>
+
+<!-- ================= 11. TRICKY ================= -->
+<h2 id="g11">11. Каверзные вопросы</h2>
+
+<details><summary>Load average 20 на сервере с 4 ядрами, CPU простаивает. Что происходит?</summary><div>
+<p>Очередь ожидания велика, но процессы не считают CPU, а ждут. Скорее всего, это состояние D — ожидание диска или сети в ядре. Проверяем <code>vmstat 1</code> (поле wa и b), <code>iostat -x 1</code>, <code>ps -eo stat,pid,cmd | grep '^D'</code>. Вероятные причины: медленный или перегруженный диск, зависшая NFS-монтировка.</p>
+</div></details>
+
+<details><summary>Приложение «тормозит». Как понять, где узкое место?</summary><div>
+<p>Идём по ресурсам: CPU (top, загрузка на ядро), память (нет ли свопа и OOM), диск (iostat, await), сеть (ss, retransmits), зависимости (базы, внешние API по трассировкам). Важно сравнивать с базовой линией: что изменилось, когда началась проблема? Часто виноват последний деплой или рост данных.</p>
+</div></details>
+
+<details><summary>В чём разница между kill, kill -9 и остановкой контейнера через docker stop?</summary><div>
+<p><code>kill</code> по умолчанию шлёт SIGTERM, процесс может завершиться корректно. <code>kill -9</code> шлёт SIGKILL, его нельзя перехватить. <code>docker stop</code> шлёт SIGTERM главному процессу контейнера и через 10 секунд SIGKILL. Поэтому приложение в контейнере должно обрабатывать SIGTERM, иначе оно не сможет завершиться корректно.</p>
+</div></details>
+
+<details><summary>Почему приложение в контейнере не реагирует на Ctrl+C или SIGTERM?</summary><div>
+<p>Если процесс запущен через shell-форму CMD, главным процессом становится shell, который не передаёт сигналы дочернему. Решение: использовать exec-форму <code>CMD ["python", "app.py"]</code> или init-процесс (<code>docker run --init</code>). Также процесс должен явно обрабатывать SIGTERM.</p>
+</div></details>
+
+<details><summary>Почему 502 на ingress, хотя поды Running?</summary><div>
+<p>Pod Running не означает, что приложение готово. Проверьте readiness, endpoints сервиса (<code>kubectl get endpoints</code>), соответствие портов в Service и containerPort, а также таймауты между ingress и приложением. Ещё частая причина: приложение слушает 127.0.0.1 вместо 0.0.0.0.</p>
+</div></details>
+
+<details><summary>Почему в Kubernetes контейнер не получает новую версию ConfigMap?</summary><div>
+<p>Если ConfigMap смонтирован как переменные окружения, при изменении он не обновится в работающем поде: переменные задаются при старте. Для томов ConfigMap обновляется со временем, но приложение должно перечитать файл. Практичное решение: менять имя ConfigMap или добавлять хеш в аннотацию пода, чтобы Deployment перезапустил поды.</p>
+</div></details>
+
+<details><summary>Почему SELECT в базе стал медленным, хотя индексы есть?</summary><div>
+<p>Варианты: индекс не используется из-за функции над колонкой, например WHERE lower(email) = ..., неправильный тип данных с неявным приведением, устаревшая статистика, выросшая таблица, блокировки от долгих транзакций. Смотрите EXPLAIN ANALYZE и журнал медленных запросов.</p>
+</div></details>
+
+<details><summary>Порт занят: «address already in use». Как найти виновника?</summary><div>
+<pre><code>ss -tulpn | grep :8080
+lsof -i :8080</code></pre>
+<p>Если процесс — от прошлого запуска, его можно остановить. Частая причина в Docker: контейнер с тем же портом уже запущен, или docker-proxy держит порт.</p>
+</div></details>
+
+<details><summary>Почему на сервере мало памяти, хотя процессы потребляют немного?</summary><div>
+<p>Возможные объяснения: кэш ядра (смотрите available, а не free), утечка памяти в ядре или в слабом месте (slab, <code>/proc/meminfo</code>), tmpfs, который занимает память (<code>df -h /dev/shm /tmp</code>), или много процессов, каждый из которых учитывается по RSS. Используйте <code>smem</code> или <code>ps aux --sort=-rss</code>.</p>
+</div></details>
+
+<details><summary>Почему NTP-сервис не синхронизирует время в контейнерах?</summary><div>
+<p>Контейнеры используют часы хоста. Синхронизировать нужно хост, а не контейнер. В Kubernetes это делает узел. Проверка: <code>timedatectl status</code> на хосте и <code>chronyc sources</code>.</p>
+</div></details>
+
+<details><summary>Что быстрее: один большой deploy или много маленьких, и почему?</summary><div>
+<p>Маленькие релизы безопаснее: меньше изменений, проще найти причину, проще откатить. Это основа практики CD. Но у каждого релиза есть накладные расходы, поэтому цель — автоматизировать процесс, а не просто делать редкие большие релизы.</p>
+</div></details>
+
+<!-- ================= 12. BEHAVIORAL ================= -->
+<h2 id="g12">12. Поведенческие вопросы</h2>
+
+<details><summary>Расскажите о самом сложном инциденте, в котором вы участвовали.</summary><div>
+<p>Используйте структуру STAR: <b>Situation</b> (контекст), <b>Task</b> (ваша задача), <b>Action</b> (что сделали именно вы), <b>Result</b> (итог и что изменили потом). Особенно важен последний пункт: что сделали, чтобы такое не повторилось. Говорите «мы» для команды, но показывайте свою конкретную роль.</p>
+</div></details>
+
+<details><summary>Как вы расставляете приоритеты, когда задач много?</summary><div>
+<p>Оцениваю влияние на пользователей и бизнес, срочность и стоимость. Инциденты и риски безопасности — выше плановых задач. Важно проговорить компромиссы с руководителем и не молчать, если сроки нереальны.</p>
+</div></details>
+
+<details><summary>Как вы объясняете техническую проблему нетехническому менеджеру?</summary><div>
+<p>Говорю языком последствий: что сломано, кто затронут, сколько стоит простой, что делаем и когда станет лучше. Без жаргона, с цифрами. Например: «Сайт недоступен 10% пользователей, исправление займёт 2 часа, риск потери заказов — оценка такая-то».</p>
+</div></details>
+
+<details><summary>Как вы относитесь к конфликтам с разработчиками, например про релизы или безопасность?</summary><div>
+<p>Ищу общую цель: надёжный и быстрый релиз. Стараюсь автоматизировать спорное, например проверки в пайплайне, чтобы не быть «полицией». Объясняю причины через риски, а не через запреты, и готов обсуждать исключения с понятными условиями.</p>
+</div></details>
+
+<details><summary>Что вы делаете, если не знаете ответа на вопрос?</summary><div>
+<p>Честно говорю, что не знаю точно, рассуждаю вслух, что бы проверил, и показываю, как бы нашёл ответ. Интервьюеры ценят честность и методичность больше, чем попытку угадать.</p>
+</div></details>
+
+<details><summary>Почему вы хотите работать именно у нас?</summary><div>
+<p>Подготовьте ответ заранее: изучите продукт, стек, публичные статьи о технологиях компании. Связывайте свой опыт с задачами, которые они решают. Общие фразы вроде «хочу расти» звучат слабо.</p>
+</div></details>
+
+<!-- ================= 13. HOW TO ANSWER ================= -->
+<h2 id="g13">13. Как отвечать на собеседовании</h2>
+<ul>
+  <li><b>Проговаривайте ход мысли.</b> Интервьюер оценивает подход, а не только итоговый ответ.</li>
+  <li><b>Начинайте с простого определения, затем добавляйте детали</b> и практический пример из опыта.</li>
+  <li><b>Говорите о компромиссах.</b> У любого решения есть плюсы и минусы, назовите их.</li>
+  <li><b>Не выдумывайте.</b> Фраза «не сталкивался, но проверил бы так-то» звучит сильнее уверенного, но неправильного ответа.</li>
+  <li><b>Задавайте уточняющие вопросы</b> про масштаб, нагрузку, ограничения. Это признак зрелости.</li>
+  <li><b>Подготовьте 2–3 истории из опыта</b> про инциденты, автоматизацию и конфликты. Их можно адаптировать под любой вопрос.</li>
+</ul>
+<div class="tip"><b>Лайфхак</b>Перед собеседованием сделайте мини-стенд: поднимите Kubernetes локально (kind или minikube), запустите приложение, сломайте его и почините. Практический опыт звучит убедительнее любой теории.</div>
+
+<p class="top"><a href="#top">↑ Наверх</a></p>
+
+</div>
+<script>
+  // Открытие ответа по ссылке из содержания: раскрыть нужный раздел
+  window.addEventListener('hashchange', () => {});
+</script>
+</body>
+</html>
