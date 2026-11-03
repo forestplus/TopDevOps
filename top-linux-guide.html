@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux: команда top и htop — как читать вывод</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --red:#b5232b; --green:#2e7d4f; --line:#c9d3e6; --code:#f1f4fa; --purple:#6a4fb3; --orange:#d97706; }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --red:#ff7b7b; --green:#7fd6a0; --line:#3a4352; --code:#242a36; --purple:#b59cff; --orange:#fbbf24; }
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:16px; line-height:1.65; }
+  .wrap { max-width:900px; margin:0 auto; }
+  h1 { text-align:center; color:var(--blue); font-size:28px; margin:0 0 6px; }
+  .lead { text-align:center; color:var(--green); margin:0 0 22px; }
+  h2 { color:var(--green); font-size:22px; margin:36px 0 12px; border-bottom:2px solid var(--line); padding-bottom:4px; }
+  h3 { color:var(--blue); font-size:18px; margin:22px 0 8px; }
+  p { margin:8px 0; }
+  ul, ol { margin:6px 0 6px 22px; padding:0; }
+  li { margin:5px 0; }
+  code { font-family:Consolas,"Courier New",monospace; color:var(--red); font-size:14px; background:rgba(127,127,127,.12); padding:1px 5px; border-radius:3px; }
+  pre { background:var(--code); border:1px solid var(--line); border-radius:6px; padding:12px 14px; overflow-x:auto; }
+  pre code { color:var(--ink); background:none; padding:0; font-size:13.5px; line-height:1.5; }
+  .toc { border:2px solid var(--line); border-radius:8px; padding:14px 18px; }
+  .toc h2 { margin:0 0 8px; border:none; font-size:18px; }
+  .toc ol { margin:0 0 0 20px; }
+  .toc li { margin:3px 0; }
+  .toc a { color:var(--blue); text-decoration:none; border-bottom:1px dashed var(--blue); }
+  .toc a:hover { color:var(--green); }
+  .tip { border-left:4px solid var(--green); background:rgba(46,125,79,.08); padding:8px 12px; margin:12px 0; border-radius:4px; }
+  .warn { border-left:4px solid var(--red); background:rgba(181,35,43,.07); padding:8px 12px; margin:12px 0; border-radius:4px; }
+  .tip b, .warn b { display:block; margin-bottom:2px; }
+  figure { margin:16px auto; text-align:center; }
+  figure svg { max-width:100%; height:auto; }
+  figcaption { font-size:14px; opacity:.75; margin-top:6px; }
+  table { border-collapse:collapse; width:100%; margin:10px 0; font-size:15px; }
+  th, td { border:1px solid var(--line); padding:6px 9px; text-align:left; vertical-align:top; }
+  th { color:var(--blue); }
+  .top { font-size:14px; margin-top:12px; display:inline-block; }
+  .top a { color:var(--blue); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1 id="top">Linux: команда top и htop</h1>
+<p class="lead">Как читать вывод, что означают цифры и где искать причину проблемы</p>
+
+<div class="toc">
+  <h2>Содержание</h2>
+  <ol>
+    <li><a href="#s1">Зачем нужен top</a></li>
+    <li><a href="#s2">Запуск и первый взгляд</a></li>
+    <li><a href="#s3">Верхняя часть: заголовок</a></li>
+    <li><a href="#s4">Строка Load average</a></li>
+    <li><a href="#s5">Строка Tasks: состояния процессов</a></li>
+    <li><a href="#s6">Строка %Cpu: расшифровка каждого поля</a></li>
+    <li><a href="#s7">Строки памяти: Mem и Swap</a></li>
+    <li><a href="#s8">Таблица процессов: колонки</a></li>
+    <li><a href="#s9">Клавиши управления</a></li>
+    <li><a href="#s10">Параметры запуска и полезные режимы</a></li>
+    <li><a href="#s11">htop: что добавляет</a></li>
+    <li><a href="#s12">Практика: разбираем типичные ситуации</a></li>
+    <li><a href="#s13">Лайфхаки</a></li>
+    <li><a href="#s14">Шпаргалка</a></li>
+  </ol>
+</div>
+
+<h2 id="s1">1. Зачем нужен top</h2>
+<p><code>top</code> — это интерактивный монитор процессов и ресурсов системы. Он отвечает на три вопроса, которые задают себе администраторы при любом инциденте:</p>
+<ul>
+  <li><b>Что загружено?</b> Процессор, память, диск или сеть.</li>
+  <li><b>Кто это делает?</b> Какой процесс и от какого пользователя потребляет ресурс.</li>
+  <li><b>Насколько это серьёзно?</b> Это нормальная нагрузка или признак проблемы.</li>
+</ul>
+<p>Команда есть почти везде: в любом дистрибутиве Linux она установлена по умолчанию. Поэтому её знание — базовый навык, который спрашивают на собеседованиях и который спасает, когда нет графического интерфейса и доступен только SSH.</p>
+
+<div class="tip"><b>Простыми словами</b>top — это «приборная панель» сервера. Заголовок — общие показания приборов, таблица ниже — список того, что сейчас потребляет ресурсы.</div>
+
+<h2 id="s2">2. Запуск и первый взгляд</h2>
+<pre><code>top            # интерактивный режим
+htop           # улучшенная версия (если установлена)
+top -bn1 | head -n 20    # один снимок, удобно для скриптов и логов</code></pre>
+<p>После запуска экран делится на две части: сверху заголовок с общими показателями, снизу таблица процессов, отсортированная по загрузке CPU.</p>
+
+<figure>
+<svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+  <rect x="20" y="20" width="680" height="320" rx="10" fill="#0f1420" stroke="#3a4352" stroke-width="2"/>
+  <rect x="34" y="34" width="652" height="96" rx="6" fill="#1a2233"/>
+  <text x="46" y="58" fill="#7fd6a0" font-size="14" font-family="Consolas,monospace">top - 14:02:11 up 12 days,  3 users,  load average: 0.42, 0.37, 0.31</text>
+  <text x="46" y="80" fill="#7fa8ff" font-size="14" font-family="Consolas,monospace">Tasks: 187 total,   1 running, 186 sleeping,   0 stopped,   0 zombie</text>
+  <text x="46" y="102" fill="#fbbf24" font-size="14" font-family="Consolas,monospace">%Cpu(s):  3.1 us,  1.2 sy,  0.0 ni, 95.4 id,  0.2 wa,  0.0 hi,  0.1 si</text>
+  <text x="46" y="122" fill="#b59cff" font-size="14" font-family="Consolas,monospace">MiB Mem :  7982.1 total,   512.4 free,  2140.7 used,  5329.0 buff/cache</text>
+  <rect x="34" y="142" width="652" height="26" rx="4" fill="#2a3550"/>
+  <text x="46" y="160" fill="#f0f0f5" font-size="13" font-family="Consolas,monospace">  PID USER      PR  NI    VIRT    RES  SHR S  %CPU  %MEM     TIME+ COMMAND</text>
+  <text x="46" y="186" fill="#d1d5db" font-size="13" font-family="Consolas,monospace"> 4312 www-data  20   0  412344  98120  9812 S   4.3   1.2  12:41.02 nginx</text>
+  <text x="46" y="206" fill="#d1d5db" font-size="13" font-family="Consolas,monospace"> 1187 postgres  20   0 1204512 310220 88012 S   2.0   3.8  80:12.55 postgres</text>
+  <text x="46" y="226" fill="#d1d5db" font-size="13" font-family="Consolas,monospace">  882 root      20   0  210988  22010  8120 S   0.7   0.3   3:01.87 sshd</text>
+  <text x="46" y="246" fill="#d1d5db" font-size="13" font-family="Consolas,monospace">    1 root      20   0  169584  13552  8400 S   0.0   0.2   0:12.44 systemd</text>
+  <rect x="34" y="262" width="652" height="30" rx="4" fill="none" stroke="#fbbf24" stroke-dasharray="5 4"/>
+  <text x="46" y="282" fill="#fbbf24" font-size="13">Заголовок (сверху): общая картина. Таблица (снизу): кто что потребляет.</text>
+</svg>
+<figcaption>Схема экрана top: верхний блок — показатели системы, нижний — таблица процессов (пример вывода условный)</figcaption>
+</figure>
+
+<h2 id="s3">3. Верхняя часть: заголовок</h2>
+<p>Первая строка — <b>время, аптайм, количество пользователей и load average</b>. Далее идут строки Tasks, %Cpu, Mem и Swap. Рассмотрим их по порядку.</p>
+<table>
+  <tr><th>Строка</th><th>Что показывает</th></tr>
+  <tr><td><code>top - 14:02:11 up 12 days, 3 users</code></td><td>Текущее время, сколько система работает без перезагрузки, число вошедших пользователей</td></tr>
+  <tr><td><code>load average: 0.42, 0.37, 0.31</code></td><td>Средняя очередь задач за 1, 5 и 15 минут</td></tr>
+  <tr><td><code>Tasks: ...</code></td><td>Количество процессов и их состояния</td></tr>
+  <tr><td><code>%Cpu(s): ...</code></td><td>Распределение времени процессора по категориям</td></tr>
+  <tr><td><code>MiB Mem / MiB Swap</code></td><td>Состояние оперативной памяти и файла подкачки</td></tr>
+</table>
+
+<h2 id="s4">4. Строка load average</h2>
+<p>Load average — число, которое часто путают с процентом загрузки. На самом деле это <b>средняя длина очереди</b> задач, которые либо выполняются, либо ждут выполнения. Значений три: за последнюю минуту, за пять и за пятнадцать минут.</p>
+<pre><code>nproc                       # сколько ядер у системы
+cat /proc/loadavg           # тот же load average в сыром виде</code></pre>
+<ul>
+  <li>Если load равен числу ядер, процессоры заняты полностью, но очереди ещё нет.</li>
+  <li>Если load в два раза больше числа ядер, часть задач ждёт очереди — это уже перегрузка.</li>
+  <li>Если load высокий, а %Cpu показывает простой (id), смотрите на состояние D и на <code>wa</code>: скорее всего, система ждёт диск или сеть.</li>
+</ul>
+<div class="tip"><b>Правило большого пальца</b>Сравнивайте load с количеством ядер. На 4 ядрах load 3–4 — нормальная работа под полной нагрузкой, load 10 — серьёзная перегрузка.</div>
+
+<h2 id="s5">5. Строка Tasks: состояния процессов</h2>
+<p>Строка показывает, сколько процессов в каждом состоянии. Главные:</p>
+<table>
+  <tr><th>Состояние</th><th>Значение</th><th>Что делать, если много</th></tr>
+  <tr><td><b>running</b></td><td>Выполняется на процессоре или готов выполняться</td><td>Норма для нагруженной системы, проверяйте %Cpu</td></tr>
+  <tr><td><b>sleeping</b></td><td>Ждёт события: сеть, таймер, ввод пользователя</td><td>Норма, большинство процессов в этом состоянии</td></tr>
+  <tr><td><b>stopped</b></td><td>Остановлен сигналом (например, Ctrl+Z)</td><td>Вернуть через <code>fg</code> или завершить</td></tr>
+  <tr><td><b>zombie</b></td><td>Завершился, но родитель не забрал код возврата</td><td>Исправить родительский процесс или перезапустить его</td></tr>
+</table>
+<p>В выводе также встречается состояние <b>D (uninterruptible sleep)</b> — процесс ждёт диск и не может быть прерван даже сигналом SIGKILL. Большое число D — признак проблем с дисковой подсистемой или зависшей NFS-монтировкой.</p>
+
+<h2 id="s6">6. Строка %Cpu: расшифровка каждого поля</h2>
+<p>Это главная строка для понимания нагрузки процессора. Пример: <code>%Cpu(s): 3.1 us, 1.2 sy, 0.0 ni, 95.4 id, 0.2 wa, 0.0 hi, 0.1 si, 0.0 st</code>. Все значения — проценты времени процессора за последний интервал, в сумме дают 100%.</p>
+
+<figure>
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+  <rect x="30" y="50" width="660" height="46" rx="6" fill="#1a2233"/>
+  <rect x="30" y="50" width="22" height="46" fill="#1e4fa3"/>
+  <rect x="52" y="50" width="8" height="46" fill="#6a4fb3"/>
+  <rect x="60" y="50" width="2" height="46" fill="#7c8799"/>
+  <rect x="62" y="50" width="2" height="46" fill="#d97706"/>
+  <rect x="64" y="50" width="2" height="46" fill="#b5232b"/>
+  <rect x="66" y="50" width="2" height="46" fill="#7fd6a0"/>
+  <rect x="68" y="50" width="2" height="46" fill="#ec4899"/>
+  <rect x="70" y="50" width="2" height="46" fill="#9ca3af"/>
+  <rect x="72" y="50" width="618" height="46" fill="#243026" opacity="0.7"/>
+  <text x="41" y="78" fill="#fff" font-size="12" font-weight="bold">us</text>
+  <text x="56" y="118" fill="#1f2a44" font-size="13">us — пользовательские программы</text>
+  <text x="56" y="138" fill="#1f2a44" font-size="13">sy — ядро (системные вызовы)</text>
+  <text x="56" y="158" fill="#1f2a44" font-size="13">wa — ожидание диска (CPU простаивает)</text>
+  <text x="330" y="118" fill="#1f2a44" font-size="13">id — простой (idle)</text>
+  <text x="330" y="138" fill="#1f2a44" font-size="13">ni — процессы с изменённым приоритетом (nice)</text>
+  <text x="330" y="158" fill="#1f2a44" font-size="13">hi / si — прерывания (аппаратные / программные)</text>
+  <text x="330" y="178" fill="#1f2a44" font-size="13">st — steal: гипервизор отбирает CPU у виртуалки</text>
+  <text x="30" y="40" fill="#1f2a44" font-size="14" font-weight="bold">Одна полоса = 100% процессорного времени</text>
+</svg>
+<figcaption>Схема распределения времени CPU: цвета условные, важны пропорции и смысл полей</figcaption>
+</figure>
+
+<table>
+  <tr><th>Поле</th><th>Расшифровка</th><th>Когда важно</th></tr>
+  <tr><td><b>us</b> (user)</td><td>Время в пользовательском коде приложений</td><td>Высокий us — приложение много считает: ищите процесс в таблице</td></tr>
+  <tr><td><b>sy</b> (system)</td><td>Время в ядре: системные вызовы, сеть, файловая система</td><td>Высокий sy при большом числе соединений или I/O — повод смотреть на сеть и диск</td></tr>
+  <tr><td><b>ni</b> (nice)</td><td>Время процессов с ручным приоритетом</td><td>Обычно ноль, если кто-то не менял приоритеты через nice</td></tr>
+  <tr><td><b>id</b> (idle)</td><td>Простой процессора</td><td>Низкий id — процессор занят. Высокий id при высоком load — проблема с I/O</td></tr>
+  <tr><td><b>wa</b> (iowait)</td><td>Процессор ждёт завершения операций ввода-вывода</td><td>Устойчиво выше 10–20% — медленный диск или перегруженная база</td></tr>
+  <tr><td><b>hi</b> / <b>si</b></td><td>Обработка аппаратных и программных прерываний</td><td>Высокий si бывает при интенсивной сетевой нагрузке</td></tr>
+  <tr><td><b>st</b> (steal)</td><td>Время, которое гипервизор отдал другим виртуалкам</td><td>Заметный steal в облаке — перегрузка хоста, помочь может только провайдер или другой тариф</td></tr>
+</table>
+
+<div class="warn"><b>Частая ошибка</b>Высокий %CPU у процесса и высокий us — не одно и то же по смыслу. Процесс может быть «горячим» из-за ядра (sy), а не из-за своего кода. Смотрите оба поля.</div>
+
+<h2 id="s7">7. Строки памяти: Mem и Swap</h2>
+<pre><code>MiB Mem :  7982.1 total,   512.4 free,  2140.7 used,  5329.0 buff/cache
+MiB Swap:  2048.0 total,  2048.0 free,     0.0 used.  5512.3 avail Mem</code></pre>
+<ul>
+  <li><b>total</b> — вся физическая память;</li>
+  <li><b>free</b> — полностью свободная память. Почти всегда мала, и это нормально;</li>
+  <li><b>used</b> — память, занятая приложениями и ядром;</li>
+  <li><b>buff/cache</b> — кэш диска и буферы. Linux использует свободную память под кэш, чтобы ускорять работу с диском. При нехватке памяти кэш отдаётся приложениям;</li>
+  <li><b>avail Mem</b> — самое важное число: сколько памяти можно выделить новым приложениям без обращения к свопу.</li>
+</ul>
+<div class="tip"><b>Смотрите на avail Mem, а не на free</b>Если free близок к нулю, но avail Mem большой, системе памяти хватает. Тревожиться стоит, когда падает avail Mem и растёт использование swap.</div>
+
+<figure>
+<svg viewBox="0 0 720 150" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+  <rect x="30" y="40" width="660" height="40" rx="6" fill="#dfe6f3"/>
+  <rect x="30" y="40" width="130" height="40" fill="#6a4fb3"/>
+  <rect x="160" y="40" width="200" height="40" fill="#1e4fa3"/>
+  <rect x="360" y="40" width="200" height="40" fill="#7fd6a0"/>
+  <rect x="560" y="40" width="130" height="40" fill="#e5e7eb" stroke="#9ca3af" stroke-dasharray="4 3"/>
+  <text x="95" y="66" fill="#fff" font-size="13" text-anchor="middle">used</text>
+  <text x="260" y="66" fill="#fff" font-size="13" text-anchor="middle">buff/cache</text>
+  <text x="460" y="66" fill="#1f2a44" font-size="13" text-anchor="middle">доступно (avail)</text>
+  <text x="625" y="66" fill="#1f2a44" font-size="13" text-anchor="middle">free</text>
+  <text x="30" y="110" fill="#1f2a44" font-size="13">Память, которую можно освободить под приложения: free + часть buff/cache. Именно её показывает avail Mem.</text>
+  <text x="30" y="130" fill="#1f2a44" font-size="13">Кэш занимает память не зря: он ускоряет чтение с диска и отдаётся приложениям по требованию.</text>
+</svg>
+<figcaption>Как распределена память: свободная память почти всегда мала, потому что система держит кэш</figcaption>
+</figure>
+
+<p><b>Swap</b> — файл или раздел на диске, куда ядро выгружает редко используемые страницы памяти. Небольшое использование swap нормально. Опасны признаки активной подкачки: растущее used в Swap и высокий <code>wa</code> одновременно — система «ходит» по диску и тормозит.</p>
+<pre><code>free -h          # та же картина в удобном виде
+vmstat 1 5       # колонки si и so: сколько страниц читается и пишется в swap за секунду</code></pre>
+
+<h2 id="s8">8. Таблица процессов: колонки</h2>
+<table>
+  <tr><th>Колонка</th><th>Расшифровка</th></tr>
+  <tr><td><b>PID</b></td><td>Идентификатор процесса. Нужен для kill, renice, strace</td></tr>
+  <tr><td><b>USER</b></td><td>Пользователь, от которого запущен процесс</td></tr>
+  <tr><td><b>PR</b> (priority)</td><td>Приоритет планировщика ядра. Для обычных процессов обычно 20</td></tr>
+  <tr><td><b>NI</b> (nice)</td><td>Настройка приоритета пользователем: от -20 (самый высокий) до 19 (самый низкий)</td></tr>
+  <tr><td><b>VIRT</b></td><td>Вся виртуальная память процесса, включая то, что не загружено. Сильно больше реального потребления, мало о чём говорит</td></tr>
+  <tr><td><b>RES</b> (resident)</td><td>Физическая память, которую процесс реально держит. Главный показатель потребления памяти</td></tr>
+  <tr><td><b>SHR</b></td><td>Часть RES, которая общая с другими процессами (библиотеки)</td></tr>
+  <tr><td><b>S</b> (state)</td><td>Состояние: R — выполняется, S — спит, D — ждёт диск, Z — зомби, T — остановлен</td></tr>
+  <tr><td><b>%CPU</b></td><td>Доля процессорного времени за последний интервал. Может быть больше 100% на многоядерных системах</td></tr>
+  <tr><td><b>%MEM</b></td><td>Доля физической памяти от общего объёма</td></tr>
+  <tr><td><b>TIME+</b></td><td>Общее процессорное время, которое процесс уже использовал</td></tr>
+  <tr><td><b>COMMAND</b></td><td>Имя программы или команда запуска</td></tr>
+</table>
+
+<div class="tip"><b>Как понять колонку VIRT</b>Программы часто резервируют большие объёмы виртуальной памяти, которые не используют. Поэтому смотрите на RES и %MEM, а не на VIRT.</div>
+
+<h2 id="s9">9. Клавиши управления</h2>
+<p>Все команды работают прямо в интерактивном режиме. Экран не блокирует работу, поэтому можно сортировать, фильтровать и завершать процессы.</p>
+<table>
+  <tr><th>Клавиша</th><th>Действие</th></tr>
+  <tr><td><code>q</code></td><td>Выход</td></tr>
+  <tr><td><code>1</code></td><td>Показать загрузку каждого ядра отдельно</td></tr>
+  <tr><td><code>t</code> / <code>m</code></td><td>Переключить вид строк CPU и памяти (графика или цифры)</td></tr>
+  <tr><td><code>P</code></td><td>Сортировать по %CPU</td></tr>
+  <tr><td><code>M</code></td><td>Сортировать по памяти</td></tr>
+  <tr><td><code>T</code></td><td>Сортировать по TIME+</td></tr>
+  <tr><td><code>k</code></td><td>Отправить сигнал процессу (по умолчанию SIGTERM, введите PID)</td></tr>
+  <tr><td><code>r</code></td><td>Изменить приоритет (nice) процесса</td></tr>
+  <tr><td><code>u</code></td><td>Показать процессы только одного пользователя</td></tr>
+  <tr><td><code>c</code></td><td>Показать полную команду запуска вместо имени</td></tr>
+  <tr><td><code>H</code></td><td>Показывать потоки вместо процессов</td></tr>
+  <tr><td><code>V</code></td><td>Показать дерево процессов (родитель и дочерние)</td></tr>
+  <tr><td><code>d</code></td><td>Изменить интервал обновления</td></tr>
+  <tr><td><code>W</code></td><td>Сохранить настройки в файл ~/.toprc</td></tr>
+  <tr><td><code>?</code></td><td>Подсказка по всем клавишам</td></tr>
+</table>
+<div class="warn"><b>Осторожно с клавишей k</b>Сигнал SIGKILL (9) не даёт процессу корректно завершиться. Сначала пробуйте SIGTERM (15, по умолчанию), и только если процесс не реагирует, — SIGKILL.</div>
+
+<h2 id="s10">10. Параметры запуска и полезные режимы</h2>
+<pre><code>top -bn1                   # один снимок в обычный текст (для скриптов и логов)
+top -b -n 3 -d 5 &gt; top.log  # три снимка с интервалом 5 секунд в файл
+top -p 1187,4312           # следить только за указанными PID
+top -u www-data            # только процессы пользователя
+top -o %MEM                # сортировка по памяти при запуске
+top -H -p 1187             # потоки конкретного процесса</code></pre>
+<ul>
+  <li><code>-b</code> — пакетный режим, без интерактивного ввода, удобно для скриптов;</li>
+  <li><code>-n</code> — сколько кадров вывести перед выходом;</li>
+  <li><code>-d</code> — интервал обновления в секундах;</li>
+  <li><code>-p</code> — фильтр по PID, можно указать несколько через запятую.</li>
+</ul>
+<div class="tip"><b>Лайфхак для логов</b>Ручной top нельзя сохранить в лог, а <code>top -bn1 -o %CPU | head -n 15</code> можно вписать в скрипт мониторинга или отправить в тикет.</div>
+
+<h2 id="s11">11. htop: что добавляет</h2>
+<p><code>htop</code> — более удобная версия top с цветами, мышью и наглядными полосками. Установка: <code>sudo apt install htop</code> (Debian/Ubuntu) или <code>sudo dnf install htop</code> (RHEL/Fedora).</p>
+<ul>
+  <li>Полосы CPU и памяти показывают долю использования и тип нагрузки цветом;</li>
+  <li>Дерево процессов клавишей <code>F5</code>: сразу видно, кто кого запустил;</li>
+  <li>Поиск <code>F3</code>, фильтр <code>F4</code>, отправка сигнала <code>F9</code>, сортировка мышью;</li>
+  <li>Нижняя панель с подсказками по функциональным клавишам.</li>
+</ul>
+<table>
+  <tr><th>Цвет полосы CPU (htop)</th><th>Что означает</th></tr>
+  <tr><td>Зелёный</td><td>Обычная пользовательская нагрузка (user)</td></tr>
+  <tr><td>Красный</td><td>Работа ядра (system)</td></tr>
+  <tr><td>Синий</td><td>Низкоприоритетные процессы (nice)</td></tr>
+  <tr><td>Серый / оранжевый</td><td>Ожидание I/O или steal, в зависимости от версии</td></tr>
+</table>
+<div class="tip"><b>Когда брать htop</b>Для быстрого осмотра на своём рабочем сервере — htop удобнее. На чужих и минимальных серверах top есть всегда, поэтому знать оба стоит.</div>
+
+<h2 id="s12">12. Практика: разбираем типичные ситуации</h2>
+
+<h3>Ситуация 1. Сервер «тормозит», load высокий</h3>
+<ol>
+  <li>Смотрим load average и число ядер: <code>nproc</code>. Например, load 12 на 4 ядрах.</li>
+  <li>Смотрим %Cpu. Если us высокий — ищем процесс с большим %CPU в таблице.</li>
+  <li>Если id высокий, а load всё равно большой — смотрим состояние D и поле wa. Это ждём диск.</li>
+  <li>Для диска: <code>iostat -x 1</code> и <code>vmstat 1</code>.</li>
+</ol>
+
+<h3>Ситуация 2. Память «кончилась», но процессы небольшие</h3>
+<ol>
+  <li>Смотрим avail Mem, а не free. Если avail большой — паники нет.</li>
+  <li>Если avail мал, сортируем по памяти клавишей <code>M</code> и смотрим RES.</li>
+  <li>Проверяем журнал ядра на OOM: <code>dmesg -T | grep -i oom</code>.</li>
+</ol>
+
+<h3>Ситуация 3. Процесс съедает 100% CPU на одном ядре</h3>
+<ol>
+  <li>Сортируем по CPU клавишей <code>P</code>, запоминаем PID.</li>
+  <li>Смотрим, что за процесс: колонка COMMAND и клавиша <code>c</code>.</li>
+  <li>Выясняем, зациклился ли он: <code>strace -p PID</code> покажет, какие системные вызовы он делает.</li>
+  <li>Решаем: исправить конфиг или перезапустить сервис через systemd.</li>
+</ol>
+
+<h3>Ситуация 4. Высокий steal в облаке</h3>
+<p>Поле st растёт, а ваши процессы простаивают. Это значит, что хост перегружен и гипервизор не даёт вашей виртуалке процессорное время. Внутри системы это не исправить: нужна поддержка провайдера или смена тарифа.</p>
+
+<h3>Ситуация 5. Много зомби</h3>
+<p>В строке Tasks растёт zombie. Зомби не потребляют CPU и память, но показывают, что родитель не забирает статус дочернего процесса. Найдите родителя: <code>ps -o ppid= -p PID_ЗОМБИ</code>, затем исправьте программу или перезапустите её.</p>
+
+<h2 id="s13">13. Лайфхаки</h2>
+<ul>
+  <li><b>Смотрите на три вещи в первую очередь:</b> load относительно nproc, avail Mem и поле wa. Этого хватает для первичного диагноза.</li>
+  <li><b>Одна команда для быстрой картины:</b> <code>top -bn1 | head -n 15</code>.</li>
+  <li><b>Сохраняйте картину при инциденте:</b> <code>top -b -n 5 -d 2 &gt; /tmp/top-incident.log</code>.</li>
+  <li><b>Смотрите потоки, а не процессы,</b> если многопоточное приложение съедает CPU: клавиша <code>H</code>.</li>
+  <li><b>Не путайте %CPU больше 100%:</b> на 4 ядрах процесс может показать 350% — это три с половиной ядра.</li>
+  <li><b>Сверяйте результат с другими инструментами:</b> <code>vmstat</code>, <code>iostat</code>, <code>free</code>, <code>ss</code>. Одна картина из нескольких источников надёжнее одного числа.</li>
+</ul>
+
+<h2 id="s14">14. Шпаргалка</h2>
+<table>
+  <tr><th>Команда / клавиша</th><th>Для чего</th></tr>
+  <tr><td><code>top</code></td><td>Интерактивный монитор</td></tr>
+  <tr><td><code>top -bn1</code></td><td>Один снимок в текст</td></tr>
+  <tr><td><code>nproc</code></td><td>Число ядер для сравнения с load</td></tr>
+  <tr><td><code>free -h</code></td><td>Память в удобном виде</td></tr>
+  <tr><td><code>vmstat 1 5</code></td><td>Память, swap, I/O и CPU по секундам</td></tr>
+  <tr><td><code>iostat -x 1</code></td><td>Нагрузка на диски</td></tr>
+  <tr><td><code>P</code> / <code>M</code> / <code>T</code></td><td>Сортировка по CPU, памяти, времени</td></tr>
+  <tr><td><code>1</code></td><td>Загрузка каждого ядра</td></tr>
+  <tr><td><code>k</code></td><td>Сигнал процессу</td></tr>
+  <tr><td><code>H</code></td><td>Потоки вместо процессов</td></tr>
+  <tr><td><code>htop</code></td><td>Удобная альтернатива с цветами и мышью</td></tr>
+</table>
+
+<p class="top"><a href="#top">↑ Наверх</a></p>
+
+</div>
+</body>
+</html>
