@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K8s: основы, архитектура, компоненты и способы установки</title>
+<style>
+  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --red:#b5232b; --green:#2e7d4f; --line:#c9d3e6; --code:#f1f4fa; }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --red:#ff7b7b; --green:#7fd6a0; --line:#3a4352; --code:#242a36; }
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:16px; line-height:1.65; }
+  .wrap { max-width:900px; margin:0 auto; }
+  h1 { text-align:center; color:var(--blue); font-size:28px; margin:0 0 6px; }
+  .lead { text-align:center; color:var(--green); margin:0 0 22px; }
+  h2 { color:var(--green); font-size:22px; margin:36px 0 12px; border-bottom:2px solid var(--line); padding-bottom:4px; }
+  h3 { color:var(--blue); font-size:18px; margin:22px 0 8px; }
+  p { margin:8px 0; }
+  ul, ol { margin:6px 0 6px 22px; padding:0; }
+  li { margin:5px 0; }
+  code { font-family:Consolas,"Courier New",monospace; color:var(--red); font-size:14px; background:rgba(127,127,127,.12); padding:1px 5px; border-radius:3px; }
+  pre { background:var(--code); border:1px solid var(--line); border-radius:6px; padding:12px 14px; overflow-x:auto; }
+  pre code { color:var(--ink); background:none; padding:0; font-size:13.5px; line-height:1.5; }
+  .toc { border:2px solid var(--line); border-radius:8px; padding:14px 18px; }
+  .toc h2 { margin:0 0 8px; border:none; font-size:18px; }
+  .toc ol { margin:0 0 0 20px; }
+  .toc li { margin:3px 0; }
+  .toc a { color:var(--blue); text-decoration:none; border-bottom:1px dashed var(--blue); }
+  .tip { border-left:4px solid var(--green); background:rgba(46,125,79,.08); padding:8px 12px; margin:12px 0; border-radius:4px; }
+  .warn { border-left:4px solid var(--red); background:rgba(181,35,43,.07); padding:8px 12px; margin:12px 0; border-radius:4px; }
+  .tip b, .warn b { display:block; margin-bottom:2px; }
+  figure { margin:16px auto; text-align:center; }
+  figure svg { max-width:100%; height:auto; }
+  figcaption { font-size:14px; opacity:.75; margin-top:6px; }
+  table { border-collapse:collapse; width:100%; margin:10px 0; font-size:15px; }
+  th, td { border:1px solid var(--line); padding:6px 9px; text-align:left; vertical-align:top; }
+  th { color:var(--blue); }
+  a { color:var(--blue); }
+  .links li { margin:6px 0; }
+  .top { font-size:14px; margin-top:12px; display:inline-block; }
+  .top a { text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1 id="top">K8s: основы, архитектура и компоненты</h1>
+<p class="lead">Что такое Kubernetes, из чего он состоит и как его установить</p>
+
+<div class="toc">
+  <h2>Содержание</h2>
+  <ol>
+    <li><a href="#s1">Что такое Kubernetes простыми словами</a></li>
+    <li><a href="#s2">Зачем он нужен: проблема без него</a></li>
+    <li><a href="#s3">Базовые понятия</a></li>
+    <li><a href="#s4">Архитектура: из чего состоит кластер</a></li>
+    <li><a href="#s5">Компоненты control plane</a></li>
+    <li><a href="#s6">Компоненты рабочего узла</a></li>
+    <li><a href="#s7">Вспомогательные части: DNS, сеть, метрики</a></li>
+    <li><a href="#s8">Что происходит, когда вы пишете kubectl apply</a></li>
+    <li><a href="#s9">Основные объекты Kubernetes</a></li>
+    <li><a href="#s10">Способы установки: обзор</a></li>
+    <li><a href="#s11">kubeadm: установка «по-взрослому» вручную</a></li>
+    <li><a href="#s12">Kubespray: установка через Ansible</a></li>
+    <li><a href="#s13">Лёгкие варианты для обучения и тестов</a></li>
+    <li><a href="#s14">Управляемые сервисы в облаке</a></li>
+    <li><a href="#s15">Как выбрать способ установки</a></li>
+    <li><a href="#s16">Полезные ссылки</a></li>
+  </ol>
+</div>
+
+<h2 id="s1">1. Что такое Kubernetes простыми словами</h2>
+<p>Представьте большой порт, где сотни контейнеров с грузами нужно раскладывать по кораблям, следить, чтобы ни один груз не потерялся, а если корабль сломался, перенести груз на другой. Kubernetes (его часто называют K8s, «кубер») — это такой диспетчер для контейнеров. Вы говорите ему: «Мне нужны три копии моего приложения», — а он сам решает, на каких серверах их запустить, следит за ними и поднимает заново, если что-то упало.</p>
+<p>Название пришло из греческого языка и означает «штурман» или «рулевой». Логотип — штурвал со спицами, поэтому его иногда называют «рулевым» для контейнеров.</p>
+<div class="tip"><b>Коротко</b>Kubernetes — это система, которая запускает контейнеры на множестве серверов, следит за их состоянием и сама исправляет отклонения от описанного вами желаемого результата.</div>
+
+<h2 id="s2">2. Зачем он нужен: проблема без него</h2>
+<p>Пока приложение живёт на одном сервере, всё просто. Когда появляется десять микросервисов, каждый в трёх копиях, и они разбросаны по двадцати серверам, возникают вопросы:</p>
+<ul>
+  <li>Где сейчас запущен каждый контейнер и что делать, если сервер выключился ночью?</li>
+  <li>Как обновить приложение без простоя?</li>
+  <li>Как сервисы находят друг друга, если их адреса постоянно меняются?</li>
+  <li>Как распределить нагрузку, если пиковый трафик вырос в пять раз?</li>
+</ul>
+<p>Kubernetes отвечает на все эти вопросы: он берёт на себя размещение, масштабирование, обновления и восстановление. Администратор описывает желаемое состояние, а система постоянно к нему приводит.</p>
+
+<h2 id="s3">3. Базовые понятия</h2>
+<table>
+  <tr><th>Понятие</th><th>Простое объяснение</th></tr>
+  <tr><td><b>Контейнер</b></td><td>Упакованное приложение со всеми зависимостями (например, образ Docker)</td></tr>
+  <tr><td><b>Под (Pod)</b></td><td>Минимальная единица в Kubernetes: один или несколько тесно связанных контейнеров, которые живут вместе и делят сеть</td></tr>
+  <tr><td><b>Узел (Node)</b></td><td>Сервер, физический или виртуальный, на котором запускаются поды</td></tr>
+  <tr><td><b>Кластер</b></td><td>Набор узлов плюс «мозг», которым управляется всё вместе</td></tr>
+  <tr><td><b>Манифест</b></td><td>Файл в формате YAML, в котором вы описываете желаемое состояние</td></tr>
+  <tr><td><b>Namespace</b></td><td>Логическая «папка» для объектов, например для разных команд или окружений</td></tr>
+</table>
+
+<h2 id="s4">4. Архитектура: из чего состоит кластер</h2>
+<p>Кластер Kubernetes делится на две большие части. Первая — <b>control plane</b>, «мозг», который принимает решения. Вторая — <b>рабочие узлы</b> (worker nodes), на которых реально крутятся ваши приложения.</p>
+
+<figure>
+<svg viewBox="0 0 720 400" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+  <rect x="150" y="10" width="420" height="130" rx="12" fill="#1e4fa3"/>
+  <text x="360" y="38" fill="#fff" font-size="17" font-weight="bold" text-anchor="middle">Control plane (мозг кластера)</text>
+  <rect x="170" y="52" width="120" height="58" rx="8" fill="#2c63c4"/>
+  <text x="230" y="78" fill="#fff" font-size="13" text-anchor="middle">API server</text>
+  <text x="230" y="96" fill="#dfe8ff" font-size="11" text-anchor="middle">вход для всех</text>
+  <rect x="300" y="52" width="120" height="58" rx="8" fill="#2c63c4"/>
+  <text x="360" y="78" fill="#fff" font-size="13" text-anchor="middle">etcd</text>
+  <text x="360" y="96" fill="#dfe8ff" font-size="11" text-anchor="middle">память кластера</text>
+  <rect x="430" y="52" width="120" height="58" rx="8" fill="#2c63c4"/>
+  <text x="490" y="78" fill="#fff" font-size="13" text-anchor="middle">scheduler</text>
+  <text x="490" y="96" fill="#dfe8ff" font-size="11" text-anchor="middle">выбирает узел</text>
+  <rect x="230" y="84" width="260" height="0"/>
+  <rect x="300" y="72" width="120" height="0"/>
+  <text x="360" y="128" fill="#dfe8ff" font-size="12" text-anchor="middle">controller manager — следит, чтобы факт совпадал с желаемым</text>
+
+  <line x1="360" y1="140" x2="170" y2="220" stroke="#2e7d4f" stroke-width="3"/>
+  <line x1="360" y1="140" x2="560" y2="220" stroke="#2e7d4f" stroke-width="3"/>
+  <text x="250" y="190" fill="#2e7d4f" font-size="12">управляет</text>
+  <text x="440" y="190" fill="#2e7d4f" font-size="12">управляет</text>
+
+  <rect x="20" y="220" width="300" height="165" rx="12" fill="none" stroke="#2e7d4f" stroke-width="2.5"/>
+  <text x="170" y="246" fill="#2e7d4f" font-size="15" font-weight="bold" text-anchor="middle">Рабочий узел 1</text>
+  <rect x="40" y="260" width="120" height="52" rx="8" fill="#6a4fb3"/>
+  <text x="100" y="283" fill="#fff" font-size="12" text-anchor="middle">Под A</text>
+  <text x="100" y="300" fill="#eae3ff" font-size="10" text-anchor="middle">контейнер</text>
+  <rect x="180" y="260" width="120" height="52" rx="8" fill="#6a4fb3"/>
+  <text x="240" y="283" fill="#fff" font-size="12" text-anchor="middle">Под B</text>
+  <text x="240" y="300" fill="#eae3ff" font-size="10" text-anchor="middle">контейнер</text>
+  <text x="170" y="340" fill="#1f2a44" font-size="12" text-anchor="middle">kubelet · kube-proxy · runtime</text>
+  <text x="170" y="366" fill="#1f2a44" font-size="11" text-anchor="middle">(агенты, которые выполняют команды)</text>
+
+  <rect x="400" y="220" width="300" height="165" rx="12" fill="none" stroke="#2e7d4f" stroke-width="2.5"/>
+  <text x="550" y="246" fill="#2e7d4f" font-size="15" font-weight="bold" text-anchor="middle">Рабочий узел 2</text>
+  <rect x="420" y="260" width="120" height="52" rx="8" fill="#6a4fb3"/>
+  <text x="480" y="283" fill="#fff" font-size="12" text-anchor="middle">Под A</text>
+  <text x="480" y="300" fill="#eae3ff" font-size="10" text-anchor="middle">копия</text>
+  <rect x="560" y="260" width="120" height="52" rx="8" fill="#6a4fb3"/>
+  <text x="620" y="283" fill="#fff" font-size="12" text-anchor="middle">Под C</text>
+  <text x="620" y="300" fill="#eae3ff" font-size="10" text-anchor="middle">другое приложение</text>
+  <text x="550" y="340" fill="#1f2a44" font-size="12" text-anchor="middle">kubelet · kube-proxy · runtime</text>
+  <text x="550" y="366" fill="#1f2a44" font-size="11" text-anchor="middle">(агенты, которые выполняют команды)</text>
+
+  <text x="360" y="402" fill="#1f2a44" font-size="12" text-anchor="middle"> </text>
+</svg>
+<figcaption>Упрощённая схема: control plane принимает решения, рабочие узлы запускают поды</figcaption>
+</figure>
+
+<h2 id="s5">5. Компоненты control plane</h2>
+<p>Control plane состоит из нескольких программ. Обычно они запускаются на одном или нескольких выделенных серверах.</p>
+<ul>
+  <li><b>kube-apiserver</b> — единственная «дверь» в кластер. Через него общаются все: вы через kubectl, узлы и другие компоненты. Он проверяет запросы и сохраняет состояние.</li>
+  <li><b>etcd</b> — распределённое хранилище «ключ-значение», где лежит всё состояние кластера: какие объекты созданы, что на что настроено. Потеря etcd без резервной копии — самая серьёзная авария.</li>
+  <li><b>kube-scheduler</b> — выбирает, на каком узле запустить новый под. Учитывает свободные ресурсы, правила размещения и ограничения.</li>
+  <li><b>kube-controller-manager</b> — набор контроллеров. Каждый следит за своим типом объектов: например, контроллер ReplicaSet поддерживает нужное число копий, а контроллер узлов реагирует, если узел пропал.</li>
+  <li><b>cloud-controller-manager</b> — связывает кластер с облаком (AWS, Azure, GCP): создаёт балансировщики и диски. Нужен только в облачных кластерах.</li>
+</ul>
+<div class="tip"><b>Запомните главное</b>API server — вход, etcd — память, scheduler — решает, где запустить, controller manager — поддерживает порядок.</div>
+
+<h2 id="s6">6. Компоненты рабочего узла</h2>
+<ul>
+  <li><b>kubelet</b> — главный агент на каждом узле. Получает от control plane список подов, которые должны работать здесь, и запускает их через container runtime. Также отчитывается о состоянии.</li>
+  <li><b>kube-proxy</b> — настраивает сетевые правила на узле, чтобы трафик к сервису Kubernetes попадал на нужные поды.</li>
+  <li><b>Container runtime</b> — программа, которая реально запускает контейнеры. Сегодня чаще всего это <b>containerd</b>. Docker напрямую в Kubernetes с версии 1.24 не используется, но образы Docker работают как прежде.</li>
+</ul>
+
+<h2 id="s7">7. Вспомогательные части: DNS, сеть, метрики</h2>
+<ul>
+  <li><b>CoreDNS</b> — DNS внутри кластера. Позволяет обращаться к сервисам по имени, например <code>my-service.my-namespace</code>, а не по IP.</li>
+  <li><b>Сетевые плагины (CNI)</b> — отвечают за сеть между подами на разных узлах. Популярные: Calico, Flannel, Cilium.</li>
+  <li><b>Metrics Server</b> — собирает базовые метрики CPU и памяти, без них работают автоскейлеры и команда <code>kubectl top</code>.</li>
+</ul>
+
+<h2 id="s8">8. Что происходит, когда вы пишете kubectl apply</h2>
+<p>Представьте, что вы отправили манифест с описанием Deployment из трёх копий. Что произойдёт дальше:</p>
+<ol>
+  <li>kubectl отправляет манифест в API server.</li>
+  <li>API server проверяет права и корректность и записывает объект в etcd.</li>
+  <li>Контроллер Deployment видит новый объект и создаёт ReplicaSet, а тот — три пода.</li>
+  <li>Scheduler выбирает для каждого пода подходящий узел.</li>
+  <li>kubelet на выбранном узле получает задание и запускает контейнеры через runtime.</li>
+  <li>kube-proxy и CoreDNS обновляют правила сети, чтобы сервис начал принимать трафик.</li>
+</ol>
+
+<figure>
+<svg viewBox="0 0 720 150" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+  <g font-size="13" text-anchor="middle">
+    <rect x="10" y="50" width="110" height="50" rx="8" fill="#1f2a44"/><text x="65" y="80" fill="#fff">kubectl</text>
+    <rect x="150" y="50" width="110" height="50" rx="8" fill="#1e4fa3"/><text x="205" y="80" fill="#fff">API server</text>
+    <rect x="290" y="50" width="110" height="50" rx="8" fill="#1e4fa3"/><text x="345" y="80" fill="#fff">etcd</text>
+    <rect x="430" y="50" width="110" height="50" rx="8" fill="#2e7d4f"/><text x="485" y="80" fill="#fff">scheduler</text>
+    <rect x="570" y="50" width="130" height="50" rx="8" fill="#6a4fb3"/><text x="635" y="80" fill="#fff">kubelet → под</text>
+  </g>
+  <g stroke="#b5232b" stroke-width="2.5">
+    <line x1="122" y1="75" x2="148" y2="75"/><line x1="262" y1="75" x2="288" y2="75"/>
+    <line x1="402" y1="75" x2="428" y2="75"/><line x1="542" y1="75" x2="568" y2="75"/>
+  </g>
+  <text x="360" y="130" fill="#1f2a44" font-size="13" text-anchor="middle">Манифест проходит через API server, сохраняется в etcd, получает узел от scheduler и запускается kubelet</text>
+</svg>
+<figcaption>Путь манифеста от команды до запущенного пода</figcaption>
+</figure>
+
+<h2 id="s9">9. Основные объекты Kubernetes</h2>
+<table>
+  <tr><th>Объект</th><th>Для чего нужен</th></tr>
+  <tr><td>Pod</td><td>Один или несколько контейнеров, работающих вместе</td></tr>
+  <tr><td>ReplicaSet</td><td>Поддерживает нужное число одинаковых подов</td></tr>
+  <tr><td>Deployment</td><td>Обычные приложения: обновления, откаты, управление ReplicaSet</td></tr>
+  <tr><td>StatefulSet</td><td>Приложения с состоянием (базы данных): постоянные имена подов и свои диски. Подробнее см. статью по контроллеру StatefulSet в ссылках ниже</td></tr>
+  <tr><td>DaemonSet</td><td>По одному поду на каждом узле: агенты логов и мониторинга</td></tr>
+  <tr><td>Job / CronJob</td><td>Разовая задача и задача по расписанию</td></tr>
+  <tr><td>Service</td><td>Постоянный адрес для группы подов, внутренняя балансировка нагрузки</td></tr>
+  <tr><td>Ingress</td><td>Маршрутизация внешнего HTTP/HTTPS-трафика по доменам и путям</td></tr>
+  <tr><td>ConfigMap / Secret</td><td>Настройки и секреты, отдельно от образа приложения</td></tr>
+  <tr><td>PersistentVolume / PVC</td><td>Постоянное хранилище, которое переживает перезапуск пода</td></tr>
+</table>
+
+<h2 id="s10">10. Способы установки: обзор</h2>
+<p>Способов установить Kubernetes много. Они различаются по сложности, назначению и по тому, кто отвечает за обслуживание. Ниже — основные варианты.</p>
+<table>
+  <tr><th>Способ</th><th>Для чего</th><th>Сложность</th></tr>
+  <tr><td><b>kubeadm</b></td><td>Классический способ собрать кластер вручную, понять устройство</td><td>Средняя</td></tr>
+  <tr><td><b>Kubespray</b></td><td>Установка через Ansible, подходит для серверов в своей инфраструктуре</td><td>Средняя</td></tr>
+  <tr><td><b>Minikube</b></td><td>Учёба и тесты на одной машине</td><td>Низкая</td></tr>
+  <tr><td><b>kind</b></td><td>Кластер из контейнеров Docker, удобен для тестов CI</td><td>Низкая</td></tr>
+  <tr><td><b>k3s</b></td><td>Лёгкий дистрибутив для edge, IoT, небольших серверов</td><td>Низкая</td></tr>
+  <tr><td><b>RKE2 / Rancher</b></td><td>Корпоративная платформа с веб-интерфейсом</td><td>Средняя</td></tr>
+  <tr><td><b>kops</b></td><td>Установка и управление кластером в AWS</td><td>Средняя</td></tr>
+  <tr><td><b>OpenShift</b></td><td>Корпоративная платформа от Red Hat с расширенными возможностями безопасности</td><td>Высокая</td></tr>
+  <tr><td><b>Managed (EKS, GKE, AKS, Яндекс Managed Service for Kubernetes)</b></td><td>Облако само ставит и обслуживает control plane</td><td>Низкая</td></tr>
+</table>
+
+<h2 id="s11">11. kubeadm: установка «по-взрослому» вручную</h2>
+<p><b>kubeadm</b> — официальный инструмент Kubernetes для создания кластера. Он не делает всё за вас в одну кнопку, зато показывает каждый шаг, поэтому его часто выбирают, чтобы понять устройство.</p>
+<p>Общие шаги на каждом сервере и на управляющем узле:</p>
+<ol>
+  <li>Подготовить серверы: отключить swap, настроить время (NTP), открыть нужные порты.</li>
+  <li>Установить container runtime (containerd) и настроить его для kubelet.</li>
+  <li>Установить kubeadm, kubelet и kubectl нужной версии.</li>
+  <li>На управляющем узле выполнить инициализацию кластера.</li>
+  <li>Установить сетевой плагин (CNI), например Calico или Flannel.</li>
+  <li>На рабочих узлах присоединиться командой <code>kubeadm join</code>, которую выдаёт инициализация.</li>
+</ol>
+<pre><code># На управляющем узле
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+
+# Настроить kubectl для обычного пользователя
+mkdir -p $HOME/.kube
+sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+# Проверить, что узлы видны
+kubectl get nodes</code></pre>
+<div class="warn"><b>Важно</b>Точные команды, версии и параметры зависят от вашей ОС и версии Kubernetes. Перед установкой сверяйтесь с официальной документацией, она обновляется чаще любой статьи.</div>
+
+<h2 id="s12">12. Kubespray: установка через Ansible</h2>
+<p><b>Kubespray</b> — набор ролей и плейбуков Ansible, который ставит production-готовый кластер на ваши серверы. Если вы уже знаете Ansible, порог входа низкий: вы описываете инвентарь серверов и запускаете плейбук.</p>
+<ul>
+  <li>Подходит для своих серверов и виртуальных машин, в том числе в закрытом контуре;</li>
+  <li>Поддерживает разные варианты сети и контейнерных рантаймов;</li>
+  <li>Установка занимает время, зато её можно повторять и воспроизводить.</li>
+</ul>
+<pre><code># Общий порядок (сокращённо)
+git clone https://github.com/kubernetes-sigs/kubespray.git
+cd kubespray
+pip install -r requirements.txt
+cp -rfp inventory/sample inventory/mycluster
+# Заполнить inventory/mycluster/inventory.ini адресами серверов
+ansible-playbook -i inventory/mycluster/inventory.ini cluster.yml -b</code></pre>
+<div class="tip"><b>Лайфхак</b>Если вы освоили Ansible по нашей заметке, Kubespray будет понятен: это тот же инвентарь, те же переменные и роли, только для целого кластера.</div>
+
+<h2 id="s13">13. Лёгкие варианты для обучения и тестов</h2>
+<ul>
+  <li><b>Minikube</b> — поднимает кластер в виртуальной машине или контейнере на вашем ноутбуке. Команда <code>minikube start</code>, и через минуту кластер готов.</li>
+  <li><b>kind</b> (Kubernetes in Docker) — каждый «узел» кластера это контейнер Docker. Очень быстро поднимается и удобен в CI.</li>
+  <li><b>k3s</b> — упрощённый дистрибутив от Rancher: один бинарный файл, меньше памяти, подходит для слабых серверов и edge-устройств.</li>
+</ul>
+<pre><code>minikube start
+kubectl get nodes
+
+kind create cluster --name test</code></pre>
+
+<h2 id="s14">14. Управляемые сервисы в облаке</h2>
+<p>В облаке control plane обычно обслуживает сам провайдер: обновляет, делает резервные копии, следит за доступностью. Вы управляете только рабочими узлами и приложениями. Примеры: Amazon EKS, Google GKE, Azure AKS, Яндекс Managed Service for Kubernetes. Это самый простой путь для production, если нет причин держать кластер у себя.</p>
+
+<h2 id="s15">15. Как выбрать способ установки</h2>
+<ul>
+  <li><b>Хотите учиться:</b> Minikube или kind, затем kubeadm, чтобы понять, что происходит внутри.</li>
+  <li><b>Свой дата-центр, нужна автоматизация:</b> Kubespray.</li>
+  <li><b>Мало ресурсов или edge:</b> k3s.</li>
+  <li><b>Нужен production без лишних забот:</b> управляемый сервис в облаке.</li>
+  <li><b>Нужна корпоративная поддержка и интерфейс:</b> OpenShift или Rancher.</li>
+</ul>
+
+<h2 id="s16">16. Полезные ссылки</h2>
+<ul class="links">
+  <li><a href="https://kubernetes.io/ru/docs/concepts/overview/components/" target="_blank" rel="noopener">Компоненты Kubernetes — официальная документация (на русском)</a></li>
+  <li><a href="https://kubernetes-blog.blogspot.com/2019/09/kubernetes-controller-statefulset.html" target="_blank" rel="noopener">Статья о контроллере StatefulSet (блог по Kubernetes)</a></li>
+  <li><a href="https://kubernetes.io/ru/docs/setup/production-environment/tools/kubeadm/" target="_blank" rel="noopener">Установка через kubeadm — официальная документация (на русском)</a></li>
+  <li><a href="https://kubespray.io/" target="_blank" rel="noopener">Kubespray — документация проекта</a></li>
+  <li><a href="https://minikube.sigs.k8s.io/" target="_blank" rel="noopener">Minikube — официальный сайт</a></li>
+  <li><a href="https://kind.sigs.k8s.io/" target="_blank" rel="noopener">kind — официальный сайт</a></li>
+  <li><a href="https://k3s.io/" target="_blank" rel="noopener">k3s — официальный сайт</a></li>
+  <li>Русскоязычные статьи о Kubernetes удобно искать на Habr по запросам «kubeadm», «kubespray», «устройство kubernetes»: там много разборов с практикой.</li>
+</ul>
+
+<p class="top"><a href="#top">↑ Наверх</a></p>
+
+</div>
+</body>
+</html>
