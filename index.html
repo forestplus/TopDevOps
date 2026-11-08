@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Дмитрий Парамонов — DevOps/SRE Team Lead</title>
-    <meta name="description" content="Дмитрий Парамонов — DevOps/SRE Team Lead. 20+ лет в IT, 9 лет в DevOps/SRE: Kubernetes, Docker, OpenShift, CI/CD, DevSecOps. Открыт к новым проектам.">
+    <meta name="description" content="Дмитрий Парамонов — DevOps/SRE Team Lead. 20+ лет в IT, 9 лет в DevOps/SRE. DevOps, DevSecOps, SRE, DevOps/SRE Team Lead. Kubernetes, Docker, OpenShift, CI/CD, ITSM/ITIL.">
     <meta name="author" content="Дмитрий Парамонов">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://forestplus.github.io/TopDevOps/">
@@ -14,7 +14,7 @@
     <meta property="og:url" content="https://forestplus.github.io/TopDevOps/">
     <meta property="og:site_name" content="Dmitriy Paramonov — DevOps/SRE Team Lead">
     <meta property="og:title" content="Дмитрий Парамонов — DevOps/SRE Team Lead">
-    <meta property="og:description" content="20+ лет в IT, 9 лет в DevOps/SRE: Kubernetes, Docker, OpenShift, CI/CD, DevSecOps. Открыт к новым проектам.">
+    <meta property="og:description" content="20+ лет в IT, 9 лет в DevOps/SRE. DevOps, DevSecOps, SRE, DevOps/SRE Team Lead. Kubernetes, Docker, OpenShift, CI/CD, ITSM/ITIL.">
     <meta property="og:image" content="https://forestplus.github.io/TopDevOps/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -26,7 +26,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Дмитрий Парамонов — DevOps/SRE Team Lead">
-    <meta name="twitter:description" content="20+ лет в IT, 9 лет в DevOps/SRE. Kubernetes, Docker, OpenShift, CI/CD, DevSecOps, ITSM/ITIL.">
+    <meta name="twitter:description" content="20+ лет в IT, 9 лет в DevOps/SRE. DevOps, DevSecOps, SRE, DevOps/SRE Team Lead. Kubernetes, Docker, OpenShift, CI/CD, ITSM/ITIL.">
     <meta name="twitter:image" content="https://forestplus.github.io/TopDevOps/og-image.png">
 
     <!-- Theme / PWA -->
@@ -1104,6 +1104,7 @@
             <h3 class="notes-group-title">Микросервисы</h3>
             <ul class="notes-list">
                 <li><a href="microservices-ru.html" target="_blank" rel="noopener" data-ru="Микросервисы: архитектура, компоненты и устройство системы" data-en="Microservices: architecture, components and system design">Микросервисы: архитектура, компоненты и устройство системы</a></li>
+                <li><a href="https://topdevops.pro/backend-architecture-ru.html" target="_blank" rel="noopener" data-ru="Backend. Важные вопросы и детали" data-en="Backend: important questions and details">Backend. Важные вопросы и детали</a></li>
             </ul>
         </div>
         <div class="notes-group">
@@ -1221,7 +1222,7 @@
             <span class="footer-tags">#DevOps #DevSecOps #MLOps #SRE #CTO #CIO #ITManager</span>
         </p>
         <p style="margin-top:0.5rem; font-size:0.7rem; color:#ffffff;" data-ru="© 2026 Дмитрий Парамонов" data-en="© 2026 Dmitriy Paramonov">© 2026 Дмитрий Парамонов</p>
-        <p style="margin-top:0.8rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--text-muted);" id="visitor-count-line"></p>
+        <p style="margin-top:0.8rem; font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--text-muted); opacity:0.35;" id="visitor-count-line"></p>
     </footer>
 
     <script>
@@ -1438,18 +1439,29 @@
                 .catch(() => renderTicker(FALLBACK_LINKS));
         })();
 
-        // ========== VISITOR COUNTER (fetch-based) ==========
+        // ========== DAILY VISITORS (one count per browser per day) ==========
         (function () {
             const lineEl = document.getElementById('visitor-count-line');
             if (!lineEl) return;
-            fetch('https://api.countapi.xyz/hit/forestplus-topdevops/site-visits')
-                .then((r) => { if (!r.ok) throw new Error('bad response'); return r.json(); })
+            const d = new Date();
+            const day = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+            const ns = 'forestplus-topdevops';
+            const key = 'visits-' + day;
+            const flag = 'counted-' + day;
+            const base = 'https://api.countapi.xyz/';
+            let counted = false;
+            try { counted = localStorage.getItem(flag) === '1'; } catch (e) {}
+            const req = counted
+                ? fetch(base + 'get/' + ns + '/' + key)
+                : fetch(base + 'hit/' + ns + '/' + key).then((r) => {
+                    try { localStorage.setItem(flag, '1'); } catch (e) {}
+                    return r;
+                });
+            req.then((r) => { if (!r.ok) throw new Error('bad response'); return r.json(); })
                 .then((data) => {
-                    if (data && typeof data.value === 'number') {
-                        lineEl.textContent = `visitors: ${data.value}`;
-                    }
+                    if (data && typeof data.value === 'number') lineEl.textContent = 'сегодня: ' + data.value;
                 })
-                .catch(() => { /* silently do nothing — many browsers/adblockers block this, that's fine */ });
+                .catch(() => { /* счётчик недоступен — ничего не показываем */ });
         })();
 
         // ========== HOVER TICK SOUNDS ==========
