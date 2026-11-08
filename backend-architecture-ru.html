@@ -1,1 +1,1308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backend. Важные вопросы и детали</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#faf9f6;--card:#fff;--text:#2a2a2a;--muted:#6b7280;--blue:#2c4a7c;--accent:#3b6fb5;--green:#1a7a4d;--orange:#c46a10;--purple:#6a4c93;--teal:#14706a;--red:#a03030;--border:#e2e5ec;--shadow:0 1px 8px rgba(0,0,0,.06);--radius:12px}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:16px}
+a{color:var(--accent);text-decoration:none;border-bottom:1px dashed var(--accent)}
+a:hover{border-bottom-style:solid}
 
+/* ===== TITLE HEADER ===== */
+.title-header{text-align:center;padding:40px 20px 30px;max-width:820px;margin:0 auto}
+.title-header h1{font-size:2em;font-weight:800;color:var(--blue);letter-spacing:-.5px;line-height:1.3}
+.title-header .sub{font-size:1.05em;color:var(--green);margin-top:8px;font-weight:500}
+
+/* ===== TOC ===== */
+.toc-wrap{max-width:820px;margin:0 auto 30px;padding:0 20px}
+.toc{background:var(--card);border-radius:var(--radius);box-shadow:0 4px 20px rgba(0,0,0,.08);padding:26px 30px;border:1px solid var(--border)}
+.toc h2{font-size:1.2em;color:var(--green);font-weight:700;margin-bottom:12px}
+.toc ol{list-style:none;padding:0;counter-reset:t}
+.toc ol li{counter-increment:t;padding:5px 0;font-size:.93em}
+.toc ol li a::before{content:counter(t)". ";font-weight:700;color:var(--muted)}
+
+.content{max-width:820px;margin:0 auto;padding:0 20px 60px}
+.sh{font-size:1.6em;font-weight:800;color:var(--green);margin:48px 0 6px;padding-top:18px;border-top:3px solid var(--green)}
+.ssh{font-size:1.2em;font-weight:700;color:var(--blue);margin:26px 0 6px}
+p{margin:8px 0}
+strong{color:var(--blue)}
+code.i{background:#eef1f8;color:var(--purple);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:.87em}
+ul.l{padding-left:18px;margin:6px 0}ul.l li{padding:2px 0;font-size:.94em}
+ol.l{padding-left:18px;margin:6px 0}ol.l li{padding:2px 0;font-size:.94em}
+.nc{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin:14px 0;box-shadow:var(--shadow)}
+.nc.ga{border-left:4px solid var(--green)}.nc.ba{border-left:4px solid var(--blue)}.nc.oa{border-left:4px solid var(--orange)}.nc.pa{border-left:4px solid var(--purple)}.nc.ta{border-left:4px solid var(--teal)}.nc.ra{border-left:4px solid var(--red)}
+.nc h4{font-size:.95em;font-weight:700;margin-bottom:6px;color:var(--blue)}
+.tb{background:#fef9e7;border-left:4px solid #e8b830;padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0;font-size:.92em}
+.wb{background:#fce8e6;border-left:4px solid var(--red);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0;font-size:.92em}
+.ib{background:#e8f4fd;border-left:4px solid var(--accent);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0;font-size:.92em}
+.tw{overflow-x:auto;margin:10px 0;border-radius:10px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.tbl{width:100%;border-collapse:collapse;font-size:.88em}
+.tbl th{background:var(--blue);color:#fff;padding:9px 12px;text-align:left;font-weight:600;white-space:nowrap}
+.tbl td{padding:8px 12px;border-bottom:1px solid #eef2fa}
+.tbl tr:nth-child(even) td{background:#f8faff}.tbl tr:last-child td{border-bottom:none}
+.cb{background:#1a2536;color:#d0dae6;border-radius:10px;padding:16px 20px;font-family:'JetBrains Mono',monospace;font-size:.84em;line-height:1.8;overflow-x:auto;margin:12px 0;white-space:pre}
+.cb .cm{color:#6a8a6a}.cb .kw{color:#cc7832}.cb .an{color:#bbb529}.cb .st{color:#6a8759}
+.dc{text-align:center;margin:18px 0}.dc svg{max-width:100%;height:auto}
+.dc .cap{font-size:.84em;color:var(--muted);margin-top:4px;font-style:italic}
+.cr{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:14px 0}
+@media(max-width:700px){.cr{grid-template-columns:1fr}}
+
+/* ===== Q&A STYLING ===== */
+.qa-c{font-size:1.2em;font-weight:700;color:var(--blue);margin:28px 0 8px;padding-bottom:4px;border-bottom:2px solid #e8edf7}
+.qi{margin:10px 0;padding:16px 20px;background:var(--card);border-radius:10px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.qi .q{font-weight:700;color:var(--blue);margin-bottom:8px;font-size:.95em;display:flex;align-items:flex-start;gap:6px}
+.qi .q::before{content:"❓";flex-shrink:0}
+.qi .a{font-size:.92em;line-height:1.7;color:var(--text)}
+.qi .a strong{color:var(--blue);font-weight:700}
+.qi .a em{color:var(--green);font-style:normal;font-weight:600}
+.qi .a p{margin:6px 0}
+.qi .a ul{padding-left:16px;margin:4px 0}
+.qi .a ul li{padding:2px 0;font-size:.95em}
+.qi .a ol{padding-left:16px;margin:4px 0}
+.qi .a ol li{padding:2px 0;font-size:.95em}
+
+/* ===== ANIMATIONS ===== */
+@keyframes dash{to{stroke-dashoffset:-20}}
+.fa{stroke-dasharray:8 4;animation:dash 1s linear infinite}
+@keyframes pulse{0%,100%{opacity:.6;r:5}50%{opacity:1;r:8}}
+.pulse-node{animation:pulse 2s ease-in-out infinite}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 2px rgba(59,111,181,.3))}50%{filter:drop-shadow(0 0 8px rgba(59,111,181,.6))}}
+.glow{animation:glow 3s ease-in-out infinite}
+@keyframes bounceArrow{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.bounce{animation:bounceArrow 1.5s ease-in-out infinite}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeSlideUp .6s ease both}
+.fd1{animation-delay:.1s}.fd2{animation-delay:.2s}.fd3{animation-delay:.3s}.fd4{animation-delay:.4s}.fd5{animation-delay:.5s}.fd6{animation-delay:.6s}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.blink{animation:blink 2s ease-in-out infinite}
+@keyframes scalePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.scale-pulse{animation:scalePulse 2s ease-in-out infinite}
+
+@media(max-width:600px){.toc{padding:18px}.sh{font-size:1.25em}.nc{padding:14px}.qi{padding:14px 16px}}
+</style>
+</head>
+<body>
+
+<!-- ===== TITLE ===== -->
+<div class="title-header">
+<h1>Backend.<br>Важные вопросы и детали</h1>
+<p class="sub">Шпаргалка по серверной разработке: от HTTP до Kubernetes</p>
+</div>
+
+<!-- ===== TOC ===== -->
+<div class="toc-wrap"><nav class="toc">
+<h2>📑 Содержание</h2>
+<ol>
+<li><a href="#s1">Основы Backend разработки</a></li>
+<li><a href="#s2">HTTP, HTTPS и веб-коммуникация</a></li>
+<li><a href="#s3">REST API и веб-сервисы</a></li>
+<li><a href="#s4">Java и основы ООП</a></li>
+<li><a href="#s5">Spring Framework и Spring Boot</a></li>
+<li><a href="#s6">Создание REST API на Spring Boot</a></li>
+<li><a href="#s7">Базы данных и SQL</a></li>
+<li><a href="#s8">Hibernate, JPA и ORM</a></li>
+<li><a href="#s9">Аутентификация и безопасность</a></li>
+<li><a href="#s10">Архитектура и системный дизайн</a></li>
+<li><a href="#s11">Кеширование, Redis и производительность</a></li>
+<li><a href="#s12">Асинхронная обработка и messaging</a></li>
+<li><a href="#s13">Docker, Kubernetes и DevOps</a></li>
+<li><a href="#s14">Мониторинг, логирование и observability</a></li>
+<li><a href="#s15">Сценарные задачи и System Design</a></li>
+<li><a href="#s16">Вопросы и ответы</a></li>
+</ol>
+</nav></div>
+
+<main class="content">
+
+<!-- ===== S1 ===== -->
+<h2 class="sh" id="s1">Основы Backend разработки</h2>
+<p><strong>Backend</strong> — серверная часть приложения. Пользователь его не видит, но именно он отвечает за бизнес-логику, работу с БД, аутентификацию и обработку запросов.</p>
+
+<div class="dc"><svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" style="max-width:700px">
+<rect x="20" y="50" width="140" height="75" rx="12" fill="#2c4a7c" class="fade-up fd1"/><text x="90" y="82" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="Inter">💻 Клиент</text><text x="90" y="100" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.6)" font-family="Inter">(браузер / app)</text>
+<line x1="165" y1="72" x2="275" y2="72" stroke="#3b6fb5" stroke-width="2" marker-end="url(#aB)" class="fa"/>
+<circle cx="220" cy="72" r="4" fill="#3b6fb5" class="pulse-node"/>
+<text x="220" y="62" text-anchor="middle" font-size="10" fill="#6b7280" font-family="Inter">HTTP Request</text>
+<line x1="275" y1="100" x2="165" y2="100" stroke="#1a7a4d" stroke-width="2" marker-end="url(#aG)" class="fa"/>
+<circle cx="220" cy="100" r="4" fill="#1a7a4d" class="pulse-node"/>
+<text x="220" y="115" text-anchor="middle" font-size="10" fill="#6b7280" font-family="Inter">JSON Response</text>
+<rect x="280" y="40" width="150" height="95" rx="12" fill="#1a7a4d" class="fade-up fd3 glow"/><text x="355" y="75" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="Inter">🖥 Сервер</text><text x="355" y="95" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.6)" font-family="Inter">бизнес-логика</text><text x="355" y="112" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.6)" font-family="Inter">auth / API</text>
+<line x1="435" y1="87" x2="520" y2="87" stroke="#6a4c93" stroke-width="2" marker-end="url(#aP)" class="fa"/>
+<ellipse cx="580" cy="62" rx="52" ry="13" fill="#6a4c93" opacity=".85"/><rect x="528" y="62" width="104" height="50" fill="#6a4c93" opacity=".85"/><ellipse cx="580" cy="112" rx="52" ry="13" fill="#5a3d80" class="fade-up fd5"/><text x="580" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="Inter">🗄 БД</text><text x="580" y="106" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.6)" font-family="Inter">MySQL/MongoDB</text>
+<defs><marker id="aB" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3b6fb5"/></marker><marker id="aG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#1a7a4d"/></marker><marker id="aP" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6a4c93"/></marker></defs>
+</svg><p class="cap">Классическая архитектура: клиент ↔ сервер ↔ база данных</p></div>
+
+<h3 class="ssh">Frontend vs Backend</h3>
+<div class="tw"><table class="tbl"><tr><th>Характеристика</th><th>Frontend</th><th>Backend</th></tr>
+<tr><td>Что делает</td><td>Интерфейс пользователя</td><td>Бизнес-логика</td></tr>
+<tr><td>Где работает</td><td>Браузер (клиент)</td><td>Сервер</td></tr>
+<tr><td>Языки</td><td>HTML, CSS, JS (React…)</td><td>Java, Python, Node.js, Go…</td></tr>
+<tr><td>Цель</td><td>UI/UX</td><td>Функциональность, безопасность, данные</td></tr>
+<tr><td>Взаимодействие</td><td>Напрямую с пользователем</td><td>Неявно (через API)</td></tr></table></div>
+
+<h3 class="ssh">Что происходит при вводе URL?</h3>
+<div class="dc"><svg viewBox="0 0 700 100" xmlns="http://www.w3.org/2000/svg" style="max-width:700px">
+<rect x="5" y="15" width="95" height="55" rx="10" fill="#2c4a7c" class="fade-up fd1"/><text x="52" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">1. URL</text><text x="52" y="55" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">введён</text>
+<line x1="105" y1="42" x2="120" y2="42" stroke="#ccc" stroke-width="2" marker-end="url(#aGr)" class="bounce"/>
+<rect x="125" y="15" width="95" height="55" rx="10" fill="#3b6fb5" class="fade-up fd2"/><text x="172" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">2. DNS</text><text x="172" y="55" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">→ IP</text>
+<line x1="225" y1="42" x2="240" y2="42" stroke="#ccc" stroke-width="2" marker-end="url(#aGr)" class="bounce"/>
+<rect x="245" y="15" width="95" height="55" rx="10" fill="#1a7a4d" class="fade-up fd3"/><text x="292" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">3. HTTP</text><text x="292" y="55" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">запрос</text>
+<line x1="345" y1="42" x2="360" y2="42" stroke="#ccc" stroke-width="2" marker-end="url(#aGr)" class="bounce"/>
+<rect x="365" y="15" width="95" height="55" rx="10" fill="#c46a10" class="fade-up fd4"/><text x="412" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">4. Обработка</text><text x="412" y="55" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">на сервере</text>
+<line x1="465" y1="42" x2="480" y2="42" stroke="#ccc" stroke-width="2" marker-end="url(#aGr)" class="bounce"/>
+<rect x="485" y="15" width="95" height="55" rx="10" fill="#6a4c93" class="fade-up fd5"/><text x="532" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">5. Ответ</text><text x="532" y="55" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">HTML/JSON</text>
+<line x1="585" y1="42" x2="600" y2="42" stroke="#ccc" stroke-width="2" marker-end="url(#aGr)" class="bounce"/>
+<rect x="605" y="15" width="85" height="55" rx="10" fill="#14706a" class="fade-up fd6"/><text x="647" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">6. Рендер</text><text x="647" y="55" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">браузером</text>
+<defs><marker id="aGr" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#aaa"/></marker></defs>
+</svg></div>
+
+<h3 class="ssh">Популярные технологии</h3>
+<ul class="l"><li><strong>Языки:</strong> Java, Python, Node.js, PHP, Go</li><li><strong>Фреймворки:</strong> Spring Boot, Express.js, Django, Laravel</li><li><strong>Базы данных:</strong> MySQL, PostgreSQL, MongoDB, Redis</li><li><strong>API:</strong> REST, GraphQL</li><li><strong>DevOps:</strong> Docker, Kubernetes, AWS, CI/CD</li><li><strong>Инструменты:</strong> Git, Postman, Maven, Jenkins</li></ul>
+
+<!-- ===== S2 ===== -->
+<h2 class="sh" id="s2">HTTP, HTTPS и веб-коммуникация</h2>
+<p><strong>HTTP</strong> — протокол прикладного уровня для связи клиента и сервера. Работает по модели «запрос → ответ» и является <strong>stateless</strong>.</p>
+<p><strong>HTTPS</strong> добавляет шифрование SSL/TLS. Порт <code class="i">443</code> (у HTTP — <code class="i">80</code>). Защищает от перехвата и подмены данных.</p>
+
+<div class="cr">
+<div class="nc ga"><h4>HTTP методы</h4>
+<div class="tw" style="border:none;box-shadow:none;margin:0"><table class="tbl" style="font-size:.84em"><tr><th>Метод</th><th>Назначение</th><th>Idempotent</th><th>Safe</th></tr>
+<tr><td><strong>GET</strong></td><td>Получить данные</td><td>✅</td><td>✅</td></tr>
+<tr><td><strong>POST</strong></td><td>Создать ресурс</td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>PUT</strong></td><td>Обновить целиком</td><td>✅</td><td>❌</td></tr>
+<tr><td><strong>PATCH</strong></td><td>Обновить частично</td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>DELETE</strong></td><td>Удалить</td><td>✅</td><td>❌</td></tr></table></div></div>
+<div class="nc ba"><h4>Коды состояний</h4>
+<div class="tw" style="border:none;box-shadow:none;margin:0"><table class="tbl" style="font-size:.84em"><tr><th>Код</th><th>Значение</th><th>Примеры</th></tr>
+<tr><td><strong>1xx</strong></td><td>Информационный</td><td>100 Continue</td></tr>
+<tr><td><strong>2xx</strong></td><td>Успех</td><td>200, 201, 204</td></tr>
+<tr><td><strong>3xx</strong></td><td>Перенаправление</td><td>301, 302, 304</td></tr>
+<tr><td><strong>4xx</strong></td><td>Ошибка клиента</td><td>400, 401, 403, 404</td></tr>
+<tr><td><strong>5xx</strong></td><td>Ошибка сервера</td><td>500, 502, 503</td></tr></table></div></div>
+</div>
+
+<h3 class="ssh">Важные заголовки</h3>
+<ul class="l"><li><code class="i">Host</code> — доменное имя сервера</li><li><code class="i">Content-Type</code> — тип данных (<code class="i">application/json</code>)</li><li><code class="i">Authorization</code> — токен аутентификации</li><li><code class="i">Accept</code> — ожидаемый формат ответа</li><li><code class="i">Cookie</code> — данные сессии</li><li><code class="i">Cache-Control</code> — инструкции кеширования</li></ul>
+
+<h3 class="ssh">Stateless vs Stateful</h3>
+<p>HTTP не запоминает состояние между запросами. Для «памяти» используют <strong>cookies</strong>, <strong>сессии</strong> или <strong>JWT токены</strong>.</p>
+
+<!-- ===== S3 ===== -->
+<h2 class="sh" id="s3">REST API и веб-сервисы</h2>
+<p><strong>API</strong> — набор правил для общения программ. <strong>REST</strong> — архитектурный стиль построения таких интерфейсов: stateless, resource-based URLs, стандартные HTTP методы, JSON формат.</p>
+
+<h3 class="ssh">6 принципов REST</h3>
+<ol class="l"><li><strong>Client-Server</strong> — разделение ответственности</li><li><strong>Statelessness</strong> — нет состояния между запросами</li><li><strong>Cacheability</strong> — ответы можно кешировать</li><li><strong>Uniform Interface</strong> — единый интерфейс</li><li><strong>Layered System</strong> — многослойность</li><li><strong>Code on Demand</strong> (опционально)</li></ol>
+
+<div class="cr">
+<div class="nc oa"><h4>REST vs SOAP</h4>
+<div class="tw" style="border:none;box-shadow:none;margin:0"><table class="tbl" style="font-size:.84em"><tr><th></th><th>REST</th><th>SOAP</th></tr>
+<tr><td>Тип</td><td>Архит. стиль</td><td>Протокол</td></tr>
+<tr><td>Данные</td><td>JSON</td><td>XML</td></tr>
+<tr><td>Скорость</td><td>Быстрее</td><td>Медленнее</td></tr>
+<tr><td>Сложность</td><td>Простая</td><td>Высокая</td></tr>
+<tr><td>State</td><td>Stateless</td><td>Stateful</td></tr></table></div></div>
+<div class="nc pa"><h4>JSON vs XML</h4>
+<div class="tw" style="border:none;box-shadow:none;margin:0"><table class="tbl" style="font-size:.84em"><tr><th></th><th>JSON</th><th>XML</th></tr>
+<tr><td>Вес</td><td>Лёгкий</td><td>Многословный</td></tr>
+<tr><td>Читаемость</td><td>Отличная</td><td>Средняя</td></tr>
+<tr><td>Типы данных</td><td>Массивы, объекты</td><td>Ограниченные</td></tr>
+<tr><td>Использование</td><td>REST API</td><td>Legacy, SOAP</td></tr></table></div></div>
+</div>
+
+<div class="ib"><strong>Идемпотентность:</strong> GET, PUT, DELETE идемпотентны (несколько вызовов = один результат). POST — нет (каждый вызов создаёт новый ресурс).</div>
+
+<!-- ===== S4 ===== -->
+<h2 class="sh" id="s4">Java и основы ООП</h2>
+
+<h3 class="ssh">JVM, JRE и JDK</h3>
+<div class="dc"><svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg" style="max-width:280px">
+<rect x="5" y="5" width="270" height="190" rx="14" fill="none" stroke="#2c4a7c" stroke-width="3" class="fade-up fd1"/><text x="140" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#2c4a7c" font-family="Inter">JDK</text><text x="140" y="42" text-anchor="middle" font-size="9" fill="#6b7280" font-family="Inter">(Development Tools)</text>
+<rect x="25" y="52" width="230" height="125" rx="10" fill="none" stroke="#1a7a4d" stroke-width="2.5" class="fade-up fd2"/><text x="140" y="72" text-anchor="middle" font-size="13" font-weight="700" fill="#1a7a4d" font-family="Inter">JRE</text><text x="140" y="86" text-anchor="middle" font-size="9" fill="#6b7280" font-family="Inter">(Libraries + JVM)</text>
+<rect x="50" y="95" width="180" height="65" rx="8" fill="#e8f4fd" stroke="#3b6fb5" stroke-width="2" class="fade-up fd3 glow"/><text x="140" y="122" text-anchor="middle" font-size="13" font-weight="700" fill="#3b6fb5" font-family="Inter">JVM</text><text x="140" y="142" text-anchor="middle" font-size="9" fill="#6b7280" font-family="Inter">(Executes bytecode)</text>
+</svg><p class="cap">Вложенность: JDK ⊃ JRE  JVM</p></div>
+
+<h3 class="ssh">ООП концепции</h3>
+<ul class="l"><li><strong>Инкапсуляция</strong> — объединение данных и методов в классе</li><li><strong>Абстракция</strong> — сокрытие деталей реализации</li><li><strong>Наследование</strong> — переиспользование кода через extends</li><li><strong>Полиморфизм</strong> — один метод, разное поведение (overriding)</li></ul>
+<div class="cb"><span class="kw">class</span> Animal {
+    <span class="kw">void</span> sound() { System.out.println(<span class="st">"Animal sound"</span>); }
+}
+<span class="kw">class</span> Dog <span class="kw">extends</span> Animal {
+    <span class="kw">@Override</span>
+    <span class="kw">void</span> sound() { System.out.println(<span class="st">"Bark!"</span>); }
+}</div>
+
+<h3 class="ssh">Interface vs Abstract Class</h3>
+<div class="tw"><table class="tbl"><tr><th></th><th>Interface</th><th>Abstract Class</th></tr>
+<tr><td>Абстракция</td><td>Полная</td><td>Частичная</td></tr>
+<tr><td>Методы</td><td>Только abstract (+default/static с Java 8)</td><td>Abstract + concrete</td></tr>
+<tr><td>Переменные</td><td>public static final</td><td>Любые</td></tr>
+<tr><td>Multiple inheritance</td><td>✅ Да</td><td>❌ Нет</td></tr>
+<tr><td>Назначение</td><td>Контракт</td><td>Общий код</td></tr></table></div>
+
+<h3 class="ssh">Collections Framework</h3>
+<div class="tw"><table class="tbl"><tr><th>Интерфейс</th><th>Реализации</th><th>Особенности</th></tr>
+<tr><td><strong>List</strong></td><td>ArrayList, LinkedList</td><td>Упорядоченный, дубликаты OK</td></tr>
+<tr><td><strong>Set</strong></td><td>HashSet, TreeSet</td><td>Без дубликатов</td></tr>
+<tr><td><strong>Map</strong></td><td>HashMap, TreeMap</td><td>Пары key→value</td></tr>
+<tr><td><strong>Queue</strong></td><td>PriorityQueue, LinkedList</td><td>FIFO / приоритет</td></tr></table></div>
+
+<!-- ===== S5 ===== -->
+<h2 class="sh" id="s5">Spring Framework и Spring Boot</h2>
+<p><strong>Spring Framework</strong> — open-source фреймворк для enterprise Java: IoC, DI, AOP, модульная архитектура. <strong>Spring Boot</strong> — надстройка с автоконфигурацией, встроенным Tomcat и starter-зависимостями (convention over configuration).</p>
+
+<h3 class="ssh">IoC и Dependency Injection</h3>
+<p>Контейнер Spring внедряет зависимости извне вместо самостоятельного создания объектами. Снижает связанность, упрощает тестирование.</p>
+<div class="dc"><svg viewBox="0 0 550 120" xmlns="http://www.w3.org/2000/svg" style="max-width:550px">
+<rect x="5" y="15" width="155" height="85" rx="12" fill="#2c4a7c" class="fade-up fd1"/><text x="82" y="48" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">Spring Container</text><text x="82" y="65" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.6)" font-family="Inter">(IoC)</text><text x="82" y="82" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.5)" font-family="Inter">управляет бинами</text>
+<line x1="165" y1="57" x2="245" y2="57" stroke="#1a7a4d" stroke-width="2.5" marker-end="url(#aDI)" class="fa"/><circle cx="205" cy="57" r="4" fill="#1a7a4d" class="pulse-node"/><text x="205" y="48" text-anchor="middle" font-size="10" fill="#6b7280" font-family="Inter">injects</text>
+<rect x="250" y="20" width="130" height="75" rx="12" fill="#1a7a4d" class="fade-up fd3"/><text x="315" y="50" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">Service</text><text x="315" y="68" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.6)" font-family="Inter">@Autowired repo</text>
+<line x1="385" y1="57" x2="440" y2="57" stroke="#6a4c93" stroke-width="2.5" marker-end="url(#aDP)" class="fa"/><circle cx="412" cy="57" r="4" fill="#6a4c93" class="pulse-node"/><text x="412" y="48" text-anchor="middle" font-size="10" fill="#6b7280" font-family="Inter">uses</text>
+<rect x="445" y="25" width="95" height="65" rx="10" fill="#6a4c93" class="fade-up fd5"/><text x="492" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">Repo</text><text x="492" y="70" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.6)" font-family="Inter">@Repository</text>
+<defs><marker id="aDI" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#1a7a4d"/></marker><marker id="aDP" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6a4c93"/></marker></defs>
+</svg></div>
+
+<h3 class="ssh">Ключевые аннотации</h3>
+<div class="tw"><table class="tbl"><tr><th>Аннотация</th><th>Назначение</th><th>Слой</th></tr>
+<tr><td><code class="i">@Component</code></td><td>Общий бином</td><td>Любой</td></tr>
+<tr><td><code class="i">@Service</code></td><td>Бизнес-логика</td><td>Service layer</td></tr>
+<tr><td><code class="i">@Repository</code></td><td>Доступ к данным</td><td>DAO layer</td></tr>
+<tr><td><code class="i">@Controller</code></td><td>MVC контроллер (view)</td><td>Web layer</td></tr>
+<tr><td><code class="i">@RestController</code></td><td>= @Controller + @ResponseBody</td><td>REST API</td></tr>
+<tr><td><code class="i">@Configuration</code></td><td>Конфигурационный класс</td><td>Java config</td></tr>
+<tr><td><code class="i">@Bean</code></td><td>Ручное объявление бина</td><td>Внутри @Configuration</td></tr></table></div>
+
+<h3 class="ssh">Как запускается Spring Boot</h3>
+<div class="dc"><svg viewBox="0 0 200 340" xmlns="http://www.w3.org/2000/svg" style="max-width:200px">
+<rect x="20" y="5" width="160" height="32" rx="8" fill="#2c4a7c" class="fade-up fd1"/><text x="100" y="26" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">main() method</text>
+<line x1="100" y1="38" x2="100" y2="50" stroke="#aaa" stroke-width="2" marker-end="url(#aDn)" class="bounce"/>
+<rect x="10" y="53" width="180" height="32" rx="8" fill="#3b6fb5" class="fade-up fd2"/><text x="100" y="74" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">SpringApplication.run()</text>
+<line x1="100" y1="86" x2="100" y2="98" stroke="#aaa" stroke-width="2" marker-end="url(#aDn)" class="bounce"/>
+<rect x="15" y="101" width="170" height="32" rx="8" fill="#1a7a4d" class="fade-up fd3"/><text x="100" y="122" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">Auto-configuration</text>
+<line x1="100" y1="134" x2="100" y2="146" stroke="#aaa" stroke-width="2" marker-end="url(#aDn)" class="bounce"/>
+<rect x="10" y="149" width="180" height="32" rx="8" fill="#c46a10" class="fade-up fd4"/><text x="100" y="170" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">Application Context</text>
+<line x1="100" y1="182" x2="100" y2="194" stroke="#aaa" stroke-width="2" marker-end="url(#aDn)" class="bounce"/>
+<rect x="15" y="197" width="170" height="32" rx="8" fill="#6a4c93" class="fade-up fd5"/><text x="100" y="218" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">Scan Components</text>
+<line x1="100" y1="230" x2="100" y2="242" stroke="#aaa" stroke-width="2" marker-end="url(#aDn)" class="bounce"/>
+<rect x="10" y="245" width="180" height="32" rx="8" fill="#14706a" class="fade-up fd6"/><text x="100" y="266" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">Start Embedded Server</text>
+<line x1="100" y1="278" x2="100" y2="290" stroke="#aaa" stroke-width="2" marker-end="url(#aDn)" class="bounce"/>
+<rect x="25" y="293" width="150" height="32" rx="8" fill="#1a7a4d" class="fade-up fd6 scale-pulse"/><text x="100" y="314" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">✅ Ready!</text>
+<defs><marker id="aDn" markerWidth="6" markerHeight="5" refX="3" refY="5" orient="auto"><polygon points="0 0,6 0,3 5" fill="#aaa"/></marker></defs>
+</svg></div>
+
+<!-- ===== S6 ===== -->
+<h2 class="sh" id="s6">Создание REST API на Spring Boot</h2>
+<p><code class="i">@RestController</code> = <code class="i">@Controller</code> + <code class="i">@ResponseBody</code>. Первый возвращает HTML-view, второй — сразу JSON/XML данные.</p>
+
+<h3 class="ssh">Маппинг запросов</h3>
+<div class="tw"><table class="tbl"><tr><th>Аннотация</th><th>HTTP Метод</th><th>Пример пути</th></tr>
+<tr><td>@GetMapping</td><td>GET</td><td>/api/users/{id}</td></tr>
+<tr><td>@PostMapping</td><td>POST</td><td>/api/users</td></tr>
+<tr><td>@PutMapping</td><td>PUT</td><td>/api/users/{id}</td></tr>
+<tr><td>@PatchMapping</td><td>PATCH</td><td>/api/users/{id}/email</td></tr>
+<tr><td>@DeleteMapping</td><td>DELETE</td><td>/api/users/{id}</td></tr></table></div>
+
+<h3 class="ssh">Path Variable vs Request Param</h3>
+<div class="cb"><span class="cm">// Из URL path: /users/42</span>
+@GetMapping(<span class="st">"/users/{id}"</span>)
+<span class="kw">public</span> ResponseEntity&lt;User&gt; getUser(@PathVariable <span class="kw">long</span> id) { ... }
+
+<span class="cm">// Из query string: /users?name=Ayush&amp;age=25</span>
+@GetMapping(<span class="st">"/users"</span>)
+<span class="kw">public</span> ResponseEntity&lt;List&lt;User&gt;&gt; getUsers(
+    @RequestParam String name,
+    @RequestParam <span class="kw">int</span> age) { ... }</div>
+
+<h3 class="ssh">DTO паттерн</h3>
+<p>Entity содержит все поля включая внутренние. DTO скрывает лишнее и валидирует входные данные.</p>
+<div class="dc"><svg viewBox="0 0 500 130" xmlns="http://www.w3.org/2000/svg" style="max-width:500px">
+<rect x="5" y="5" width="200" height="115" rx="10" fill="#fff" stroke="#2c4a7c" stroke-width="2" class="fade-up fd1"/><rect x="5" y="5" width="200" height="26" rx="10" fill="#2c4a7c"/><text x="105" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">Entity (User)</text>
+<text x="20" y="50" font-size="11" font-family="JetBrains Mono" fill="#6b7280">@Id private Long id;</text><text x="20" y="67" font-size="11" font-family="JetBrains Mono" fill="#6b7280">private String name;</text><text x="20" y="84" font-size="11" font-family="JetBrains Mono" fill="#6b7280">private String email;</text><text x="20" y="101" font-size="11" font-family="JetBrains Mono" fill="#a03030" class="blink">private String password; ← скрыт!</text>
+<line x1="210" y1="62" x2="260" y2="62" stroke="#1a7a4d" stroke-width="2.5" marker-end="url(#aDto)" class="fa"/><text x="235" y="55" text-anchor="middle" font-size="10" fill="#6b7280" font-family="Inter">convert</text>
+<rect x="265" y="10" width="225" height="105" rx="10" fill="#fff" stroke="#1a7a4d" stroke-width="2" class="fade-up fd3"/><rect x="265" y="10" width="225" height="26" rx="10" fill="#1a7a4d"/><text x="377" y="29" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">DTO (UserDTO)</text>
+<text x="280" y="55" font-size="11" font-family="JetBrains Mono" fill="#6b7280">private String name;</text><text x="280" y="72" font-size="11" font-family="JetBrains Mono" fill="#6b7280">private String email;</text><text x="280" y="92" font-size="10" font-family="Inter" fill="#1a7a4d" font-style="italic">без id, без password ✅</text>
+<defs><marker id="aDto" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#1a7a4d"/></marker></defs>
+</svg></div>
+
+<h3 class="ssh">Валидация</h3>
+<div class="cb"><span class="kw">public class</span> UserDTO {
+    @NotEmpty
+    <span class="kw">private</span> String name;
+    @Email
+    <span class="kw">private</span> String email;
+    @Min(18)
+    <span class="kw">private int</span> age;
+}</div>
+
+<h3 class="ssh">Глобальная обработка исключений</h3>
+<div class="cb">@RestControllerAdvice
+<span class="kw">public class</span> GlobalExceptionHandler {
+    @ExceptionHandler(Exception.<span class="kw">class</span>)
+    <span class="kw">public</span> ResponseEntity&lt;String&gt; handle(Exception ex) {
+        <span class="kw">return</span> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(<span class="st">"Error: "</span> + ex.getMessage());
+    }
+}</div>
+
+<!-- ===== S7 ===== -->
+<h2 class="sh" id="s7">Базы данных и SQL</h2>
+
+<h3 class="ssh">SQL vs NoSQL</h3>
+<div class="tw"><table class="tbl"><tr><th>Характеристика</th><th>SQL (реляционные)</th><th>NoSQL (нереляционные)</th></tr>
+<tr><td>Модель</td><td>Таблицы, строки, столбцы</td><td>Документы, KV, графы, колонки</td></tr>
+<tr><td>Схема</td><td>Фиксированная</td><td>Гибкая (schema-less)</td></tr>
+<tr><td>Запросы</td><td>SQL</td><td>Разные (JSON-like, API)</td></tr>
+<tr><td>Масштабирование</td><td>Вертикальное</td><td>Горизонтальное</td></tr>
+<tr><td>ACID</td><td>Да</td><td>CAP (eventual consistency)</td></tr>
+<tr><td>Примеры</td><td>MySQL, PostgreSQL, Oracle</td><td>MongoDB, Cassandra, Redis, DynamoDB</td></tr></table></div>
+
+<h3 class="ssh">Ключи и связи</h3>
+<div class="dc"><svg viewBox="0 0 550 180" xmlns="http://www.w3.org/2000/svg" style="max-width:550px">
+<rect x="15" y="5" width="220" height="125" rx="10" fill="#fff" stroke="#2c4a7c" stroke-width="2" class="fade-up fd1"/><rect x="15" y="5" width="220" height="26" rx="10" fill="#2c4a7c"/><text x="125" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">Student</text>
+<text x="30" y="50" font-size="11" font-family="JetBrains Mono" fill="#a03030" font-weight="700">PK │ id │ name  │ dept_id</text><text x="30" y="68" font-size="11" font-family="JetBrains Mono" fill="#6b7280">   │ 1  │ Ayush │ 101</text><text x="30" y="86" font-size="11" font-family="JetBrains Mono" fill="#6b7280">   │ 2  │ Rohan │ 102</text><text x="30" y="104" font-size="11" font-family="JetBrains Mono" fill="#6b7280">   │ 3  │ Neha  │ 101</text><text x="30" y="122" font-size="10" font-family="Inter" fill="#c46a10" font-weight="600">FK ↑ dept_id</text>
+<path d="M240 90 C290 90 290 120 330 120" fill="none" stroke="#c46a10" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#aFK)" class="fa"/><text x="285" y="100" text-anchor="middle" font-size="10" fill="#c46a10" font-family="Inter" font-weight="600">Foreign Key</text>
+<rect x="310" y="65" width="220" height="100" rx="10" fill="#fff" stroke="#1a7a4d" stroke-width="2" class="fade-up fd3"/><rect x="310" y="65" width="220" height="26" rx="10" fill="#1a7a4d"/><text x="420" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">Department</text>
+<text x="325" y="110" font-size="11" font-family="JetBrains Mono" fill="#a03030" font-weight="700">PK │ id  │ dept_name</text><text x="325" y="128" font-size="11" font-family="JetBrains Mono" fill="#6b7280">   │ 101 │ CSE</text><text x="325" y="146" font-size="11" font-family="JetBrains Mono" fill="#6b7280">   │ 102 │ IT</text>
+<defs><marker id="aFK" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#c46a10"/></marker></defs>
+</svg><p class="cap">Связь через Foreign Key: каждый студент ссылается на отдел</p></div>
+
+<h3 class="ssh">JOIN операции</h3>
+<div class="tw"><table class="tbl"><tr><th>Тип</th><th>Что возвращает</th></tr>
+<tr><td><strong>INNER JOIN</strong></td><td>Только совпадающие строки из обеих таблиц</td></tr>
+<tr><td><strong>LEFT JOIN</strong></td><td>Все из левой + совпадения из правой (NULL если нет)</td></tr>
+<tr><td><strong>RIGHT JOIN</strong></td><td>Все из правой + совпадения из левой</td></tr>
+<tr><td><strong>FULL OUTER JOIN</strong></td><td>Все из обеих таблиц</td></tr>
+<tr><td><strong>CROSS JOIN</strong></td><td>Декартово произведение (все комбинации)</td></tr></table></div>
+
+<h3 class="ssh">Нормализация</h3>
+<ul class="l"><li><strong>1NF</strong> — атомарные значения, нет повторяющихся групп</li><li><strong>2NF</strong> — 1NF + нет частичной зависимости от составного ключа</li><li><strong>3NF</strong> — 2NF + нет транзитивных зависимостей</li><li><strong>BCNF</strong> — усиленная 3NF: каждый детерминант — кандидатный ключ</li></ul>
+
+<h3 class="ssh">ACID свойства транзакций</h3>
+<div class="cr">
+<div class="nc ga"><h4>A — Atomicity</h4><p>Всё или ничего. Либо все операции выполнены, либо ни одной.</p></div>
+<div class="nc ba"><h4>C — Consistency</h4><p>Данные всегда переходят из одного валидного состояния в другое.</p></div>
+<div class="nc oa"><h4>I — Isolation</h4><p>Параллельные транзакции не влияют друг на друга.</p></div>
+<div class="nc pa"><h4>D — Durability</h4><p>После COMMIT изменения сохранятся даже при аварии.</p></div>
+</div>
+
+<!-- ===== S8 ===== -->
+<h2 class="sh" id="s8">Hibernate, JPA и ORM</h2>
+<p><strong>ORM</strong> — отображение объектов Java в таблицы БД. <strong>JPA</strong> — спецификация (интерфейс), <strong>Hibernate</strong> — реализация.</p>
+<div class="tw"><table class="tbl"><tr><th></th><th>JPA</th><th>Hibernate</th></tr>
+<tr><td>Тип</td><td>Спецификация (API)</td><td>Реализация JPA</td></tr>
+<tr><td>Автор</td><td>Jakarta EE</td><td>Open source проект</td></tr>
+<tr><td>Query Language</td><td>JPQL</td><td>HQL (надмножество JPQL)</td></tr>
+<tr><td>Cache</td><td>Не определён</td><td>L1 + L2 cache</td></tr></table></div>
+
+<h3 class="ssh">Пример Entity + Repository</h3>
+<div class="cb">@Entity
+@Table(name = <span class="st">"students"</span>)
+<span class="kw">public class</span> Student {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    <span class="kw">private</span> Long id;
+    @Column(nullable = false)
+    <span class="kw">private</span> String name;
+    @ManyToOne @JoinColumn(name = <span class="st">"dept_id"</span>)
+    <span class="kw">private</span> Department department;
+}
+
+<span class="kw">public interface</span> StudentRepository <span class="kw">extends</span> JpaRepository&lt;Student, Long&gt; {
+    List&lt;Student&gt; findByName(String name);
+}</div>
+
+<h3 class="ssh">Связи между сущностями</h3>
+<div class="dc"><svg viewBox="0 0 650 260" xmlns="http://www.w3.org/2000/svg" style="max-width:650px">
+<text x="80" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#2c4a7c" font-family="Inter" class="fade-up fd1">One-to-One</text>
+<rect x="15" y="25" width="60" height="35" rx="6" fill="#e8edf7" stroke="#2c4a7c" class="fade-up fd1"/><text x="45" y="47" text-anchor="middle" font-size="10" font-family="Inter" fill="#2c4a7c">User</text>
+<line x1="80" y1="42" x2="115" y2="42" stroke="#2c4a7c" stroke-width="1.5" marker-end="url(#ao1)" class="fa"/><text x="97" y="35" text-anchor="middle" font-size="8" fill="#6b7280">1:1</text>
+<rect x="120" y="25" width="70" height="35" rx="6" fill="#e8edf7" stroke="#2c4a7c" class="fade-up fd2"/><text x="155" y="47" text-anchor="middle" font-size="10" font-family="Inter" fill="#2c4a7c">Address</text>
+<text x="340" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#1a7a4d" font-family="Inter" class="fade-up fd2">One-to-Many</text>
+<rect x="270" y="25" width="80" height="35" rx="6" fill="#e8fff5" stroke="#1a7a4d" class="fade-up fd2"/><text x="310" y="47" text-anchor="middle" font-size="10" font-family="Inter" fill="#1a7a4d">Dept</text>
+<line x1="355" y1="42" x2="395" y2="42" stroke="#1a7a4d" stroke-width="1.5" marker-end="url(#ao2)" class="fa"/><text x="375" y="35" text-anchor="middle" font-size="8" fill="#6b7280">1:N</text>
+<rect x="400" y="25" width="80" height="35" rx="6" fill="#e8fff5" stroke="#1a7a4d" class="fade-up fd3"/><text x="440" y="47" text-anchor="middle" font-size="10" font-family="Inter" fill="#1a7a4d">Employee</text>
+<text x="80" y="100" text-anchor="middle" font-size="12" font-weight="700" fill="#c46a10" font-family="Inter" class="fade-up fd3">Many-to-One</text>
+<rect x="10" y="108" width="80" height="35" rx="6" fill="#fef3e2" stroke="#c46a10" class="fade-up fd3"/><text x="50" y="130" text-anchor="middle" font-size="10" font-family="Inter" fill="#c46a10">Employee</text>
+<line x1="95" y1="125" x2="130" y2="125" stroke="#c46a10" stroke-width="1.5" marker-end="url(#ao3)" class="fa"/><text x="112" y="118" text-anchor="middle" font-size="8" fill="#6b7280">N:1</text>
+<rect x="135" y="108" width="60" height="35" rx="6" fill="#fef3e2" stroke="#c46a10" class="fade-up fd4"/><text x="165" y="130" text-anchor="middle" font-size="10" font-family="Inter" fill="#c46a10">Dept</text>
+<text x="340" y="100" text-anchor="middle" font-size="12" font-weight="700" fill="#6a4c93" font-family="Inter" class="fade-up fd4">Many-to-Many</text>
+<rect x="270" y="108" width="70" height="35" rx="6" fill="#f3eeff" stroke="#6a4c93" class="fade-up fd4"/><text x="305" y="130" text-anchor="middle" font-size="10" font-family="Inter" fill="#6a4c93">Student</text>
+<line x1="345" y1="125" x2="370" y2="125" stroke="#6a4c93" stroke-width="1.5"/>
+<rect x="375" y="112" width="50" height="28" rx="4" fill="#ddd6fe" stroke="#6a4c93" stroke-dasharray="4 2" class="blink"/><text x="400" y="130" text-anchor="middle" font-size="9" font-family="Inter" fill="#6a4c93">join tbl</text>
+<line x1="430" y1="125" x2="455" y2="125" stroke="#6a4c93" stroke-width="1.5" marker-end="url(#ao4)" class="fa"/>
+<rect x="460" y="108" width="60" height="35" rx="6" fill="#f3eeff" stroke="#6a4c93" class="fade-up fd5"/><text x="490" y="130" text-anchor="middle" font-size="10" font-family="Inter" fill="#6a4c93">Course</text>
+<text x="375" y="155" text-anchor="middle" font-size="8" fill="#6b7280" font-family="Inter">N:M через промежуточную таблицу</text>
+<rect x="15" y="175" width="620" height="75" rx="10" fill="#f8faff" stroke="#e2e5ec" class="fade-up fd6"/>
+<text x="30" y="195" font-size="11" font-weight="700" fill="#2c4a7c" font-family="Inter">Аннотации связей:</text>
+<text x="30" y="215" font-size="10" font-family="JetBrains Mono" fill="#6b7280">@OneToOne | @OneToMany(mappedBy="...") | @ManyToOne(fetch=LAZY) | @ManyToMany</text>
+<text x="30" y="235" font-size="10" font-family="JetBrains Mono" fill="#6b7280">@JoinColumn(name="fk_col") | @JoinTable(name="student_course", joinColumns=..., inverseJoinColumns=...)</text>
+<defs><marker id="ao1" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#2c4a7c"/></marker><marker id="ao2" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#1a7a4d"/></marker><marker id="ao3" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#c46a10"/></marker><marker id="ao4" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#6a4c93"/></marker></defs>
+</svg></div>
+
+<div class="wb"><strong>Проблема N+1:</strong> Загрузка списка из N сущностей выполняет N дополнительных запросов на связи. Решения: JOIN FETCH, @EntityGraph, batch fetching.</div>
+
+<!-- ===== S9 ===== -->
+<h2 class="sh" id="s9">Аутентификация и безопасность</h2>
+<p><strong>Аутентификация</strong> — «Кто ты?». <strong>Авторизация</strong> — «Что тебе разрешено?».</p>
+
+<h3 class="ssh">Session-based vs Token-based</h3>
+<div class="tw"><table class="tbl"><tr><th></th><th>Session-based</th><th>Token-based (JWT)</th></tr>
+<tr><td>Хранение</td><td>На сервере</td><td>На клиенте</td></tr>
+<tr><td>Statefulness</td><td>Stateful</td><td>Stateless</td></tr>
+<tr><td>Масштабируемость</td><td>Сложнее (sticky sessions)</td><td>Лучше</td></tr>
+<tr><td>CSRF</td><td>Уязвим</td><td>Менее уязвим</td></tr>
+<tr><td>Logout</td><td>Удалить сессию</td><td>Blacklist / короткий TTL</td></tr></table></div>
+
+<h3 class="ssh">Структура JWT</h3>
+<div class="dc"><svg viewBox="0 0 600 70" xmlns="http://www.w3.org/2000/svg" style="max-width:600px">
+<rect x="5" y="8" width="170" height="50" rx="10" fill="#2c4a7c" class="fade-up fd1"/><text x="90" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">Header</text><text x="90" y="46" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">alg: HS256, typ: JWT</text>
+<text x="185" y="38" font-size="20" fill="#6b7280" font-weight="bold" class="blink">.</text>
+<rect x="195" y="8" width="190" height="50" rx="10" fill="#1a7a4d" class="fade-up fd2"/><text x="290" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">Payload</text><text x="290" y="46" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">{ userId, role, exp }</text>
+<text x="395" y="38" font-size="20" fill="#6b7280" font-weight="bold" class="blink">.</text>
+<rect x="405" y="8" width="185" height="50" rx="10" fill="#c46a10" class="fade-up fd3"/><text x="497" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">Signature</text><text x="497" y="46" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">HMACSHA256(h.p, secret)</text>
+</svg><p class="cap">JWT = Base64Url(Header) . Base64Url(Payload) . Signature</p></div>
+
+<h3 class="ssh">Хеширование паролей</h3>
+<div class="dc"><svg viewBox="0 0 500 60" xmlns="http://www.w3.org/2000/svg" style="max-width:500px">
+<rect x="5" y="10" width="85" height="38" rx="8" fill="#e8edf7" stroke="#2c4a7c" class="fade-up fd1"/><text x="47" y="34" text-anchor="middle" font-size="11" font-family="Inter" fill="#2c4a7c" font-weight="600">Password</text>
+<line x1="95" y1="29" x2="120" y2="29" stroke="#aaa" stroke-width="2" marker-end="url(#aH)" class="fa"/>
+<rect x="125" y="10" width="70" height="38" rx="8" fill="#fef3e2" stroke="#c46a10" class="fade-up fd2"/><text x="160" y="34" text-anchor="middle" font-size="11" font-family="Inter" fill="#c46a10" font-weight="600">+ Salt</text>
+<line x1="200" y1="29" x2="225" y2="29" stroke="#aaa" stroke-width="2" marker-end="url(#aH)" class="fa"/>
+<rect x="230" y="5" width="90" height="48" rx="8" fill="#6a4c93" class="fade-up fd3 glow"/><text x="275" y="28" text-anchor="middle" font-size="10" font-family="Inter" fill="#fff" font-weight="600">BCrypt /</text><text x="275" y="43" text-anchor="middle" font-size="10" font-family="Inter" fill="#fff" font-weight="600">Argon2</text>
+<line x1="325" y1="29" x2="350" y2="29" stroke="#aaa" stroke-width="2" marker-end="url(#aH)" class="fa"/>
+<rect x="355" y="10" width="95" height="38" rx="8" fill="#1a7a4d" class="fade-up fd4"/><text x="402" y="28" text-anchor="middle" font-size="10" font-family="Inter" fill="#fff" font-weight="600">Hash →</text><text x="402" y="43" text-anchor="middle" font-size="10" font-family="Inter" fill="#fff">в БД</text>
+<defs><marker id="aH" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#aaa"/></marker></defs>
+</svg></div>
+
+<h3 class="ssh">Распространённые угрозы</h3>
+<div class="tw"><table class="tbl"><tr><th>Угроза</th><th>Описание</th><th>Защита</th></tr>
+<tr><td>SQL Injection</td><td>Внедрение вредоносного SQL</td><td>PreparedStatement, ORM</td></tr>
+<tr><td>XSS</td><td>Вредоносные скрипты в страницах</td><td>Санитизация вывода, CSP</td></tr>
+<tr><td>CSRF</td><td>Поддельные межсайтовые запросы</td><td>CSRF токены, SameSite cookies</td></tr>
+<tr><td>Brute Force</td><td>Перебор паролей</td><td>Rate limiting, lockout</td></tr>
+<tr><td>MITM</td><td>Перехват трафика</td><td>HTTPS, certificate pinning</td></tr></table></div>
+
+<!-- ===== S10 ===== -->
+<h2 class="sh" id="s10">Архитектура и системный дизайн</h2>
+
+<h3 class="ssh">Монолит vs Микросервисы</h3>
+<div class="dc"><svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" style="max-width:700px">
+<text x="150" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#2c4a7c" font-family="Inter" class="fade-up fd1">Монолит</text>
+<rect x="40" y="25" width="220" height="95" rx="12" fill="#e8edf7" stroke="#2c4a7c" stroke-width="2" class="fade-up fd1"/>
+<rect x="55" y="38" width="58" height="28" rx="4" fill="#2c4a7c" opacity=".7" class="fade-up fd2"/><text x="84" y="57" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Auth</text>
+<rect x="120" y="38" width="58" height="28" rx="4" fill="#2c4a7c" opacity=".7" class="fade-up fd2"/><text x="149" y="57" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Orders</text>
+<rect x="185" y="38" width="58" height="28" rx="4" fill="#2c4a7c" opacity=".7" class="fade-up fd3"/><text x="214" y="57" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Users</text>
+<rect x="55" y="75" width="58" height="28" rx="4" fill="#2c4a7c" opacity=".5" class="fade-up fd3"/><text x="84" y="94" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Pay</text>
+<rect x="120" y="75" width="58" height="28" rx="4" fill="#2c4a7c" opacity=".5" class="fade-up fd4"/><text x="149" y="94" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Inv</text>
+<rect x="185" y="75" width="58" height="28" rx="4" fill="#2c4a7c" opacity=".5" class="fade-up fd4"/><text x="214" y="94" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">...</text>
+<text x="150" y="135" text-anchor="middle" font-size="10" fill="#6b7280" font-family="Inter">Один деплой, одна БД</text>
+<text x="500" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#1a7a4d" font-family="Inter" class="fade-up fd2">Микросервисы</text>
+<rect x="370" y="25" width="75" height="40" rx="8" fill="#1a7a4d" opacity=".8" class="fade-up fd3 scale-pulse"/><text x="407" y="50" text-anchor="middle" font-size="9" fill="#fff" font-family="Inter">Auth svc</text>
+<rect x="455" y="25" width="75" height="40" rx="8" fill="#3b6fb5" opacity=".8" class="fade-up fd3 scale-pulse"/><text x="492" y="50" text-anchor="middle" font-size="9" fill="#fff" font-family="Inter">Order svc</text>
+<rect x="540" y="25" width="75" height="40" rx="8" fill="#c46a10" opacity=".8" class="fade-up fd4 scale-pulse"/><text x="577" y="50" text-anchor="middle" font-size="9" fill="#fff" font-family="Inter">User svc</text>
+<rect x="370" y="75" width="75" height="40" rx="8" fill="#6a4c93" opacity=".8" class="fade-up fd4 scale-pulse"/><text x="407" y="100" text-anchor="middle" font-size="9" fill="#fff" font-family="Inter">Pay svc</text>
+<rect x="455" y="75" width="75" height="40" rx="8" fill="#14706a" opacity=".8" class="fade-up fd5 scale-pulse"/><text x="492" y="100" text-anchor="middle" font-size="9" fill="#fff" font-family="Inter">Inv svc</text>
+<rect x="540" y="75" width="75" height="40" rx="8" fill="#9a3a5a" opacity=".8" class="fade-up fd5 scale-pulse"/><text x="577" y="100" text-anchor="middle" font-size="9" fill="#fff" font-family="Inter">Notif svc</text>
+<line x1="445" y1="45" x2="455" y2="45" stroke="#aaa" stroke-width="1" stroke-dasharray="3 2" class="fa"/><line x1="530" y1="45" x2="540" y2="45" stroke="#aaa" stroke-width="1" stroke-dasharray="3 2" class="fa"/>
+<line x1="407" y1="65" x2="407" y2="75" stroke="#aaa" stroke-width="1" stroke-dasharray="3 2" class="fa"/><line x1="492" y1="65" x2="492" y2="75" stroke="#aaa" stroke-width="1" stroke-dasharray="3 2" class="fa"/>
+<text x="500" y="135" text-anchor="middle" font-size="10" fill="#6b7280" font-family="Inter">Независимый деплой, своя БД у каждого</text>
+<rect x="40" y="155" width="620" height="75" rx="10" fill="#f8faff" stroke="#e2e5ec" class="fade-up fd6"/>
+<text x="55" y="175" font-size="11" font-weight="700" fill="#2c4a7c" font-family="Inter">Когда что выбирать:</text>
+<text x="55" y="195" font-size="10" fill="#6b7280" font-family="Inter">• Монолит: малые/средние проекты, быстрая разработка, одна команда</text>
+<text x="55" y="212" font-size="10" fill="#6b7280" font-family="Inter">• Микросервисы: большие системы, много команд, разная нагрузка, независимое масштабирование</text>
+</svg></div>
+
+<h3 class="ssh">HLD vs LLD</h3>
+<div class="cr">
+<div class="nc ba"><h4>High Level Design (HLD)</h4><p>Общая картина: компоненты, их взаимодействие, потоки данных. Отвечает на вопрос <strong>«что система делает»</strong>.</p></div>
+<div class="nc ga"><h4>Low Level Design (LLD)</h4><p>Детали: классы, методы, схемы БД, API контракты. Отвечает на вопрос <strong>«как система реализована»</strong>.</p></div>
+</div>
+
+<h3 class="ssh">Load Balancing</h3>
+<div class="dc"><svg viewBox="0 0 550 170" xmlns="http://www.w3.org/2000/svg" style="max-width:550px">
+<rect x="185" y="5" width="130" height="32" rx="8" fill="#2c4a7c" class="fade-up fd1"/><text x="250" y="26" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">Clients</text>
+<line x1="250" y1="38" x2="250" y2="55" stroke="#3b6fb5" stroke-width="2" class="fa"/>
+<rect x="170" y="58" width="160" height="35" rx="8" fill="#c46a10" class="fade-up fd2 glow"/><text x="250" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">Load Balancer</text><text x="250" y="88" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.6)" font-family="Inter">Round Robin / Least Conn / IP Hash</text>
+<line x1="200" y1="96" x2="100" y2="125" stroke="#1a7a4d" stroke-width="1.5" marker-end="url(#aLB)" class="fa"/><line x1="250" y1="96" x2="250" y2="125" stroke="#1a7a4d" stroke-width="1.5" marker-end="url(#aLB)" class="fa"/><line x1="300" y1="96" x2="400" y2="125" stroke="#1a7a4d" stroke-width="1.5" marker-end="url(#aLB)" class="fa"/>
+<rect x="50" y="128" width="100" height="32" rx="6" fill="#1a7a4d" class="fade-up fd3"/><text x="100" y="149" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter">Server 1</text>
+<rect x="200" y="128" width="100" height="32" rx="6" fill="#1a7a4d" class="fade-up fd4"/><text x="250" y="149" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter">Server 2</text>
+<rect x="350" y="128" width="100" height="32" rx="6" fill="#1a7a4d" class="fade-up fd5"/><text x="400" y="149" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter">Server 3</text>
+<defs><marker id="aLB" markerWidth="6" markerHeight="5" refX="3" refY="5" orient="auto"><polygon points="0 0,6 0,3 5" fill="#1a7a4d"/></marker></defs>
+</svg></div>
+
+<!-- ===== S11 ===== -->
+<h2 class="sh" id="s11">Кеширование, Redis и производительность</h2>
+<p><strong>Кеширование</strong> — хранение часто используемых данных в быстром доступе (RAM), чтобы не обращаться к медленной БД каждый раз.</p>
+
+<h3 class="ssh">Flow Cache-Aside</h3>
+<div class="dc"><svg viewBox="0 0 600 160" xmlns="http://www.w3.org/2000/svg" style="max-width:600px">
+<rect x="5" y="50" width="75" height="38" rx="8" fill="#2c4a7c" class="fade-up fd1"/><text x="42" y="74" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter">Client</text>
+<line x1="85" y1="69" x2="130" y2="69" stroke="#aaa" stroke-width="2" marker-end="url(#aC)" class="fa"/>
+<polygon points="180,40 230,69 180,98 130,69" fill="#fff" stroke="#c46a10" stroke-width="2" class="fade-up fd2 glow"/><text x="180" y="66" text-anchor="middle" font-size="9" font-weight="700" fill="#c46a10" font-family="Inter">Check</text><text x="180" y="79" text-anchor="middle" font-size="9" font-weight="700" fill="#c46a10" font-family="Inter">Cache</text>
+<line x1="230" y1="55" x2="330" y2="25" stroke="#1a7a4d" stroke-width="2" marker-end="url(#aHit)" class="fa"/><text x="280" y="30" text-anchor="middle" font-size="9" fill="#1a7a4d" font-family="Inter" font-weight="600">HIT ✓</text>
+<rect x="335" y="8" width="110" height="32" rx="8" fill="#1a7a4d" class="fade-up fd3"/><text x="390" y="29" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter">Return cached</text>
+<line x1="180" y1="98" x2="180" y2="120" stroke="#a03030" stroke-width="2" marker-end="url(#aMiss)" class="fa"/><text x="200" y="115" font-size="9" fill="#a03030" font-family="Inter" font-weight="600" class="blink">MISS ✗</text>
+<rect x="125" y="123" width="115" height="30" rx="6" fill="#6a4c93" class="fade-up fd4"/><text x="182" y="143" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter">Fetch from DB</text>
+<line x1="245" y1="138" x2="330" y2="138" stroke="#aaa" stroke-width="2" marker-end="url(#aSt)" class="fa"/>
+<rect x="335" y="123" width="130" height="30" rx="6" fill="#c46a10" class="fade-up fd5"/><text x="400" y="143" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter">Store in cache+TTL</text>
+<defs><marker id="aC" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#aaa"/></marker><marker id="aHit" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#1a7a4d"/></marker><marker id="aMiss" markerWidth="6" markerHeight="5" refX="3" refY="5" orient="auto"><polygon points="0 0,6 0,3 5" fill="#a03030"/></marker><marker id="aSt" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#aaa"/></marker></defs>
+</svg></div>
+
+<h3 class="ssh">Redis basics</h3>
+<p><strong>Redis</strong> — in-memory key-value хранилище. Строки, списки, множества, хэши, sorted sets. Кеширование, сессии, rate limiting, очереди.</p>
+<div class="tw"><table class="tbl"><tr><th>Команда</th><th>Описание</th><th>Пример</th></tr>
+<tr><td>SET / GET</td><td>Записать / прочитать</td><td>SET user:1:name "Ayush"</td></tr>
+<tr><td>DEL</td><td>Удалить ключ</td><td>DEL user:1</td></tr>
+<tr><td>EXPIRE</td><td>Установить TTL (сек)</td><td>EXPIRE session:abc 3600</td></tr>
+<tr><td>HSET / HGET</td><td>Hash поля</td><td>HSET user:1 email "a@b.com"</td></tr>
+<tr><td>LPUSH / LRANGE</td><td>Список слева / диапазон</td><td>LPUSH tasks "send_email"</td></tr>
+<tr><td>SADD / SMEMBERS</td><td>Set операции</td><td>SADD online_users "ayush"</td></tr>
+<tr><td>ZADD / ZRANGE</td><td>Sorted set (лидерборды)</td><td>ZADD lb 100 "player1"</td></tr></table></div>
+
+<h3 class="ssh">Redis vs Memcached</h3>
+<div class="tw"><table class="tbl"><tr><th></th><th>Redis</th><th>Memcached</th></tr>
+<tr><td>Структуры данных</td><td>String, List, Set, Hash, Sorted Set…</td><td>Только String</td></tr>
+<tr><td>Persistence</td><td>RDB + AOF</td><td>Нет</td></tr>
+<tr><td>Репликация</td><td>Да</td><td>Нет</td></tr>
+<tr><td>Pub/Sub</td><td>Да</td><td>Нет</td></tr>
+<tr><td>Производительность</td><td>Высокая</td><td>Очень высокая (проще)</td></tr></table></div>
+
+<h3 class="ssh">Инвалидация кеша</h3>
+<ul class="l"><li><strong>TTL expiration</strong> — данные сами удаляются по таймеру</li><li><strong>Manual delete</strong> — явное удаление при обновлении</li><li><strong>Event-based</strong> — слушатель событий очищает кеш</li><li><strong>Versioning keys</strong> — user:1:v2 вместо user:1</li></ul>
+
+<!-- ===== S12 ===== -->
+<h2 class="sh" id="s12">Асинхронная обработка и messaging</h2>
+<p>Асинхронная обработка позволяет выполнять длительные задачи в фоне, не блокируя основной поток пользователя.</p>
+
+<h3 class="ssh">Sync vs Async</h3>
+<div class="tw"><table class="tbl"><tr><th></th><th>Синхронная</th><th>Асинхронная</th></tr>
+<tr><td>Выполнение</td><td>Ждёт завершения</td><td>Не ждёт</td></tr>
+<tr><td>Ответ</td><td>Медленнее</td><td>Быстрее (ACK мгновенно)</td></tr>
+<tr><td>Ресурсы</td><td>Блокирует поток</td><td>Неблокирующая</td></tr>
+<tr><td>Пример</td><td>REST вызов</td><td>Message Queue, Event-driven</td></tr></table></div>
+
+<h3 class="ssh">Message Queue архитектура</h3>
+<div class="dc"><svg viewBox="0 0 650 110" xmlns="http://www.w3.org/2000/svg" style="max-width:650px">
+<rect x="10" y="25" width="105" height="50" rx="10" fill="#1a7a4d" class="fade-up fd1"/><text x="62" y="48" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">Producer</text><text x="62" y="63" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">(Service A)</text>
+<line x1="120" y1="50" x2="190" y2="50" stroke="#3b6fb5" stroke-width="2" marker-end="url(#aMQ)" class="fa"/><circle cx="155" cy="50" r="4" fill="#3b6fb5" class="pulse-node"/><text x="155" y="42" text-anchor="middle" font-size="9" fill="#6b7280" font-family="Inter">Send msg</text>
+<rect x="195" y="10" width="200" height="80" rx="12" fill="#2c4a7c" class="fade-up fd3 glow"/><text x="295" y="32" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">Message Broker</text>
+<rect x="215" y="42" width="20" height="14" rx="2" fill="#5b8def" class="fade-up fd4"/><rect x="240" y="42" width="20" height="14" rx="2" fill="#5b8def" class="fade-up fd4"/><rect x="265" y="42" width="20" height="14" rx="2" fill="#5b8def" class="fade-up fd5"/><rect x="290" y="42" width="20" height="14" rx="2" fill="#8ba8df" opacity=".5" class="fade-up fd5"/><rect x="315" y="42" width="20" height="14" rx="2" fill="#8ba8df" opacity=".3" class="fade-up fd6"/><rect x="340" y="42" width="20" height="14" rx="2" fill="#8ba8df" opacity=".15" class="fade-up fd6"/>
+<text x="295" y="75" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.5)" font-family="Inter">RabbitMQ / Kafka / SQS</text>
+<line x1="400" y1="50" x2="470" y2="50" stroke="#c46a10" stroke-width="2" marker-end="url(#aCo)" class="fa"/><circle cx="435" cy="50" r="4" fill="#c46a10" class="pulse-node"/><text x="435" y="42" text-anchor="middle" font-size="9" fill="#6b7280" font-family="Inter">Consume</text>
+<rect x="475" y="25" width="105" height="50" rx="10" fill="#c46a10" class="fade-up fd5"/><text x="527" y="48" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">Consumer</text><text x="527" y="63" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">(Service B)</text>
+<defs><marker id="aMQ" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3b6fb5"/></marker><marker id="aCo" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#c46a10"/></marker></defs>
+</svg></div>
+
+<h3 class="ssh">Kafka vs RabbitMQ</h3>
+<div class="tw"><table class="tbl"><tr><th></th><th>Kafka</th><th>RabbitMQ</th></tr>
+<tr><td>Тип</td><td>Distributed streaming platform</td><td>Traditional message broker</td></tr>
+<tr><td>Модель</td><td>Topics → Partitions → Consumer Groups</td><td>Exchanges → Queues → Bindings</td></tr>
+<tr><td>Throughput</td><td>Очень высокий (млн msg/sec)</td><td>Высокий, но ниже Kafka</td></tr>
+<tr><td>Retention</td><td>Сохраняет историю (days/weeks)</td><td>Удаляет после consumption</td></tr>
+<tr><td>Use case</td><td>Event sourcing, log aggregation, analytics</td><td>Task queues, microservice comm</td></tr></table></div>
+
+<h3 class="ssh">Архитектура Kafka</h3>
+<div class="dc"><svg viewBox="0 0 650 210" xmlns="http://www.w3.org/2000/svg" style="max-width:650px">
+<rect x="10" y="65" width="85" height="45" rx="8" fill="#1a7a4d" class="fade-up fd1"/><text x="52" y="88" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter">Producer</text><text x="52" y="102" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.6)" font-family="Inter">publishes</text>
+<line x1="100" y1="87" x2="145" y2="87" stroke="#aaa" stroke-width="2" marker-end="url(#aK)" class="fa"/>
+<rect x="150" y="5" width="240" height="190" rx="12" fill="#f3eeff" stroke="#6a4c93" stroke-width="2" class="fade-up fd2"/><text x="270" y="25" text-anchor="middle" font-size="12" font-weight="700" fill="#6a4c93" font-family="Inter">Kafka Cluster</text>
+<rect x="165" y="35" width="210" height="50" rx="8" fill="#fff" stroke="#6a4c93" stroke-width="1.5" class="fade-up fd3"/><text x="270" y="52" text-anchor="middle" font-size="10" font-weight="600" fill="#6a4c93" font-family="Inter">Topic: orders</text>
+<rect x="178" y="60" width="38" height="18" rx="3" fill="#6a4c93" class="fade-up fd4"/><text x="197" y="73" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">P0</text>
+<rect x="222" y="60" width="38" height="18" rx="3" fill="#8b6abf" class="fade-up fd4"/><text x="241" y="73" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">P1</text>
+<rect x="266" y="60" width="38" height="18" rx="3" fill="#a78bd4" class="fade-up fd5"/><text x="285" y="73" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">P2</text>
+<rect x="310" y="60" width="38" height="18" rx="3" fill="#c4b0e3" class="fade-up fd5"/><text x="329" y="73" text-anchor="middle" font-size="8" fill="#6a4c93" font-family="Inter">P3</text>
+<rect x="165" y="95" width="210" height="50" rx="8" fill="#fff" stroke="#6a4c93" stroke-width="1.5" class="fade-up fd4"/><text x="270" y="112" text-anchor="middle" font-size="10" font-weight="600" fill="#6a4c93" font-family="Inter">Topic: events</text>
+<rect x="178" y="120" width="38" height="18" rx="3" fill="#6a4c93" class="fade-up fd5"/><text x="197" y="133" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">P0</text>
+<rect x="222" y="120" width="38" height="18" rx="3" fill="#8b6abf" class="fade-up fd5"/><text x="241" y="133" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">P1</text>
+<rect x="266" y="120" width="38" height="18" rx="3" fill="#a78bd4" class="fade-up fd6"/><text x="285" y="133" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">P2</text>
+<line x1="400" y1="60" x2="445" y2="40" stroke="#1a7a4d" stroke-width="1.5" marker-end="url(#aCG)" class="fa"/><line x1="400" y1="120" x2="445" y2="140" stroke="#1a7a4d" stroke-width="1.5" marker-end="url(#aCG)" class="fa"/>
+<rect x="450" y="15" width="180" height="50" rx="8" fill="#e8fff5" stroke="#1a7a4d" stroke-width="1.5" class="fade-up fd5"/><text x="540" y="33" text-anchor="middle" font-size="10" font-weight="600" fill="#1a7a4d" font-family="Inter">Consumer Group 1</text>
+<rect x="462" y="40" width="62" height="18" rx="3" fill="#1a7a4d" class="fade-up fd6"/><text x="493" y="53" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Consumer 1</text>
+<rect x="532" y="40" width="62" height="18" rx="3" fill="#3aaa6a" class="fade-up fd6"/><text x="563" y="53" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Consumer 2</text>
+<rect x="450" y="120" width="180" height="50" rx="8" fill="#e8fff5" stroke="#1a7a4d" stroke-width="1.5" class="fade-up fd6"/><text x="540" y="138" text-anchor="middle" font-size="10" font-weight="600" fill="#1a7a4d" font-family="Inter">Consumer Group 2</text>
+<rect x="462" y="145" width="62" height="18" rx="3" fill="#1a7a4d" class="fade-up fd6"/><text x="493" y="158" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Consumer 3</text>
+<rect x="532" y="145" width="62" height="18" rx="3" fill="#3aaa6a" class="fade-up fd6"/><text x="563" y="158" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Consumer 4</text>
+<defs><marker id="aK" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#aaa"/></marker><marker id="aCG" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0 0,6 2.5,0 5" fill="#1a7a4d"/></marker></defs>
+</svg><p class="cap">Каждая partition читается только одним consumer'ом внутри группы</p></div>
+
+<div class="tb"><strong>Best practices:</strong> делайте потребителей идемпотентными, используйте DLQ для failed messages, отслеживайте lag очереди, обеспечивайте at-least-once или exactly-once delivery.</div>
+
+<!-- ===== S13 ===== -->
+<h2 class="sh" id="s13">Docker, Kubernetes и DevOps</h2>
+
+<h3 class="ssh">CI/CD Pipeline</h3>
+<div class="dc"><svg viewBox="0 0 700 70" xmlns="http://www.w3.org/2000/svg" style="max-width:700px">
+<rect x="5" y="10" width="95" height="45" rx="10" fill="#2c4a7c" class="fade-up fd1"/><text x="52" y="32" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter">Code</text><text x="52" y="46" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.6)" font-family="Inter">Developer</text>
+<line x1="105" y1="32" x2="128" y2="32" stroke="#c46a10" stroke-width="2.5" marker-end="url(#aPi)" class="fa"/><circle cx="116" cy="32" r="3" fill="#c46a10" class="pulse-node"/>
+<rect x="133" y="10" width="95" height="45" rx="10" fill="#c46a10" class="fade-up fd2"/><text x="180" y="32" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter">Build</text><text x="180" y="46" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.6)" font-family="Inter">Jenkins/GHA</text>
+<line x1="233" y1="32" x2="256" y2="32" stroke="#c46a10" stroke-width="2.5" marker-end="url(#aPi)" class="fa"/><circle cx="244" cy="32" r="3" fill="#c46a10" class="pulse-node"/>
+<rect x="261" y="10" width="95" height="45" rx="10" fill="#1a7a4d" class="fade-up fd3"/><text x="308" y="32" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter">Test</text><text x="308" y="46" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.6)" font-family="Inter">Unit+Integration</text>
+<line x1="361" y1="32" x2="384" y2="32" stroke="#c46a10" stroke-width="2.5" marker-end="url(#aPi)" class="fa"/><circle cx="372" cy="32" r="3" fill="#c46a10" class="pulse-node"/>
+<rect x="389" y="10" width="95" height="45" rx="10" fill="#6a4c93" class="fade-up fd4"/><text x="436" y="32" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter">Deploy</text><text x="436" y="46" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.6)" font-family="Inter">Docker/K8s</text>
+<line x1="489" y1="32" x2="512" y2="32" stroke="#c46a10" stroke-width="2.5" marker-end="url(#aPi)" class="fa"/><circle cx="500" cy="32" r="3" fill="#c46a10" class="pulse-node"/>
+<rect x="517" y="10" width="105" height="45" rx="10" fill="#14706a" class="fade-up fd5"/><text x="569" y="32" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter">Monitor</text><text x="569" y="46" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.6)" font-family="Inter">Prometheus/Grafana</text>
+<defs><marker id="aPi" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#c46a10"/></marker></defs>
+</svg></div>
+
+<h3 class="ssh">Docker основы</h3>
+<p>Docker упаковывает приложение со всеми зависимостями в <strong>контейнер</strong> — изолированный, переносимый юнит.</p>
+<div class="cb"><span class="cm"># Dockerfile</span>
+FROM openjdk:17-slim
+WORKDIR /app
+COPY target/my-app.jar app.jar
+EXPOSE 8080
+ENTRYPOINT [<span class="st">"java"</span>, <span class="st">"-jar"</span>, <span class="st">"app.jar"</span>]</div>
+<div class="tw"><table class="tbl"><tr><th>Команда</th><th>Действие</th></tr>
+<tr><td>docker build -t myapp .</td><td>Собрать образ</td></tr>
+<tr><td>docker run -d -p 8080:8080 myapp</td><td>Запустить контейнер</td></tr>
+<tr><td>docker ps</td><td>Список запущенных</td></tr>
+<tr><td>docker logs &lt;container&gt;</td><td>Логи контейнера</td></tr>
+<tr><td>docker-compose up</td><td>Multi-service стек</td></tr></table></div>
+
+<h3 class="ssh">Kubernetes архитектура</h3>
+<div class="dc"><svg viewBox="0 0 600 270" xmlns="http://www.w3.org/2000/svg" style="max-width:600px">
+<rect x="120" y="5" width="360" height="95" rx="14" fill="#2c4a7c" class="fade-up fd1 glow"/><text x="300" y="25" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">Control Plane («мозг кластера»)</text>
+<rect x="140" y="35" width="85" height="30" rx="5" fill="#3b6fb5" class="fade-up fd2"/><text x="182" y="50" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">kube-apiserver</text><text x="182" y="60" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.5)" font-family="Inter">вход для всех</text>
+<rect x="235" y="35" width="65" height="30" rx="5" fill="#4a7ad4" class="fade-up fd2"/><text x="267" y="50" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">etcd</text><text x="267" y="60" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.5)" font-family="Inter">память</text>
+<rect x="310" y="35" width="70" height="30" rx="5" fill="#5b8def" class="fade-up fd3"/><text x="345" y="50" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">scheduler</text><text x="345" y="60" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.5)" font-family="Inter">выбирает узел</text>
+<rect x="390" y="35" width="75" height="30" rx="5" fill="#7ba4f0" class="fade-up fd3"/><text x="427" y="50" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">controller mgr</text><text x="427" y="60" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.5)" font-family="Inter">следит за состоянием</text>
+<text x="300" y="88" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.4)" font-family="Inter">controller manager следит, чтобы факт совпадал с желаемым</text>
+<line x1="220" y1="103" x2="150" y2="135" stroke="#1a7a4d" stroke-width="2" marker-end="url(#aN)" class="fa"/><text x="165" y="125" font-size="9" fill="#1a7a4d" font-family="Inter" font-weight="600">управляет</text>
+<line x1="380" y1="103" x2="450" y2="135" stroke="#1a7a4d" stroke-width="2" marker-end="url(#aN)" class="fa"/><text x="435" y="125" font-size="9" fill="#1a7a4d" font-family="Inter" font-weight="600">управляет</text>
+<rect x="40" y="138" width="220" height="115" rx="12" fill="#e8fff5" stroke="#1a7a4d" stroke-width="2" class="fade-up fd4"/><text x="150" y="158" text-anchor="middle" font-size="11" font-weight="700" fill="#1a7a4d" font-family="Inter">Worker Node 1</text>
+<rect x="55" y="168" width="55" height="30" rx="5" fill="#1a7a4d" opacity=".7" class="fade-up fd5 scale-pulse"/><text x="82" y="183" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Pod A</text><text x="82" y="193" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.6)" font-family="Inter">container</text>
+<rect x="118" y="168" width="55" height="30" rx="5" fill="#3aaa6a" opacity=".7" class="fade-up fd5 scale-pulse"/><text x="145" y="183" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Pod B</text><text x="145" y="193" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.6)" font-family="Inter">container</text>
+<rect x="181" y="168" width="55" height="30" rx="5" fill="#5bc48a" opacity=".7" class="fade-up fd6 scale-pulse"/><text x="208" y="183" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Pod C</text><text x="208" y="193" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.6)" font-family="Inter">sidecar</text>
+<text x="150" y="218" text-anchor="middle" font-size="8" fill="#6b7280" font-family="Inter">kubelet · kube-proxy · runtime</text>
+<text x="150" y="232" text-anchor="middle" font-size="7" fill="#9ca3af" font-family="Inter">(агенты, которые выполняют команды)</text>
+<rect x="340" y="138" width="220" height="115" rx="12" fill="#e8fff5" stroke="#1a7a4d" stroke-width="2" class="fade-up fd5"/><text x="450" y="158" text-anchor="middle" font-size="11" font-weight="700" fill="#1a7a4d" font-family="Inter">Worker Node 2</text>
+<rect x="355" y="168" width="55" height="30" rx="5" fill="#1a7a4d" opacity=".7" class="fade-up fd6 scale-pulse"/><text x="382" y="183" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Pod D</text><text x="382" y="193" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.6)" font-family="Inter">replica</text>
+<rect x="418" y="168" width="55" height="30" rx="5" fill="#3aaa6a" opacity=".7" class="fade-up fd6 scale-pulse"/><text x="445" y="183" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Pod E</text><text x="445" y="193" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.6)" font-family="Inter">другое</text>
+<rect x="481" y="168" width="55" height="30" rx="5" fill="#5bc48a" opacity=".7" class="fade-up fd6 scale-pulse"/><text x="508" y="183" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">Pod F</text><text x="508" y="193" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.6)" font-family="Inter">app</text>
+<text x="450" y="218" text-anchor="middle" font-size="8" fill="#6b7280" font-family="Inter">kubelet · kube-proxy · runtime</text>
+<text x="450" y="232" text-anchor="middle" font-size="7" fill="#9ca3af" font-family="Inter">(агенты, которые выполняют команды)</text>
+<defs><marker id="aN" markerWidth="8" markerHeight="6" refX="4" refY="6" orient="auto"><polygon points="0 0,8 0,4 6" fill="#1a7a4d"/></marker></defs>
+</svg><p class="cap">Control plane принимает решения, worker nodes исполняют поды</p></div>
+
+<h3 class="ssh">Основные объекты K8s</h3>
+<div class="tw"><table class="tbl"><tr><th>Объект</th><th>Назначение</th></tr>
+<tr><td><strong>Pod</strong></td><td>Минимальная единица (1+ контейнера)</td></tr>
+<tr><td><strong>Deployment</strong></td><td>Управляет replicas подов, rolling updates</td></tr>
+<tr><td><strong>Service</strong></td><td>Стабильный network endpoint для группы подов</td></tr>
+<tr><td><strong>ConfigMap</strong></td><td>Неконфиденциальные конфиги</td></tr>
+<tr><td><strong>Secret</strong></td><td>Конфиденциальные данные (base64)</td></tr>
+<tr><td><strong>Ingress</strong></td><td>HTTP routing извне кластера</td></tr>
+<tr><td><strong>Namespace</strong></td><td>Логическая изоляция ресурсов</td></tr>
+<tr><td><strong>Helm</strong></td><td>Package manager для K8s приложений</td></tr></table></div>
+
+<h3 class="ssh">Способы установки K8s</h3>
+<ul class="l"><li><strong>kubeadm</strong> — официальный инструмент, вручную</li><li><strong>Kubespray</strong> — автоматизация через Ansible</li><li><strong>minikube / kind</strong> — лёгкие варианты для обучения</li><li><strong>Managed сервисы</strong> — EKS (AWS), GKE (Google), AKS (Azure)</li></ul>
+
+<!-- ===== NEW S14: MONITORING & OBSERVABILITY ===== -->
+<h2 class="sh" id="s14">Мониторинг, логирование и Observability</h2>
+<p><strong>Observability</strong> — способность понять внутреннее состояние системы по её внешним выходным сигналам. Три столпа: метрики, логи, трейсы.</p>
+
+<h3 class="ssh">Три столпа Observability</h3>
+<div class="cr">
+<div class="nc ga"><h4>Metrics (Метрики)</h4><p>Числовые данные во времени: CPU usage, memory, request rate, latency, error count. Агрегируются, дешёвые в хранении.</p></div>
+<div class="nc ba"><h4>Logs (Логи)</h4><p>Текстовые события с timestamp: ошибки, warnings, debug info. Детализированные, дорогие в объёме.</p></div>
+<div class="nc oa"><h4>Traces (Трейсы)</h4><p>Сквозная трассировка запроса через микросервисы. Показывают где bottleneck, как распределена задержка.</p></div>
+</div>
+
+<h3 class="ssh">Prometheus + Grafana</h3>
+<p><strong>Prometheus</strong> — time-series database для сбора и хранения метрик. Pull-модель: сам ходит по endpoints <code class="i">/metrics</code>. <strong>Grafana</strong> — визуализация дашбордов поверх Prometheus/Loki/Elasticsearch.</p>
+<div class="dc"><svg viewBox="0 0 650 140" xmlns="http://www.w3.org/2000/svg" style="max-width:650px">
+<rect x="10" y="30" width="100" height="60" rx="10" fill="#1a7a4d" class="fade-up fd1"/><text x="60" y="55" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">App</text><text x="60" y="72" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">/metrics</text>
+<line x1="115" y1="60" x2="180" y2="60" stroke="#c46a10" stroke-width="2" marker-end="url(#aMon)" class="fa"/><text x="147" y="50" text-anchor="middle" font-size="9" fill="#6b7280" font-family="Inter">pull</text>
+<rect x="185" y="20" width="140" height="80" rx="12" fill="#c46a10" class="fade-up fd2 glow"/><text x="255" y="50" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">Prometheus</text><text x="255" y="68" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">TSDB + PromQL</text><text x="255" y="85" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.5)" font-family="Inter">alerts rules</text>
+<line x1="330" y1="60" x2="395" y2="60" stroke="#3b6fb5" stroke-width="2" marker-end="url(#aMon2)" class="fa"/>
+<rect x="400" y="20" width="130" height="80" rx="12" fill="#3b6fb5" class="fade-up fd3"/><text x="465" y="50" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Inter">Grafana</text><text x="465" y="68" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.6)" font-family="Inter">Dashboards</text><text x="465" y="85" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.5)" font-family="Inter">visualization</text>
+<rect x="540" y="35" width="100" height="50" rx="10" fill="#6a4c93" class="fade-up fd4"/><text x="590" y="58" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Inter">Alertmanager</text><text x="590" y="75" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.6)" font-family="Inter">notifications</text>
+<line x1="330" y1="80" x2="535" y2="65" stroke="#6a4c93" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#aMon3)" class="fa"/>
+<defs><marker id="aMon" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#c46a10"/></marker><marker id="aMon2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3b6fb5"/></marker><marker id="aMon3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6a4c93"/></marker></defs>
+</svg></div>
+
+<h3 class="ssh">Ключевые RED-методология метрик</h3>
+<div class="tw"><table class="tbl"><tr><th>Метрика</th><th>Что измеряет</th><th>Пример PromQL</th></tr>
+<tr><td><strong>R</strong>ate</td><td>Requests per second</td><td>rate(http_requests_total[5m])</td></tr>
+<tr><td><strong>E</strong>rrors</td><td>Error rate (%)</td><td>sum(rate(errors_total[5m])) / sum(rate(requests_total[5m]))</td></tr>
+<tr><td><strong>D</strong>uration</td><td>Latency percentiles</td><td>histogram_quantile(0.95, http_request_duration_seconds_bucket)</td></tr>
+</table></div>
+
+<h3 class="ssh">ELK Stack (Elasticsearch, Logstash, Kibana)</h3>
+<p>Популярный стек для централизованного логирования:</p>
+<ul class="l"><li><strong>Elasticsearch</strong> — search & analytics engine (хранит индексы логов)</li><li><strong>Logstash</strong> — pipeline обработки (parse, enrich, transform)</li><li><strong>Kibana</strong> — UI для поиска, визуализации, алертинга</li></ul>
+<div class="info-box">
+<strong>Альтернатива:</strong> Loki (графана) — более легковесный, индексирует только labels не содержимое логов. Экономит ресурсы.
+</div>
+
+<h3 class="ssh">Distributed Tracing</h3>
+<p>В микросервисной архитектуре один пользовательский запрос проходит через десятки сервисов. Трейсинг восстанавливает полную картину:</p>
+<div class="tw"><table class="tbl"><tr><th>Инструмент</th><th>Особенности</th></tr>
+<tr><td><strong>Jaeger</strong></td><td>OpenTelemetry native, CNCF graduated project</td></tr>
+<tr><td><strong>Zipkin</strong></td><td>Лёгкий, простой deployment</td></tr>
+<tr><td><strong>Tempo</strong></td><td>Grafana Labs, интеграция с Loki/Grafana</td></tr>
+<tr><td><strong>OpenTelemetry</strong></td><td>Vendor-neutral SDK/API/spec для metrics/logs/traces</td></tr>
+</table></div>
+
+<h3 class="ssh">Health Checks в K8s</h3>
+<div class="tw"><table class="tbl"><tr><th>Тип probe</th><th>Назначение</th><th>Когда использовать</th></tr>
+<tr><td><strong>livenessProbe</strong></td><td>Restart container if fails</td><td>Приложение зависло / deadlock</td></tr>
+<tr><td><strong>readinessProbe</strong></td><td>Remove from Service endpoints</td><td>Ещё не готов принимать traffic (warmup, migration)</td></tr>
+<tr><td><strong>startupProbe</strong></td><td>Delay liveness/readiness checks</td><td>Медленно стартующие приложения (>60s init)</td></tr>
+</table></div>
+<div class="cb"><span class="cm"># Пример health check в Deployment YAML</span>
+spec:
+  containers:
+    - name: api
+      image: my-api:latest
+      livenessProbe:
+        httpGet:
+          path: /actuator/health/liveness
+          port: 8080
+        initialDelaySeconds: 30
+        periodSeconds: 10
+      readinessProbe:
+        httpGet:
+          path: /actuator/health/readiness
+          port: 8080
+        initialDelaySeconds: 5
+        periodSeconds: 5</div>
+
+<h3 class="ssh">Logging best practices</h3>
+<ul class="l"><li><strong>Structured logging</strong> — JSON format вместо plain text (легче парсить)</li><li><strong>Correlation ID</strong> — уникальный ID на весь жизненный цикл запроса</li><li><strong>Levels discipline</strong> — DEBUG/INFO/WARN/ERROR/FATAL осмысленно</li><li><strong>No PII in logs</strong> — маскировать passwords, tokens, personal data</li><li><strong>Centralized collection</strong> — все логи в одно место (Loki/ELK/CloudWatch)</li><li><strong>Retention policy</strong> — defined TTL для разных уровней (debug короче, audit дольше)</li></ul>
+
+<!-- ===== S15 (was S14) ===== -->
+<h2 class="sh" id="s15">Сценарные задачи и System Design</h2>
+<p>Типовые задачи проектирования систем и ключевые моменты для каждой:</p>
+
+<div class="nc ba"><h4>URL Shortener (bit.ly)</h4><ul class="l"><li>Генерация уникального короткого кода (base62 encoding)</li><li>Хранение映射 long URL → short code (KV store: Redis/DynamoDB)</li><li>Redirect через 301/302</li><li>Analytics: клики, география (async via Kafka)</li><li>Кеширование горячих URL в Redis</li></ul></div>
+
+<div class="nc ga"><h4>Chat Application (WhatsApp)</h4><ul class="l"><li>WebSocket для realtime доставки</li><li>Message queue (Kafka) для offline delivery</li><li>Storage: per-user inbox model vs write-fanout</li><li>Read receipts, typing indicators</li><li>End-to-end encryption</li><li>Presence service (online/offline tracking)</li></ul></div>
+
+<div class="nc oa"><h4>E-commerce Backend (Amazon)</h4><ul class="l"><li>Catalog service (search via Elasticsearch)</li><li>Cart & checkout (distributed transactions / saga pattern)</li><li>Inventory management (optimistic locking)</li><li>Payment integration (idempotency keys)</li><li>Order processing pipeline (event-driven)</li><li>Recommendation engine (ML + caching)</li></ul></div>
+
+<div class="nc pa"><h4>Notification System</h4><ul class="l"><li>Multi-channel: Email, SMS, Push, In-app</li><li>Template rendering service</li><li>Priority queues (urgent > normal)</li><li>Retry with exponential backoff</li><li>Rate limiting per user/channel</li><li>Delivery tracking and analytics</li></ul></div>
+
+<div class="nc ta"><h4>Rate Limiter</h4><ul class="l"><li>Algorithms: Token Bucket, Leaky Bucket, Sliding Window</li><li>Implementation: Redis INCR + EXPIRE</li><li>Per-user / per-IP / per-API-key limits</li><li>Distributed rate limiting (shared Redis cluster)</li><li>Graceful degradation: 429 Too Many Requests + Retry-After header</li></ul></div>
+
+<!-- ===== S16 (was S15): Q&A ===== -->
+<h2 class="sh" id="s16">Вопросы и ответы</h2>
+<p>Ниже собраны вопросы из всех разделов с краткими ответами.</p>
+
+<h3 class="qa-c">Основы Backend</h3>
+
+<div class="qi">
+<div class="q">Что такое backend разработка?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Серверная часть приложения, отвечающая за бизнес-логику, работу с БД, аутентификацию и API.</p>
+<p>Пользователь не видит бэкенд напрямую, но именно он обеспечивает всю функциональность.</p>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Чем отличается frontend от backend?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>Frontend</strong> — клиентская часть (браузер), отвечает за UI/UX, использует HTML/CSS/JS.</li>
+<li><strong>Backend</strong> — серверная часть, отвечает за логику, данные, безопасность, использует Java/Python/Node.js.</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Что происходит при вводе URL в браузере?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ol>
+<li>DNS-запрос для получения IP-адреса</li>
+<li>Установка TCP соединения</li>
+<li>Отправка HTTP-запроса на сервер</li>
+<li>Сервер обрабатывает запрос (бизнес-логика + обращение к БД)</li>
+<li>Возврат HTTP-ответа (HTML/JSON)</li>
+<li>Браузер рендерит страницу</li>
+</ol>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Каковы обязанности backend разработчика?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li>Проектирование серверной логики</li>
+<li>Создание и поддержка REST API</li>
+<li>Работа с базами данных (SQL/NoSQL)</li>
+<li>Реализация аутентификации и авторизации</li>
+<li>Настройка серверов и деплой</li>
+<li>Обеспечение безопасности приложения</li>
+<li>Оптимизация производительности и масштабируемости</li>
+<li>Работа с инструментами DevOps и облачными платформами</li>
+</ul>
+</div>
+</div>
+
+<h3 class="qa-c">HTTP и HTTPS</h3>
+
+<div class="qi">
+<div class="q">Разница между HTTP и HTTPS?</div>
+<div class="a">
+<p><strong>Ответ:</strong> HTTPS = HTTP + TLS/SSL шифрование.</p>
+<ul>
+<li><strong>HTTP</strong> передаёт данные открытым текстом (порт 80)</li>
+<li><strong>HTTPS</strong> шифрует весь трафик (порт 443), защищая от перехвата и подмены</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">В чём разница между PUT и PATCH?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>PUT</strong> заменяет ресурс целиком (идемпотентен)</li>
+<li><strong>PATCH</strong> обновляет только указанные поля</li>
+</ul>
+<p>Пример: PUT меняет весь объект User, PATCH меняет только email.</p>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Что такое stateless протокол?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Сервер не хранит информацию о предыдущих запросах клиента. Каждый запрос должен содержать всю необходимую информацию самостоятельно.</p>
+<p>Для поддержания «памяти» используются cookies, sessions или JWT токены.</p>
+</div>
+</div>
+
+<h3 class="qa-c">REST API</h3>
+
+<div class="qi">
+<div class="q">Назовите принципы REST.</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ol>
+<li>Client-Server</li>
+<li>Statelessness</li>
+<li>Cacheability</li>
+<li>Uniform Interface</li>
+<li>Layered System</li>
+<li>Code on Demand (опционально)</li>
+</ol>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">REST vs SOAP — когда что использовать?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>REST</strong> — для современных веб/мобильных приложений (легковесный, JSON, HTTP-native)</li>
+<li><strong>SOAP</strong> — для enterprise интеграций, где нужны строгие контракты (WSDL), WS-Security, транзакльности</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Как версионировать API?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Три основных подхода:</p>
+<ol>
+<li><strong>URI versioning:</strong> <code class="i">/api/v1/users</code></li>
+<li><strong>Header versioning:</strong> Accept: application/vnd.api.v1+json</li>
+<li><strong>Query param:</strong> <code class="i">/api/users?version=1</code></li>
+</ol>
+</div>
+</div>
+
+<h3 class="qa-c">Java</h3>
+
+<div class="qi">
+<div class="q">Разница между интерфейсом и абстрактным классом?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>Интерфейс</strong> — чистый контракт (до Java 8 только abstract методы), поддерживает multiple inheritance. Определяет «что делать».</li>
+<li><strong>Абстрактный класс</strong> — может иметь concrete методы, поля, конструкторы, но single inheritance. Предоставляет «общую основу».</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">ArrayList vs LinkedList?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>ArrayList</strong> — динамический массив: O(1) random access, O(n) insert/delete в середине</li>
+<li><strong>LinkedList</strong> — двусвязный список: O(n) access, O(1) insert/delete на краях</li>
+</ul>
+<p>Для большинства случаев ArrayList быстрее из-за locality of reference.</p>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">HashMap vs HashSet?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>HashMap</strong> хранит пары key→value</li>
+<li><strong>HashSet</strong> хранит только уникальные элементы (внутренне использует HashMap с dummy value)</li>
+</ul>
+<p>Оба обеспечивают O(1) средний поиск.</p>
+</div>
+</div>
+
+<h3 class="qa-c">Spring Framework</h3>
+
+<div class="qi">
+<div class="q">Что такое Dependency Injection и типы DI?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Техника передачи зависимостей объекту извне вместо самостоятельного создания.</p>
+<p><strong>Типы:</strong></p>
+<ol>
+<li><strong>Constructor injection</strong> (рекомендуется — неизменяемость, обязательность)</li>
+<li><strong>Setter injection</strong> (для опциональных зависимостей)</li>
+<li><strong>Field injection</strong> (@Autowired — проще, но хуже тестируемость)</li>
+</ol>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Разница между @Component, @Service и @Repository?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Все три являются стереотипами @Component.</p>
+<ul>
+<li><strong>@Service</strong> маркирует бизнес-слой</li>
+<li><strong>@Repository</strong> — DAO слой (добавляет translation of persistence exceptions)</li>
+</ul>
+<p>Функционально одинаковы, семантически различаются для читаемости и AOP.</p>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Как Spring Boot стартует приложение?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Последовательность запуска:</p>
+<ol>
+<li>main() вызывается</li>
+<li>SpringApplication.run()</li>
+<li>Автоконфигурация (читает META-INF/spring.factories)</li>
+<li>Создание ApplicationContext</li>
+<li>Сканирование @Component/@Configuration</li>
+<li>Регистрация бинов</li>
+<li>Старт embedded server (Tomcat/Jetty/Netty)</li>
+<li>Приложение готово</li>
+</ol>
+</div>
+</div>
+
+<h3 class="qa-c">REST на Spring Boot</h3>
+
+<div class="qi">
+<div class="q">Зачем нужны DTO?</div>
+<div class="a">
+<p><strong>Ответ:</strong> DTO отделяют внешнюю форму данных от внутренней модели. Позволяют:</p>
+<ul>
+<li>Скрыть чувствительные поля (password)</li>
+<li>Контролировать сериализацию</li>
+<li>Избежать lazy loading проблем</li>
+<li>Валидировать вход отдельно от entity</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Как глобально обрабатывать исключения?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Через <code class="i">@RestControllerAdvice</code> + <code class="i">@ExceptionHandler</code>.</p>
+<p>Один класс перехватывает все исключения и возвращает единообразный error response с нужным HTTP статусом и сообщением.</p>
+</div>
+</div>
+
+<h3 class="qa-c">Базы данных</h3>
+
+<div class="qi">
+<div class="q">Объясните 1NF, 2NF, 3NF.</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>1NF:</strong> атомарные значения, нет повторяющихся групп</li>
+<li><strong>2NF:</strong> 1NF + каждый неключевой атрибут полностью зависит от всего первичного ключа (нет partial dependency)</li>
+<li><strong>3NF:</strong> 2NF + нет transitive dependency (неключевые атрибуты не зависят друг от друга)</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Когда создавать индекс?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Когда столбец часто используется в WHERE, JOIN, ORDER BY.</p>
+<p>Индекс ускоряет чтение, но замедляет запись (INSERT/UPDATE/DELETE). Не индексируйте низкокардинальные столбцы (пол, boolean).</p>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Что такое ACID?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Свойства транзакций:</p>
+<ul>
+<li><strong>Atomicity</strong> — вся транзакция или ничего</li>
+<li><strong>Consistency</strong> — данные всегда в валидном состоянии</li>
+<li><strong>Isolation</strong> — параллельные транзакции не мешают друг другу</li>
+<li><strong>Durability</strong> — после commit данные переживают crash</li>
+</ul>
+</div>
+</div>
+
+<h3 class="qa-c">Hibernate и JPA</h3>
+
+<div class="qi">
+<div class="q">Что такое проблема N+1 и как решить?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Загружаем список из N сущностей, каждая имеет lazy связь → Hibernate делает 1 запрос на список + N запросов на связи.</p>
+<p><strong>Решения:</strong></p>
+<ul>
+<li>JOIN FETCH в JPQL</li>
+<li>@EntityGraph</li>
+<li>Batch fetching</li>
+<li>EAGER fetch (осторожно!)</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">EAGER vs LAZY loading?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>EAGER</strong> — связанные данные грузятся сразу вместе с родителем</li>
+<li><strong>LAZY</strong> — грузятся при первом обращении к getter</li>
+</ul>
+<p>По умолчанию: @ManyToOne/@OneToOne = EAGER, @OneToMany/@ManyToMany = LAZY. Рекомендуется LAZY + явный fetch когда нужно.</p>
+</div>
+</div>
+
+<h3 class="qa-c">Безопасность</h3>
+
+<div class="qi">
+<div class="q">Как работает JWT?</div>
+<div class="a">
+<p><strong>Ответ:</strong> JWT состоит из трёх base64url частей:</p>
+<ol>
+<li><strong>Header</strong> — алгоритм подписи</li>
+<li><strong>Payload</strong> — claims (userId, role, exp)</li>
+<li><strong>Signature</strong> — подпись секретом</li>
+</ol>
+<p>Сервер проверяет подпись при каждом запросе. Токен самодостаточен — сервер не хранит сессии.</p>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Как защититься от SQL Injection?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li>Никогда не конкатенировать пользовательский ввод в SQL</li>
+<li>Использовать PreparedStatement / параметризованные запросы</li>
+<li>В JPA/Hibernate это сделано автоматически через JPQL/Criteria API</li>
+<li>Input validation, least privilege DB accounts</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Session-based vs Token-based authentication?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>Session:</strong> сервер хранит состояние, клиент получает session ID в cookie. Масштабирование сложнее (sticky sessions).</li>
+<li><strong>Token (JWT):</strong> сервер ничего не хранит, токен содержит все claims. Лучше для микросервисов и SPA, но logout требует blacklist или короткого TTL.</li>
+</ul>
+</div>
+</div>
+
+<h3 class="qa-c">Архитектура</h3>
+
+<div class="qi">
+<div class="q">Монолит vs микросервисы — плюсы и минусы?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<p><strong>Монолит:</strong></p>
+<ul>
+<li>✅ Прост в разработке/деплое, одна кодовая база, легко дебажить</li>
+<li>❌ Сложно масштабировать части независимо, technology lock-in</li>
+</ul>
+<p><strong>Микросервисы:</strong></p>
+<ul>
+<li>✅ Независимый деплой, tech diversity, fault isolation</li>
+<li>❌ Distributed complexity, network overhead, data consistency challenges</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Vertical vs Horizontal scaling?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>Vertical (scale up):</strong> добавить CPU/RAM одному серверу. Просто, но есть предел и single point of failure.</li>
+<li><strong>Horizontal (scale out):</strong> добавить больше серверов за load balancer. Практически бесконечно масштабируемо, но сложнее в управлении.</li>
+</ul>
+</div>
+</div>
+
+<h3 class="qa-c">Кеширование</h3>
+
+<div class="qi">
+<div class="q">Стратегии кеширования?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>Cache-aside (lazy loading):</strong> приложение проверяет кеш → miss → fetch DB → store cache</li>
+<li><strong>Write-through:</strong> пишет и в кеш и в DB одновременно</li>
+<li><strong>Write-behind:</strong> пишет в кеш, DB обновляется асинхронно</li>
+<li><strong>Read-through:</strong> кеш-слой сам загружает из DB</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Redis vs Memcached?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>Redis:</strong> богатые структуры данных (lists, sets, hashes, sorted sets), persistence (RDB/AOF), replication, pub/sub, transactions</li>
+<li><strong>Memcached:</strong> только simple key-value, нет persistence, но чуть быстрее для простых кейсов</li>
+</ul>
+<p>Redis универсальнее.</p>
+</div>
+</div>
+
+<h3 class="qa-c">Асинхронная обработка</h3>
+
+<div class="qi">
+<div class="q">Kafka vs RabbitMQ — когда что?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>Kafka:</strong> high-throughput event streaming, retention истории, replay, log aggregation, real-time analytics</li>
+<li><strong>RabbitMQ:</strong> traditional task queues, complex routing (exchanges/bindings), lower throughput but richer delivery semantics, simpler setup</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Что такое Dead Letter Queue (DLQ)?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Специальная очередь для сообщений, которые не удалось обработать после N retry.</p>
+<p>Предотвращает бесконечные циклы повторной обработки. Сообщения в DLQ анализируются вручную или автоматически для диагностики.</p>
+</div>
+</div>
+
+<h3 class="qa-c">DevOps и деплой</h3>
+
+<div class="qi">
+<div class="q">Контейнер vs виртуальная машина?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>VM</strong> эмулирует целое железо + guest OS (тяжёлая, минуты старта)</li>
+<li><strong>Контейнер</strong> разделяет host kernel, изолирует только process space (лёгкий, секунды старта)</li>
+</ul>
+<p>Docker container ≈ процесс с своей файловой системой и networking.</p>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Blue-green deployment vs rolling update?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>Blue-green:</strong> две идентичные среды, traffic переключается atomically с blue на green. Instant rollback. Дороже (2x ресурсы).</li>
+<li><strong>Rolling update:</strong> постепенно заменяет старые pod'ы новыми (K8s default). Дешевле, но slower rollback.</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Основные компоненты control plane Kubernetes?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>kube-apiserver</strong> — единственная точка входа</li>
+<li><strong>etcd</strong> — распределённое KV хранилище состояния</li>
+<li><strong>kube-scheduler</strong> — выбирает node для пода</li>
+<li><strong>kube-controller-manager</strong> — контроллеры (deployment, replica, endpoint и др.)</li>
+<li><strong>cloud-controller-manager</strong> — интеграция с cloud provider</li>
+</ul>
+</div>
+</div>
+
+<!-- NEW DEVOPS QA ITEMS -->
+<h3 class="qa-c">Monitoring & Observability</h3>
+
+<div class="qi">
+<div class="q">Что такое RED methodology?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Подход к мониторингу микросервисов:</p>
+<ul>
+<li><strong>R</strong>ate — количество запросов в секунду</li>
+<li><strong>E</strong>rrors — доля ошибочных ответов</li>
+<li><strong>D</strong>uration — время обработки (percentiles p50/p95/p99)</li>
+</ul>
+<p>Эти три метрики дают быстрый взгляд на здоровье сервиса.</p>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Чем отличаются liveness, readiness и startup probes?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>livenessProbe</strong> — если fail, kubelet перезапускает контейнер (deadlock/hang detection)</li>
+<li><strong>readinessProbe</strong> — если fail, pod убирается из Service endpoints (ещё не готов обслуживать)</li>
+<li><strong>startupProbe</strong> — временно отключает остальные probes пока приложение медленно инициализируется (&gt;60s)</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Зачем нужен correlation ID в логах?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Уникальный идентификатор, присваиваемый каждому запросу на входе и пробрасываемый через все микросервисы.</p>
+<p>Позволяет собрать всю цепочку событий одного запроса в ELK/Loki несмотря на распределённую природу системы.</p>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Prometheus pull vs push модель?</div>
+<div class="a">
+<p><strong>Ответ:</strong></p>
+<ul>
+<li><strong>Pull (default):</strong> Prometheus сам ходит по targets каждые N секунд. Лучше для долгоживущих сервисов,自动 discovery.</li>
+<li><strong>Push (via Pushgateway):</strong> приложение само отправляет метрики. Нужно для ephemeral jobs (batch/cron), которые живут меньше scrape interval.</li>
+</ul>
+</div>
+</div>
+
+<div class="qi">
+<div class="q">Что такое OpenTelemetry?</div>
+<div class="a">
+<p><strong>Ответ:</strong> Vendor-neutral стандарт CNCF для instrumentation applications.</p>
+<ul>
+<li>Единый API/SDK для generation of traces, metrics, logs</li>
+<li>Collector component для processing/exporting telemetry</li>
+<li>Поддержка многих backend'ов (Jaeger, Zipkin, Prometheus, OTLP)</li>
+</ul>
+<p>Появился как merge Opencensus + OpenTracing.</p>
+</div>
+</div>
+
+</main>
+
+</body>
+</html>
