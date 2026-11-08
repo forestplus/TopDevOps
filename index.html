@@ -1459,7 +1459,7 @@
                 });
             req.then((r) => { if (!r.ok) throw new Error('bad response'); return r.json(); })
                 .then((data) => {
-                    if (data && typeof data.value === 'number') lineEl.textContent = 'сегодня: ' + data.value;
+                    if (data && typeof data.value === 'number') lineEl.textContent = String(data.value);
                 })
                 .catch(() => { /* счётчик недоступен — ничего не показываем */ });
         })();
