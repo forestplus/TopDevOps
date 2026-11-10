@@ -1,0 +1,59 @@
+name: Deploy TopDevOps to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: topdevops-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Validate and deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate static site
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s index.html
+          echo "index.html found"
+          for file in resume.pdf resume_en.pdf; do
+            if [[ -f "$file" ]]; then
+              echo "$file found"
+            else
+              echo "WARNING: $file is missing"
+            fi
+          done
+
+      - name: Prepare Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          while IFS= read -r -d '' file; do
+            case "$file" in
+              .github/*|CNAME) continue ;;
+            esac
+            mkdir -p "dist/$(dirname "$file")"
+            cp "$file" "dist/$file"
+          done < <(git ls-files -z)
+          test -s dist/index.html
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=topdevops --branch=main
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
