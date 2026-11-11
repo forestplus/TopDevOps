@@ -590,14 +590,72 @@
             .stats { grid-template-columns: repeat(2, 1fr); }
             .hero-name { font-size: 1.8rem; }
         }
-            .notes-group { max-width: 900px; margin: 0 auto; }
-        .notes-group-title { color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; margin: 0 0 0.4rem; }
-        .notes-subgroup-title { color: var(--accent-purple); font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 600; margin: 0 0 1rem; }
-        .notes-list { list-style: none; padding: 0; margin: 0; }
-        .notes-list li { margin-bottom: 0.6rem; padding-left: 1.2rem; position: relative; }
+        /* notes: collapsible groups (accordion) */
+        .notes-controls { max-width: 900px; margin: -1.8rem auto 1.1rem; display: flex; justify-content: flex-end; }
+        .notes-expand-all {
+            display: inline-flex; align-items: center; gap: 0.45rem;
+            padding: 0.42rem 0.85rem; border: 1px solid var(--border); border-radius: 20px;
+            background: rgba(0,212,255,0.05); color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .notes-expand-all:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); box-shadow: 0 0 14px rgba(0,212,255,0.15); }
+        .notes-expand-all:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 2px; }
+
+        .notes-group {
+            max-width: 900px; margin: 0 auto 0.8rem;
+            background: linear-gradient(160deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012));
+            border: 1px solid rgba(255,255,255,0.09); border-radius: 14px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+            overflow: hidden;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .notes-group:hover { border-color: rgba(0,212,255,0.35); }
+        .notes-group.open { border-color: rgba(0,212,255,0.45); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 12px 32px -20px rgba(0,212,255,0.6); }
+        .notes-group-title { margin: 0; font-size: 1.1rem; }
+        .notes-toggle {
+            width: 100%; display: flex; align-items: center; gap: 0.75rem;
+            padding: 1rem 1.2rem; background: none; border: 0; cursor: pointer;
+            color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem; font-weight: 600; text-align: left;
+            transition: background 0.25s ease;
+        }
+        .notes-toggle:hover { background: rgba(0,212,255,0.05); }
+        .notes-toggle:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: -3px; }
+        .notes-toggle-label { flex: 1 1 auto; min-width: 0; }
+        .notes-count {
+            flex: 0 0 auto; font-size: 0.66rem; font-weight: 400; color: var(--text-muted);
+            padding: 0.18rem 0.55rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+            letter-spacing: 0.02em;
+        }
+        .notes-chevron {
+            flex: 0 0 auto; font-size: 0.85rem; color: var(--accent-cyan);
+            transition: transform 0.35s ease; line-height: 1;
+        }
+        .notes-group.open .notes-chevron { transform: rotate(180deg); }
+        .notes-group-body {
+            display: grid; grid-template-rows: 0fr;
+            transition: grid-template-rows 0.35s ease;
+        }
+        .notes-group.open .notes-group-body { grid-template-rows: 1fr; }
+        .notes-group-inner { overflow: hidden; min-height: 0; padding: 0 1.2rem; transition: padding 0.35s ease; }
+        .notes-group.open .notes-group-inner { padding-bottom: 1.1rem; }
+        .notes-subgroup-title { color: var(--accent-purple); font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.55rem; }
+        .notes-group-inner > .notes-subgroup-title:first-child { margin-top: 0; }
+        .notes-list { list-style: none; padding: 0; margin: 0 0 0.35rem; }
+        .notes-list:last-child { margin-bottom: 0; }
+        .notes-list li { margin-bottom: 0.55rem; padding-left: 1.2rem; position: relative; }
+        .notes-list li:last-child { margin-bottom: 0; }
         .notes-list li::before { content: '▸'; position: absolute; left: 0; color: var(--accent-cyan); }
         .notes-list a { color: var(--text-primary); text-decoration: none; border-bottom: 1px dashed var(--accent-cyan); }
         .notes-list a:hover { color: var(--accent-cyan); }
+        @media (prefers-reduced-motion: reduce) {
+            .notes-group-body, .notes-chevron, .notes-group-inner { transition: none; }
+        }
+        @media (max-width: 640px) {
+            .notes-toggle { padding: 0.85rem 0.95rem; font-size: 0.98rem; gap: 0.55rem; }
+            .notes-count { display: none; }
+        }
 
         /* ===== GitHub projects (rendered from data/github-projects.json) ===== */
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -1193,6 +1251,11 @@
     <section id="notes">
         <h2 class="section-title" data-ru="Мои заметки" data-en="My notes">Мои заметки</h2>
         <p class="section-subtitle" data-ru="закрытые кейсы / case notes" data-en="closed cases / case notes">закрытые кейсы / case notes</p>
+        <div class="notes-controls">
+            <button type="button" class="notes-expand-all" id="notes-expand-all" aria-pressed="false">
+                <span id="notes-expand-all-label" data-ru="Развернуть все" data-en="Expand all">Развернуть все</span>
+            </button>
+        </div>
         <div class="notes-group">
             <h3 class="notes-group-title">Микросервисы</h3>
             <ul class="notes-list">
@@ -2226,6 +2289,120 @@
         bindEvents();
         updatePlaceholder();
         load();
+    })();
+    </script>
+
+    <!-- Notes: collapsible groups (progressive enhancement, all collapsed by default) -->
+    <script>
+    (function () {
+        'use strict';
+
+        var section = document.getElementById('notes');
+        if (!section) return;
+
+        var groups = Array.prototype.slice.call(section.querySelectorAll('.notes-group'));
+        if (!groups.length) return;
+
+        var toggleAllBtn = document.getElementById('notes-expand-all');
+        var toggleAllLabel = document.getElementById('notes-expand-all-label');
+
+        function pluralRu(n, one, few, many) {
+            var n10 = n % 10;
+            var n100 = n % 100;
+            if (n10 === 1 && n100 !== 11) return one;
+            if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return few;
+            return many;
+        }
+
+        function lang() {
+            return document.documentElement.lang === 'en' ? 'en' : 'ru';
+        }
+
+        function setGroupState(group, open) {
+            var btn = group.querySelector('.notes-toggle');
+            var body = group.querySelector('.notes-group-body');
+            if (!btn || !body) return;
+            group.classList.toggle('open', open);
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (open) body.removeAttribute('inert');
+            else body.setAttribute('inert', '');
+        }
+
+        function allOpen() {
+            return groups.every(function (g) { return g.classList.contains('open'); });
+        }
+
+        function syncToggleAll() {
+            if (!toggleAllBtn || !toggleAllLabel) return;
+            var open = allOpen();
+            toggleAllLabel.dataset.ru = open ? 'Свернуть все' : 'Развернуть все';
+            toggleAllLabel.dataset.en = open ? 'Collapse all' : 'Expand all';
+            toggleAllLabel.textContent = toggleAllLabel.dataset[lang()];
+            toggleAllBtn.setAttribute('aria-pressed', open ? 'true' : 'false');
+        }
+
+        groups.forEach(function (group, index) {
+            var title = group.querySelector('.notes-group-title');
+            if (!title || group.dataset.accordionReady) return;
+            group.dataset.accordionReady = '1';
+
+            var body = document.createElement('div');
+            body.className = 'notes-group-body';
+            body.id = 'notes-body-' + index;
+            body.setAttribute('inert', '');
+
+            var inner = document.createElement('div');
+            inner.className = 'notes-group-inner';
+            while (title.nextSibling) inner.appendChild(title.nextSibling);
+            body.appendChild(inner);
+
+            var count = inner.querySelectorAll('.notes-list a').length;
+            var countRu = count + ' ' + pluralRu(count, 'статья', 'статьи', 'статей');
+            var countEn = count + (count === 1 ? ' article' : ' articles');
+
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'notes-toggle';
+            btn.setAttribute('aria-expanded', 'false');
+            btn.setAttribute('aria-controls', body.id);
+
+            var label = document.createElement('span');
+            label.className = 'notes-toggle-label';
+            label.textContent = title.textContent.trim();
+
+            var badge = document.createElement('span');
+            badge.className = 'notes-count';
+            badge.dataset.ru = countRu;
+            badge.dataset.en = countEn;
+            badge.textContent = countRu;
+
+            var chevron = document.createElement('span');
+            chevron.className = 'notes-chevron';
+            chevron.setAttribute('aria-hidden', 'true');
+            chevron.textContent = '▾';
+
+            btn.appendChild(label);
+            btn.appendChild(badge);
+            btn.appendChild(chevron);
+            title.textContent = '';
+            title.appendChild(btn);
+            group.appendChild(body);
+
+            btn.addEventListener('click', function () {
+                setGroupState(group, !group.classList.contains('open'));
+                syncToggleAll();
+            });
+        });
+
+        if (toggleAllBtn) {
+            toggleAllBtn.addEventListener('click', function () {
+                var open = !allOpen();
+                groups.forEach(function (group) { setGroupState(group, open); });
+                syncToggleAll();
+            });
+        }
+
+        syncToggleAll();
     })();
     </script>
 </body>
