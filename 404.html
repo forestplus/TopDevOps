@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, follow">
+    <title>Страница не найдена — Дмитрий Парамонов</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #050508; --card: #0f0f1a; --cyan: #00d4ff; --text: #f0f0f5; --muted: #a0a0b0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at 50% 0%, #0b1220, var(--bg) 60%);
+            color: var(--text); font-family: 'Inter', sans-serif; padding: 2rem; text-align: center;
+        }
+        .card {
+            max-width: 560px; width: 100%; padding: 2.5rem 2rem;
+            background: linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+            border: 1px solid rgba(255,255,255,0.09); border-radius: 18px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 12px 40px rgba(0,0,0,0.4);
+        }
+        .code { font-family: 'JetBrains Mono', monospace; font-size: 3rem; font-weight: 700; color: var(--cyan); }
+        h1 { font-size: 1.15rem; margin: 0.6rem 0 0.8rem; }
+        p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+        a.home {
+            display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1.6rem;
+            padding: 0.8rem 1.6rem; border-radius: 50px; text-decoration: none; font-weight: 600;
+            color: #050508; background: linear-gradient(135deg, var(--cyan), #7c3aed);
+        }
+        a.home:hover { filter: brightness(1.1); }
+        .hint { margin-top: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #606070; }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <div class="code">404</div>
+        <h1>Страница не найдена</h1>
+        <p>Возможно, страница переехала в тематический раздел заметок.<br>Проверьте адрес или вернитесь на главную.</p>
+        <a class="home" href="/">← На главную</a>
+        <div class="hint" id="hint"></div>
+    </main>
+    <script>
+        // Старые адреса заметок (плоский список) -> новые папки.
+        (function () {
+            var MAP = {
+                '/microservices-ru.html': '/microservices/microservices-ru.html',
+                '/backend-architecture-ru.html': '/microservices/backend-architecture-ru.html',
+                '/docker-commands.html': '/docker/docker-commands.html',
+                '/dockerfile-reference.html': '/docker/dockerfile-reference.html',
+                '/k8s-basics-architecture-ru.html': '/k8s/k8s-basics-architecture-ru.html',
+                '/k8s-info.html': '/k8s/k8s-info.html',
+                '/k8s-info-net.html': '/k8s/k8s-info-net.html',
+                '/k8s-rollout.html': '/k8s/k8s-rollout.html',
+                '/k8s-events-lifecycle.html': '/k8s/k8s-events-lifecycle.html',
+                '/helm-basics.html': '/k8s/helm-basics.html',
+                '/helm-values.html': '/k8s/helm-values.html',
+                '/helm-dependencies.html': '/k8s/helm-dependencies.html',
+                '/k8s-windows.html': '/windows/k8s-windows.html',
+                '/windows-diagnostics.html': '/windows/windows-diagnostics.html',
+                '/linux-users-groups.html': '/linux/linux-users-groups.html',
+                '/linux-archives.html': '/linux/linux-archives.html',
+                '/linux-files-permissions.html': '/linux/linux-files-permissions.html',
+                '/linux-text.html': '/linux/linux-text.html',
+                '/linux-processes-services.html': '/linux/linux-processes-services.html',
+                '/linux-network.html': '/linux/linux-network.html',
+                '/linux-disks.html': '/linux/linux-disks.html',
+                '/linux-packages.html': '/linux/linux-packages.html',
+                '/linux-system-info.html': '/linux/linux-system-info.html',
+                '/linux-cron-ssh.html': '/linux/linux-cron-ssh.html',
+                '/linux-filesystem.html': '/linux/linux-filesystem.html',
+                '/top-linux-guide.html': '/linux/top-linux-guide.html',
+                '/linux-commands.html': '/linux/linux-commands.html',
+                '/git-basics.html': '/git/git-basics.html',
+                '/git-branches.html': '/git/git-branches.html',
+                '/git-remote.html': '/git/git-remote.html',
+                '/git-history.html': '/git/git-history.html',
+                '/git-tips.html': '/git/git-tips.html',
+                '/postgresql-guide.html': '/postgresql/postgresql-guide.html',
+                '/interview-qa-ru.html': '/devops/interview-qa-ru.html',
+                '/ansible-ru.html': '/devops/ansible-ru.html',
+                '/ci-cd-pipeline-ru.html': '/devops/ci-cd-pipeline-ru.html',
+                '/devops-all-commands-ru.html': '/devops/devops-all-commands-ru.html'
+            };
+            var path = location.pathname.replace(/\/+$/, '') || '/';
+            var target = MAP[path] || MAP[path.toLowerCase()];
+            if (target) {
+                document.getElementById('hint').textContent = 'Переход: ' + target;
+                location.replace(target + location.search + location.hash);
+            }
+        })();
+    </script>
+</body>
+</html>
