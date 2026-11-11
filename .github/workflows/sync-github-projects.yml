@@ -1,0 +1,52 @@
+name: Sync GitHub projects
+
+# Keeps data/github-projects.json in step with the public GitHub account.
+# The site itself stays 100% static: no tokens, no runtime API calls.
+
+on:
+  schedule:
+    # Daily at 04:00 UTC (07:00 MSK)
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-github-projects
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Refresh snapshot
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Sync public GitHub data
+        env:
+          GITHUB_OWNER: forestplus
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/sync-github-projects.mjs
+
+      - name: Validate snapshot
+        run: node -e "const d=require('./data/github-projects.json'); if(!Array.isArray(d.repos)||!d.stats) { throw new Error('invalid snapshot'); } console.log('snapshot ok:', d.repos.length, 'repos');"
+
+      - name: Commit snapshot
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- data/github-projects.json; then
+            echo "No changes in data/github-projects.json"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/github-projects.json
+          git commit -m "chore(data): sync GitHub projects snapshot"
+          git push
