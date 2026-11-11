@@ -540,6 +540,8 @@
         footer { text-align: center; padding: 3rem 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.8rem; position: relative; z-index: 1; }
         .footer-status { font-family: 'JetBrains Mono', monospace; display: inline-flex; align-items: center; gap: 0.5rem; letter-spacing: 0.02em; flex-wrap: wrap; justify-content: center; max-width: 90vw; }
         .footer-tags { font-size: 0.72rem; }
+        .visitor-count { margin-top: 0.8rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-muted); opacity: 0.5; letter-spacing: 0.08em; }
+        .visitor-count[hidden] { display: none; }
         .footer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); animation: pulse2 2s infinite; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { opacity: 0; transform: translateY(30px); transition: all 0.6s ease; }
@@ -1290,7 +1292,7 @@
             <span class="footer-tags">#DevOps #DevSecOps #MLOps #SRE #CTO #CIO #ITManager</span>
         </p>
         <p style="margin-top:0.5rem; font-size:0.7rem; color:#ffffff;" data-ru="© 2026 Дмитрий Парамонов" data-en="© 2026 Dmitriy Paramonov">© 2026 Дмитрий Парамонов</p>
-        <p style="margin-top:0.8rem; font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--text-muted); opacity:0.35;" id="visitor-count-line"></p>
+        <p class="visitor-count" id="visitor-count-line" hidden title="Уникальных посетителей сегодня">0</p>
     </footer>
 
     <script>
@@ -1509,19 +1511,61 @@
         })();
 
         // ========== VISITOR COUNTER ==========
-        // Счётчик работает только через внешний сервис (сам по себе сайт на GitHub Pages
-        // не может считать посетителей). Укажите адрес сервиса в COUNTER_URL:
-        // сервис должен отдавать JSON вида {"value": 123}. Пока адрес пуст — счётчик не выводится.
+        // Сайт статический (GitHub Pages), поэтому счётчик работает через публичный сервис.
+        // Один запрос от браузера в сутки: значение = количество уникальных браузеров за день.
+        // Если сервис недоступен — число просто не выводится.
         (function () {
-            const COUNTER_URL = '';
-            const lineEl = document.getElementById('visitor-count-line');
-            if (!lineEl || !COUNTER_URL) return;
-            fetch(COUNTER_URL)
-                .then((r) => { if (!r.ok) throw new Error('bad response'); return r.json(); })
-                .then((data) => {
-                    if (data && typeof data.value === 'number') lineEl.textContent = String(data.value);
+            const el = document.getElementById('visitor-count-line');
+            if (!el) return;
+
+            const CACHE_KEY = 'topdevops.uv.v1';
+            const SERVICE = 'https://api.visitorbadge.io/api/visitors';
+            const TIME_ZONE = 'Europe/Moscow';
+
+            function todayKey() {
+                try {
+                    return new Intl.DateTimeFormat('en-CA', { timeZone: TIME_ZONE }).format(new Date());
+                } catch (e) {
+                    return new Date().toISOString().slice(0, 10);
+                }
+            }
+
+            function readCache() {
+                try { return JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch (e) { return null; }
+            }
+
+            function writeCache(value) {
+                try { localStorage.setItem(CACHE_KEY, JSON.stringify({ day: todayKey(), value: value })); } catch (e) { /* private mode */ }
+            }
+
+            function show(value) {
+                const n = Number(value);
+                if (!isFinite(n) || n <= 0) return;
+                el.textContent = new Intl.NumberFormat('ru-RU').format(n);
+                el.hidden = false;
+            }
+
+            const day = todayKey();
+            const cached = readCache();
+            if (cached && cached.day === day && cached.value > 0) {
+                show(cached.value);
+                return;
+            }
+
+            const url = SERVICE + '?path=' + encodeURIComponent('topdevops.pro/uv/' + day) +
+                '&countColor=%2300d4ff&style=flat';
+
+            fetch(url, { cache: 'no-store' })
+                .then(function (r) { if (!r.ok) throw new Error('bad response'); return r.text(); })
+                .then(function (svg) {
+                    const m = svg.match(/(?:visitors|VISITORS):\s*([\d,\s]+)/);
+                    if (!m) throw new Error('no count in response');
+                    const value = Number(m[1].replace(/[^\d]/g, ''));
+                    if (!value) throw new Error('empty count');
+                    writeCache(value);
+                    show(value);
                 })
-                .catch(() => { /* счётчик недоступен — ничего не показываем */ });
+                .catch(function () { /* счётчик недоступен — ничего не показываем */ });
         })();
 
         // ========== HOVER TICK SOUNDS ==========
