@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Git: отмена изменений, reset, reflog и восстановление</title>
+<meta name="description" content="Четвёртая часть гида: как откатить изменения на любом уровне, переписать историю и вернуть «потерянные» коммиты">
+<meta name="author" content="Дмитрий Парамонов">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://topdevops.pro/git/git-history.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://topdevops.pro/git/git-history.html">
+<meta property="og:site_name" content="Dmitriy Paramonov. DevOps, DevSecOps, SRE">
+<meta property="og:title" content="Git: отмена изменений, reset, reflog и восстановление">
+<meta property="og:description" content="Четвёртая часть гида: как откатить изменения на любом уровне, переписать историю и вернуть «потерянные» коммиты">
+<meta property="og:image" content="https://topdevops.pro/og-image.png">
+<meta property="og:image:alt" content="Git: отмена изменений, reset, reflog и восстановление">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Git: отмена изменений, reset, reflog и восстановление">
+<meta name="twitter:description" content="Четвёртая часть гида: как откатить изменения на любом уровне, переписать историю и вернуть «потерянные» коммиты">
+<meta name="twitter:image" content="https://topdevops.pro/og-image.png">
 <style>
   :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
   @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
@@ -23,6 +39,33 @@
   .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
   .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Git: отмена изменений, reset, reflog и восстановление",
+  "description": "Четвёртая часть гида: как откатить изменения на любом уровне, переписать историю и вернуть «потерянные» коммиты",
+  "url": "https://topdevops.pro/git/git-history.html",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://topdevops.pro/git/git-history.html"
+  },
+  "inLanguage": "ru",
+  "datePublished": "2026-11-11",
+  "dateModified": "2026-11-11",
+  "author": {
+    "@type": "Person",
+    "name": "Дмитрий Парамонов",
+    "url": "https://topdevops.pro/"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Дмитрий Парамонов",
+    "url": "https://topdevops.pro/"
+  },
+  "image": "https://topdevops.pro/og-image.png"
+}
+</script>
 </head>
 <body>
 <div class="wrap">

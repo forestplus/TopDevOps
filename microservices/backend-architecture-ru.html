@@ -4,8 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Backend. Важные вопросы и детали</title>
+<meta name="description" content="Backend. Важные вопросы и детали — заметка Дмитрия Парамонова, DevOps/SRE Team Lead.">
+<meta name="author" content="Дмитрий Парамонов">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://topdevops.pro/microservices/backend-architecture-ru.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://topdevops.pro/microservices/backend-architecture-ru.html">
+<meta property="og:site_name" content="Dmitriy Paramonov. DevOps, DevSecOps, SRE">
+<meta property="og:title" content="Backend. Важные вопросы и детали">
+<meta property="og:description" content="Backend. Важные вопросы и детали — заметка Дмитрия Парамонова, DevOps/SRE Team Lead.">
+<meta property="og:image" content="https://topdevops.pro/og-image.png">
+<meta property="og:image:alt" content="Backend. Важные вопросы и детали">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Backend. Важные вопросы и детали">
+<meta name="twitter:description" content="Backend. Важные вопросы и детали — заметка Дмитрия Парамонова, DevOps/SRE Team Lead.">
+<meta name="twitter:image" content="https://topdevops.pro/og-image.png">
+<link rel="stylesheet" href="../assets/fonts.css">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#faf9f6;--card:#fff;--text:#2a2a2a;--muted:#6b7280;--blue:#2c4a7c;--accent:#3b6fb5;--green:#1a7a4d;--orange:#c46a10;--purple:#6a4c93;--teal:#14706a;--red:#a03030;--border:#e2e5ec;--shadow:0 1px 8px rgba(0,0,0,.06);--radius:12px}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:16px}
@@ -84,6 +100,33 @@ ol.l{padding-left:18px;margin:6px 0}ol.l li{padding:2px 0;font-size:.94em}
 
 @media(max-width:600px){.toc{padding:18px}.sh{font-size:1.25em}.nc{padding:14px}.qi{padding:14px 16px}}
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Backend. Важные вопросы и детали",
+  "description": "Backend. Важные вопросы и детали — заметка Дмитрия Парамонова, DevOps/SRE Team Lead.",
+  "url": "https://topdevops.pro/microservices/backend-architecture-ru.html",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://topdevops.pro/microservices/backend-architecture-ru.html"
+  },
+  "inLanguage": "ru",
+  "datePublished": "2026-11-11",
+  "dateModified": "2026-11-11",
+  "author": {
+    "@type": "Person",
+    "name": "Дмитрий Парамонов",
+    "url": "https://topdevops.pro/"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Дмитрий Парамонов",
+    "url": "https://topdevops.pro/"
+  },
+  "image": "https://topdevops.pro/og-image.png"
+}
+</script>
 </head>
 <body>
 

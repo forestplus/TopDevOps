@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Linux: диски, разделы, файловые системы и монтирование</title>
+<meta name="description" content="Просмотр дисков, создание разделов и файловых систем, монтирование, fstab, место на диске и swap">
+<meta name="author" content="Дмитрий Парамонов">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://topdevops.pro/linux/linux-disks.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://topdevops.pro/linux/linux-disks.html">
+<meta property="og:site_name" content="Dmitriy Paramonov. DevOps, DevSecOps, SRE">
+<meta property="og:title" content="Linux: диски, разделы, файловые системы и монтирование">
+<meta property="og:description" content="Просмотр дисков, создание разделов и файловых систем, монтирование, fstab, место на диске и swap">
+<meta property="og:image" content="https://topdevops.pro/og-image.png">
+<meta property="og:image:alt" content="Linux: диски, разделы, файловые системы и монтирование">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Linux: диски, разделы, файловые системы и монтирование">
+<meta name="twitter:description" content="Просмотр дисков, создание разделов и файловых систем, монтирование, fstab, место на диске и swap">
+<meta name="twitter:image" content="https://topdevops.pro/og-image.png">
 <style>
   :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
   @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
@@ -23,6 +39,33 @@
   .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
   .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Linux: диски, разделы, файловые системы и монтирование",
+  "description": "Просмотр дисков, создание разделов и файловых систем, монтирование, fstab, место на диске и swap",
+  "url": "https://topdevops.pro/linux/linux-disks.html",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://topdevops.pro/linux/linux-disks.html"
+  },
+  "inLanguage": "ru",
+  "datePublished": "2026-11-11",
+  "dateModified": "2026-11-11",
+  "author": {
+    "@type": "Person",
+    "name": "Дмитрий Парамонов",
+    "url": "https://topdevops.pro/"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Дмитрий Парамонов",
+    "url": "https://topdevops.pro/"
+  },
+  "image": "https://topdevops.pro/og-image.png"
+}
+</script>
 </head>
 <body>
 <div class="wrap">
@@ -88,7 +131,7 @@
 </table>
 
 <h2>/etc/fstab</h2>
-<pre># <file system>                             <mount point>  <type>  <options>        <dump> <pass>
+<pre># &lt;file system&gt;                             &lt;mount point&gt;  &lt;type&gt;  &lt;options&gt;        &lt;dump&gt; &lt;pass&gt;
 UUID=3f2a-9b1c-0000-1111                    /              ext4    errors=remount-ro  0      1
 UUID=7d4e-aaaa-2222-3333                    /data          ext4    defaults,noatime   0      2
 //nas/share                                 /mnt/nas       cifs    credentials=/root/.smb,uid=1000  0  0

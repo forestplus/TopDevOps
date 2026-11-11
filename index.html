@@ -16,6 +16,7 @@
     <meta property="og:title" content="Дмитрий Парамонов. DevOps, DevSecOps, SRE, DevOps/SRE Team Lead">
     <meta property="og:description" content="20+ лет в IT, 9 лет в DevOps/SRE. Kubernetes, Docker, OpenShift, CI/CD, DevSecOps, ITSM/ITIL, AI/ML.">
     <meta property="og:image" content="https://topdevops.pro/og-image.png">
+    <meta property="og:image:alt" content="Дмитрий Парамонов — DevOps/SRE Team Lead">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:locale" content="ru_RU">
@@ -43,8 +44,9 @@
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/inter-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="assets/fonts.css">
 
     <!-- Structured data (schema.org Person — there is no official "Resume" type, Person is the correct/recommended type for this use case) -->
     <script type="application/ld+json">
@@ -117,7 +119,7 @@
             --accent-orange: #f59e0b;
             --text-primary: #f0f0f5;
             --text-secondary: #a0a0b0;
-            --text-muted: #606070;
+            --text-muted: #7f7f95;
             --border: rgba(0, 212, 255, 0.1);
             --glow-cyan: rgba(0, 212, 255, 0.3);
             --glow-purple: rgba(124, 58, 237, 0.3);
@@ -176,6 +178,43 @@
         }
         .lang-switch button.active { border-color: var(--accent-cyan); color: var(--accent-cyan); box-shadow: 0 0 10px var(--glow-cyan); }
         .lang-switch button:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        /* mobile navigation */
+        .nav-toggle {
+            display: none; width: 42px; height: 42px; padding: 0;
+            border: 1px solid var(--border); border-radius: 10px;
+            background: rgba(0,212,255,0.05); cursor: pointer;
+            align-items: center; justify-content: center; flex-direction: column; gap: 5px;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        .nav-toggle span { display: block; width: 18px; height: 2px; border-radius: 2px; background: var(--accent-cyan); transition: transform 0.3s ease, opacity 0.3s ease; }
+        .nav-toggle:hover { border-color: var(--accent-cyan); box-shadow: 0 0 14px rgba(0,212,255,0.2); }
+        .nav-toggle:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 3px; }
+        body.nav-open .nav-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        body.nav-open .nav-toggle span:nth-child(2) { opacity: 0; }
+        body.nav-open .nav-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        nav a.active { color: var(--accent-cyan); }
+        nav a.active::after { width: 100%; }
+        /* skip link */
+        .skip-link {
+            position: fixed; top: -70px; left: 1rem; z-index: 10001;
+            padding: 0.6rem 1rem; border-radius: 0 0 10px 10px;
+            background: var(--accent-cyan); color: #050508; font-weight: 700; text-decoration: none;
+            transition: top 0.2s ease;
+        }
+        .skip-link:focus { top: 0; }
+        /* back to top */
+        .to-top {
+            position: fixed; right: 1.4rem; bottom: 1.4rem; z-index: 900;
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 1px solid var(--border); background: rgba(5,5,8,0.85); color: var(--accent-cyan);
+            font-size: 1.1rem; line-height: 1; cursor: pointer; display: grid; place-items: center;
+            opacity: 0; visibility: hidden; transform: translateY(10px);
+            transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+            backdrop-filter: blur(12px);
+        }
+        .to-top.show { opacity: 1; visibility: visible; transform: none; }
+        .to-top:hover { border-color: var(--accent-cyan); box-shadow: 0 0 18px rgba(0,212,255,0.25); }
+        .to-top:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 3px; }
         .hero {
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
             position: relative; padding: 6rem 2rem 4rem; z-index: 1;
@@ -345,7 +384,17 @@
         .section-title { font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 3rem; position: relative; display: inline-block; left: 50%; transform: translateX(-50%); }
         .section-title::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 3px; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple)); border-radius: 2px; }
         .section-subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 3rem; font-size: 0.9rem; }
-        .contact-email-line { text-align: center; margin-top: -2rem; margin-bottom: 0.8rem; font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: var(--accent-cyan); }
+        .contact-email-line { text-align: center; margin-top: -2rem; margin-bottom: 0.8rem; }
+        .email-copy {
+            display: inline-flex; align-items: center; gap: 0.45rem;
+            background: none; border: 0; padding: 0.25rem 0.45rem; border-radius: 8px; cursor: pointer;
+            color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; font-size: 1rem;
+            transition: background 0.25s ease, color 0.25s ease;
+        }
+        .email-copy:hover { background: rgba(0,212,255,0.08); }
+        .email-copy:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 3px; }
+        .email-copy.copied { color: var(--accent-green); }
+        .email-copy-icon { width: 14px; height: 14px; opacity: 0.55; }
         .about { max-width: 900px; margin: 0 auto; }
         .about-text {
             background: linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
@@ -581,7 +630,23 @@
             .timeline-item, .timeline-item:nth-child(odd) { flex-direction: column; text-align: left; padding-left: 50px; }
             .timeline-item:nth-child(odd) .timeline-content, .timeline-item:nth-child(even) .timeline-content { margin: 0; width: 100%; }
             .timeline-dot { left: 20px; }
-            nav { display: none; }
+            nav {
+                display: flex; position: absolute; top: 100%; left: 0; right: 0;
+                flex-direction: column; align-items: stretch; gap: 0;
+                padding: 0.4rem 1.6rem 1.2rem;
+                background: rgba(5,5,8,0.98); backdrop-filter: blur(20px);
+                border-bottom: 1px solid var(--border);
+                opacity: 0; visibility: hidden; transform: translateY(-6px); pointer-events: none;
+                transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+                max-height: calc(100vh - 72px); overflow-y: auto;
+            }
+            body.nav-open nav { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
+            body.nav-open { overflow: hidden; }
+            nav a { padding: 0.8rem 0; font-size: 1rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
+            nav a:last-child { border-bottom: 0; }
+            nav a::after { display: none; }
+            nav a.active { color: var(--accent-cyan); }
+            .nav-toggle { display: inline-flex; }
             .contact-buttons { flex-direction: column; align-items: center; }
             .ops-metrics { grid-template-columns: repeat(2, 1fr); }
             .ops-metric:nth-child(2) { border-right: none; }
@@ -661,22 +726,24 @@
 </head>
 <body>
 
+    <a class="skip-link" href="#about">Перейти к содержимому</a>
+
     <!-- Glow Orbs -->
-    <div class="glow-orb glow-orb-1"></div>
-    <div class="glow-orb glow-orb-2"></div>
-    <div class="glow-orb glow-orb-3"></div>
-    <div class="glow-orb glow-orb-4"></div>
+    <div class="glow-orb glow-orb-1" aria-hidden="true"></div>
+    <div class="glow-orb glow-orb-2" aria-hidden="true"></div>
+    <div class="glow-orb glow-orb-3" aria-hidden="true"></div>
+    <div class="glow-orb glow-orb-4" aria-hidden="true"></div>
 
     <!-- Particles Canvas -->
-    <canvas id="particles-canvas"></canvas>
+    <canvas id="particles-canvas" aria-hidden="true"></canvas>
 
     <!-- Scroll Progress -->
-    <div class="scroll-progress" id="scroll-progress"></div>
+    <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
 
     <!-- Header -->
     <header id="header">
         <a href="#top" class="logo" aria-label="Home / Главная">dmitriy@devops<span>~</span></a>
-        <nav>
+        <nav id="primary-nav" aria-label="Основная навигация">
             <a href="#top" data-ru="Главная" data-en="Home">Главная</a>
             <a href="#about" data-ru="Обо мне" data-en="About">Обо мне</a>
             <a href="#experience" data-ru="Опыт" data-en="Experience">Опыт</a>
@@ -685,9 +752,12 @@
             <a href="#contact" data-ru="Контакты" data-en="Contact">Контакты</a>
         </nav>
         <div class="lang-switch">
-            <button class="active" onclick="setLang('ru', this)">RU</button>
-            <button onclick="setLang('en', this)">EN</button>
+            <button class="active" data-lang="ru" onclick="setLang('ru', this)">RU</button>
+            <button data-lang="en" onclick="setLang('en', this)">EN</button>
         </div>
+        <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="primary-nav">
+            <span></span><span></span><span></span>
+        </button>
     </header>
 
     <!-- Hero -->
@@ -1265,7 +1335,12 @@
     <section id="contact">
         <h2 class="section-title" data-ru="Контакты" data-en="Contact">Контакты</h2>
         <p class="section-subtitle" data-ru="контакты / contact" data-en="contacts / contact">контакты / contact</p>
-        <p class="contact-email-line">forestplus@ya.ru</p>
+        <p class="contact-email-line">
+            <button type="button" class="email-copy" id="email-copy" data-email="forestplus@ya.ru" title="Скопировать e-mail">
+                <span id="email-copy-text">forestplus@ya.ru</span>
+                <svg class="email-copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            </button>
+        </p>
         <div class="social-icons">
             <a href="https://www.linkedin.com/in/topdevops" class="social-icon linkedin-icon magnetic" target="_blank" rel="noopener" aria-label="LinkedIn" data-tip-ru="Связаться со мной в LinkedIn" data-tip-en="Connect with me on LinkedIn">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM3.556 20.452h3.564V9H3.556v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
@@ -1340,7 +1415,12 @@
         }
 
         function particleCountFor(w, h) {
-            return Math.min(380, Math.max(90, Math.floor((w * h) / 5500)));
+            const cores = navigator.hardwareConcurrency || 4;
+            const memory = navigator.deviceMemory || 4;
+            let max = 380;
+            if (cores <= 4 || memory <= 4) max = 240;
+            if (cores <= 2) max = 130;
+            return Math.min(max, Math.max(60, Math.floor((w * h) / 5500)));
         }
         for (let i = 0; i < particleCountFor(canvas.width, canvas.height); i++) particles.push(new Particle());
         window.addEventListener('resize', () => {
@@ -1370,13 +1450,40 @@
             }
         }
 
-        function animateParticles() {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let particlesRunning = false;
+        let particlesRaf = null;
+
+        function drawFrame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => { p.update(); p.draw(); });
             drawConnections();
-            requestAnimationFrame(animateParticles);
         }
-        animateParticles();
+
+        function loopParticles() {
+            drawFrame();
+            particlesRaf = requestAnimationFrame(loopParticles);
+        }
+
+        function startParticles() {
+            if (particlesRunning || reduceMotion || document.hidden) return;
+            particlesRunning = true;
+            loopParticles();
+        }
+
+        function stopParticles() {
+            particlesRunning = false;
+            if (particlesRaf) cancelAnimationFrame(particlesRaf);
+            particlesRaf = null;
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) stopParticles();
+            else startParticles();
+        });
+
+        if (reduceMotion) drawFrame();
+        else startParticles();
 
         window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
 
@@ -1452,10 +1559,13 @@
 
         // ========== LANGUAGE SWITCH ==========
         let currentLang = 'ru';
+
         function setLang(lang, btn) {
             currentLang = lang;
-            document.querySelectorAll('.lang-switch button').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
+            document.querySelectorAll('.lang-switch button').forEach(b => {
+                const active = b.dataset.lang === lang || b === btn;
+                b.classList.toggle('active', active);
+            });
             document.querySelectorAll('[data-ru]').forEach(el => {
                 el.textContent = el.dataset[lang];
             });
@@ -1465,8 +1575,27 @@
             if (resumeBtn) resumeBtn.setAttribute('href', resumeHref);
             if (resumeBtnHero) resumeBtnHero.setAttribute('href', resumeHref);
             document.documentElement.setAttribute('lang', lang);
+            try { localStorage.setItem('topdevops.lang', lang); } catch (e) { /* private mode */ }
             document.dispatchEvent(new CustomEvent('langchange', { detail: lang }));
         }
+
+        // Начальный язык: ?lang=ru|en -> сохранённый выбор -> язык браузера
+        (function initLang() {
+            let lang = null;
+            try {
+                const param = new URLSearchParams(location.search).get('lang');
+                if (param === 'ru' || param === 'en') lang = param;
+                if (!lang) {
+                    const saved = localStorage.getItem('topdevops.lang');
+                    if (saved === 'ru' || saved === 'en') lang = saved;
+                }
+            } catch (e) { /* storage/params unavailable */ }
+            if (!lang) {
+                const browserLang = (navigator.language || 'ru').toLowerCase();
+                lang = browserLang.indexOf('ru') === 0 ? 'ru' : 'en';
+            }
+            setLang(lang, document.querySelector('.lang-switch button[data-lang="' + lang + '"]'));
+        })();
 
         // ========== AI/ML NEWS TICKER ==========
         (function () {
@@ -1657,6 +1786,132 @@
             }
             raf();
         })();
+
+        // ========== MOBILE NAVIGATION ==========
+        (function () {
+            const toggle = document.getElementById('nav-toggle');
+            const nav = document.getElementById('primary-nav');
+            if (!toggle || !nav) return;
+
+            function setOpen(open) {
+                document.body.classList.toggle('nav-open', open);
+                toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                toggle.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
+            }
+
+            toggle.addEventListener('click', function () {
+                setOpen(!document.body.classList.contains('nav-open'));
+            });
+
+            nav.addEventListener('click', function (e) {
+                if (e.target.closest('a')) setOpen(false);
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && document.body.classList.contains('nav-open')) {
+                    setOpen(false);
+                    toggle.focus();
+                }
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!document.body.classList.contains('nav-open')) return;
+                if (e.target.closest('#primary-nav') || e.target.closest('#nav-toggle')) return;
+                setOpen(false);
+            });
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 900 && document.body.classList.contains('nav-open')) setOpen(false);
+            });
+        })();
+
+        // ========== ACTIVE SECTION IN NAV ==========
+        (function () {
+            const links = Array.from(document.querySelectorAll('header nav a[href^="#"]'));
+            if (!links.length) return;
+            const sections = links
+                .map(function (a) { return document.querySelector(a.getAttribute('href')); })
+                .filter(Boolean);
+            if (!sections.length) return;
+
+            let ticking = false;
+            function update() {
+                ticking = false;
+                const line = window.scrollY + window.innerHeight * 0.3;
+                let current = sections[0];
+                sections.forEach(function (section) {
+                    if (section.offsetTop <= line) current = section;
+                });
+                links.forEach(function (a) {
+                    a.classList.toggle('active', a.getAttribute('href') === '#' + current.id);
+                });
+            }
+            window.addEventListener('scroll', function () {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(update);
+            }, { passive: true });
+            window.addEventListener('resize', update);
+            update();
+        })();
+
+        // ========== BACK TO TOP ==========
+        (function () {
+            function init() {
+                const btn = document.getElementById('to-top');
+                if (!btn) return;
+                window.addEventListener('scroll', function () {
+                    btn.classList.toggle('show', window.scrollY > 600);
+                }, { passive: true });
+                btn.addEventListener('click', function () {
+                    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+                });
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+            else init();
+        })();
+
+        // ========== COPY E-MAIL ==========
+        (function () {
+            const btn = document.getElementById('email-copy');
+            if (!btn) return;
+            const label = document.getElementById('email-copy-text');
+            const email = btn.dataset.email || label.textContent.trim();
+            let timer = null;
+
+            function fallbackCopy(text) {
+                const area = document.createElement('textarea');
+                area.value = text;
+                area.setAttribute('readonly', '');
+                area.style.position = 'fixed';
+                area.style.top = '-1000px';
+                document.body.appendChild(area);
+                area.select();
+                try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+                area.remove();
+            }
+
+            btn.addEventListener('click', function () {
+                const done = function () {
+                    label.textContent = 'Скопировано ✓';
+                    btn.classList.add('copied');
+                    clearTimeout(timer);
+                    timer = setTimeout(function () {
+                        label.textContent = email;
+                        btn.classList.remove('copied');
+                    }, 1600);
+                };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(email).then(done).catch(function () {
+                        fallbackCopy(email);
+                        done();
+                    });
+                } else {
+                    fallbackCopy(email);
+                    done();
+                }
+            });
+        })();
     </script>
 
 
@@ -1773,5 +2028,7 @@
         syncToggleAll();
     })();
     </script>
+
+    <button type="button" class="to-top" id="to-top" aria-label="Наверх" title="Наверх">↑</button>
 </body>
 </html>
