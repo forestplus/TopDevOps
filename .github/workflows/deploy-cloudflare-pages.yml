@@ -4,13 +4,6 @@ on:
   push:
     branches:
       - main
-  # Pushes made with the built-in GITHUB_TOKEN do not trigger `push` workflows,
-  # so the daily snapshot commit is deployed explicitly after it completes.
-  workflow_run:
-    workflows:
-      - Sync GitHub projects
-    types:
-      - completed
   workflow_dispatch:
 
 permissions:
@@ -24,7 +17,6 @@ concurrency:
 jobs:
   deploy:
     name: Validate and deploy
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
