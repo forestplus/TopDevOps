@@ -13,7 +13,7 @@
 .ambient-orb--blue{width:440px;height:440px;top:38%;right:-12%;background:radial-gradient(circle,#65a9ff,transparent 70%);animation:ambientAurora2 22s ease-in-out infinite}
 .ambient-orb--purple{width:390px;height:390px;bottom:3%;left:22%;background:radial-gradient(circle,#a78bfa,transparent 70%);animation:ambientAurora3 20s ease-in-out infinite}
 .ambient-orb--mint{width:360px;height:360px;top:24%;left:48%;background:radial-gradient(circle,#62e5d0,transparent 70%);opacity:.08;animation:ambientAurora4 25s ease-in-out infinite}
-body>*:not(.ambient-layer){position:relative;z-index:1}
+body>*:not(.ambient-layer):not(.preview-ribbon){position:relative;z-index:1}
 @keyframes ambientAurora1{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(55px,-35px) scale(1.1)}50%{transform:translate(18px,45px) scale(.96)}75%{transform:translate(-35px,-18px) scale(1.04)}}
 @keyframes ambientAurora2{0%,100%{transform:translate(0,0) scale(1)}30%{transform:translate(-45px,35px) scale(1.08)}60%{transform:translate(25px,-28px) scale(.94)}}
 @keyframes ambientAurora3{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(45px,28px) scale(1.1)}70%{transform:translate(-28px,-35px) scale(.92)}}
