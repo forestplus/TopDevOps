@@ -1,0 +1,11 @@
+services:
+  ollama:
+    image: ollama/ollama:0.5.7
+    container_name: topdevops-local-ollama
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+volumes:
+  ollama_data:

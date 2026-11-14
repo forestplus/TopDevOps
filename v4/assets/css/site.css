@@ -5,3 +5,4 @@
 
 .hero-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:42px;align-items:center;padding-top:95px}
 @media(max-width:700px){.hero-layout{grid-template-columns:1fr;gap:20px;padding-top:55px}.hero-layout>div:last-child{max-width:420px}}
+.hero-layout{max-width:1160px;margin-inline:auto}
