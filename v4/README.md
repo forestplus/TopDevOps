@@ -1,30 +1,21 @@
-# TopDevOps V4 — Preview
+# TopDevOps V4 — Full Preview
 
-Вся разработка V4 изолирована в этой директории. Preview: https://topdevops.pro/v4/
+Preview: https://topdevops.pro/v4/
 
-## Принципы
-- Production, V3 (/new), старые URL и существующие файлы не изменяются.
-- Все страницы V4 используют `noindex,nofollow`; V4 не добавляется в production sitemap.
-- Существующие CV, фото и статьи используются по относительным ссылкам, без копирования.
-- Не публиковать неподтверждённые метрики, достижения, роли или результаты.
-- Визуальная система Aurora Engineering сохраняет фоновую анимацию частиц и связей; reduced-motion отключает её.
-- Общие стили и логика находятся в `assets/css/main.css` и `assets/js/main.js`.
+V4 is developed entirely inside this directory. Production, V3 (/new), existing article URLs, root assets, CV files and sitemap remain untouched.
 
-## Структура
-- `index.html` — главная V4.
-- `engineering/` — инженерные направления.
-- `projects/` — кейсы и проектный портфель.
-- `ai-mlops/` — AI Infrastructure & MLOps Lab.
-- `knowledge/` — каталог существующих материалов.
-- `resume/` — профиль и карьерная история.
+## Included
+- Bilingual RU/EN home page with responsive navigation and animated particle/network background.
+- Professional profile, engineering domains, anonymized experience-based case studies and career timeline.
+- Searchable catalogue of currently inventoried published technical articles.
+- AI Infrastructure & MLOps section with a local MLflow + PostgreSQL Docker Compose lab.
+- Browser-based playground: YAML validation, cron expression builder, IPv4 CIDR calculator, Kubernetes Deployment generator, Dockerfile starter generator and regex tester.
+- Shared CSS/JS, reduced-motion support and browser-local language preference.
 
-## Этапы
-1. Foundation — дизайн-система, навигация, RU/EN, responsive, фон.
-2. Professional Identity — расширенный профиль и timeline после получения актуального CV.
-3. Engineering Portfolio — реальные кейсы, схемы и проверяемые артефакты.
-4. AI/MLOps — MLflow Engineering Lab с Docker Compose и пошаговым HowTo.
-5. Knowledge Hub — инвентаризация статей, поиск, теги и связи.
-6. QA — маршруты, mobile, доступность, SEO, производительность.
-
-## Release gate
-Production не переключать до отдельного явного одобрения владельца сайта.
+## Guardrails
+- All V4 pages use noindex,nofollow and are excluded from the production sitemap.
+- Existing source articles are linked in place; their URLs are not copied or changed.
+- No invented performance metrics, uptime claims or confidential customer details.
+- AI/MLOps is described as an emerging engineering track; the lab is local and educational.
+- Career timeline follows the currently published profile and requires reconciliation with the latest full CV before production release.
+- No production switch without explicit owner approval.
