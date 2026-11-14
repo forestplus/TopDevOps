@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: mlflow
-      POSTGRES_PASSWORD: \${POSTGRES_PASSWORD:-mlflow-local-only}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mlflow-local-only}
       POSTGRES_DB: mlflow
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -26,7 +26,7 @@ services:
       server
       --host 0.0.0.0
       --port 5000
-      --backend-store-uri postgresql://mlflow:\${POSTGRES_PASSWORD:-mlflow-local-only}@postgres:5432/mlflow
+      --backend-store-uri postgresql://mlflow:${POSTGRES_PASSWORD:-mlflow-local-only}@postgres:5432/mlflow
       --serve-artifacts
       --artifacts-destination /mlartifacts
     ports:
