@@ -23,11 +23,12 @@ services:
       postgres:
         condition: service_healthy
     command: >
-      mlflow server
+      server
       --host 0.0.0.0
       --port 5000
       --backend-store-uri postgresql://mlflow:\${POSTGRES_PASSWORD:-mlflow-local-only}@postgres:5432/mlflow
-      --default-artifact-root /mlartifacts
+      --serve-artifacts
+      --artifacts-destination /mlartifacts
     ports:
       - "127.0.0.1:5000:5000"
     volumes:
