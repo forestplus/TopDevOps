@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Парамонов Дмитрий — DevOps Team Lead</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #1a1a2e;
+            background: #f0f2f5;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 40px;
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .header .subtitle { font-size: 1.3em; color: #4fbdba; margin-bottom: 20px; }
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 0.95em;
+        }
+        .contact-item { display: flex; align-items: center; gap: 8px; }
+        .section { padding: 30px 40px; border-bottom: 1px solid #eee; }
+        .section-title {
+            font-size: 1.4em;
+            color: #1a1a2e;
+            border-bottom: 3px solid #4fbdba;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .job { margin-bottom: 25px; }
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .job-title { font-size: 1.2em; font-weight: 600; color: #1a1a2e; }
+        .job-date { color: #666; font-size: 0.95em; }
+        .job-company { color: #4fbdba; font-weight: 500; margin-bottom: 10px; }
+        .job-description { color: #444; }
+        .job-description ul { margin-left: 20px; margin-top: 8px; }
+        .job-description li { margin-bottom: 6px; }
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .skill-category h3 {
+            color: #4fbdba;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .skill-tag {
+            background: #f0f2f5;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            color: #333;
+        }
+        .about-text {
+            font-size: 1.05em;
+            line-height: 1.8;
+            color: #444;
+        }
+        @media print {
+            body { background: white; }
+            .container { box-shadow: none; }
+        }
+        @media (max-width: 600px) {
+            .header, .section { padding: 20px; }
+            .header h1 { font-size: 1.8em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Парамонов Дмитрий Валерьевич</h1>
+            <div class="subtitle">DevOps Team Lead / SRE</div>
+            <div class="contact-info">
+                <div class="contact-item">📍 Санкт-Петербург, Россия</div>
+                <div class="contact-item">📧 forestplus@ya.ru</div>
+                <div class="contact-item">💬 <a href="https://t.me/TopDevOps" style="color: #4fbdba;">@TopDevOps</a></div>
+                <div class="contact-item">🔗 <a href="https://linkedin.com/in/dparamonov" style="color: #4fbdba;">LinkedIn</a></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Опыт работы — 17 лет 3 месяца</h2>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">DevOps Team Lead</div>
+                    <div class="job-date">Июнь 2023 — Октябрь 2026</div>
+                </div>
+                <div class="job-company">Crypto Industry International, ОАЭ</div>
+                <div class="job-description">
+                    <ul>
+                        <li>Организация, управление и развитие DevOps-процессов</li>
+                        <li>Обеспечение стабильной работы микросервисной инфраструктуры</li>
+                        <li>Проектирование архитектуры программных продуктов</li>
+                        <li>Разработка регламентов разработки, тестирования и сопровождения</li>
+                        <li>Управление бэклогом и приоритизация задач</li>
+                        <li>Организация найма, онбординга и обучения технических специалистов</li>
+                        <li>Внедрение CI/CD-процессов и автоматизация масштабирования</li>
+                        <li>Мониторинг производительности и доступности инфраструктуры</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">Lead DevOps</div>
+                    <div class="job-date">Апрель 2021 — Июнь 2023 (2 года 3 месяца)</div>
+                </div>
+                <div class="job-company">Иннотех (ВТБ), Москва</div>
+                <div class="job-description">
+                    <ul>
+                        <li>Руководство DevOps-функцией на двух крупных бизнес-направлениях</li>
+                        <li>Миграция инфраструктуры в новый дата-центр VTB.Cloud</li>
+                        <li>Построение CI/CD на TeamCity + OpenShift Templates</li>
+                        <li>Миграция на DreamPipe (TeamCity + Helm Charts, DevSecOps)</li>
+                        <li>Перенос очередей сообщений на Apache ActiveMQ Artemis</li>
+                        <li>Миграция БД в PostgreSQL-кластер (Astra Linux)</li>
+                        <li>Наставничество Junior/Middle-специалистов</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">Senior DevOps</div>
+                    <div class="job-date">Декабрь 2018 — Апрель 2021 (2 года 5 месяцев)</div>
+                </div>
+                <div class="job-company">DELL, Россия</div>
+                <div class="job-description">
+                    <ul>
+                        <li>Администрирование Atlassian Stack (Jira, Confluence, Bitbucket)</li>
+                        <li>Развёртывание Kubernetes-кластеров с нуля (kubeadm)</li>
+                        <li>Интеграция K8s с GitLab CI/CD</li>
+                        <li>Настройка мониторинга: Prometheus + Grafana + Alertmanager</li>
+                        <li>Автоматизация с Ansible</li>
+                        <li>Взаимодействие с распределёнными командами (США, Индия)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">Middle DevOps</div>
+                    <div class="job-date">Февраль 2018 — Август 2018 (7 месяцев)</div>
+                </div>
+                <div class="job-company">FINOM, Санкт-Петербург</div>
+                <div class="job-description">
+                    <ul>
+                        <li>Построение DevOps-процессов с нуля для группы компаний</li>
+                        <li>CI/CD на GitLab, мониторинг Nagios/Zabbix</li>
+                        <li>Миграция Jira/Confluence на собственные серверы</li>
+                        <li>Резервное копирование в Amazon S3</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">DevOps</div>
+                    <div class="job-date">Февраль 2017 — Август 2017 (7 месяцев)</div>
+                </div>
+                <div class="job-company">ПрофИТ Солюшенз, Санкт-Петербург</div>
+                <div class="job-description">
+                    <ul>
+                        <li>Внедрение ITSM/ITIL на базе GLPI</li>
+                        <li>CI/CD на Jenkins, администрирование Atlassian Stack</li>
+                        <li>Администрирование VMware ESXi, Docker</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">Основатель (CEO & CIO)</div>
+                    <div class="job-date">Март 2016 — Февраль 2017 (1 год)</div>
+                </div>
+                <div class="job-company">IThelperSPb, Санкт-Петербург</div>
+                <div class="job-description">
+                    <ul>
+                        <li>IT-консалтинг, внедрение облачных решений на Azure</li>
+                        <li>ITSM/ITIL-процессы, мониторинг</li>
+                        <li>Разработка сайтов, SEO/SMM</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">Старший специалист по системному администрированию</div>
+                    <div class="job-date">Декабрь 2014 — Март 2016 (1 год 4 месяца)</div>
+                </div>
+                <div class="job-company">Объединённая Вагонная Компания, Москва</div>
+                <div class="job-description">
+                    <ul>
+                        <li>Аудит и реструктуризация IT-инфраструктуры</li>
+                        <li>Виртуализация VMware ESXi, Linux-сервисы</li>
+                        <li>Корпоративный портал ONLYOFFICE, ERP Odoo</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">Сооснователь (CEO & CIO)</div>
+                    <div class="job-date">Январь 2012 — Декабрь 2014 (3 года)</div>
+                </div>
+                <div class="job-company">ООО «Микрозаймфинанс», Москва</div>
+                <div class="job-description">
+                    <ul>
+                        <li>Построение бизнеса с нуля (микрофинансовая организация)</li>
+                        <li>Разработка сайта, CRM, IT-инфраструктуры</li>
+                        <li>Операционное управление</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">Главный системный администратор</div>
+                    <div class="job-date">Январь 2011 — Декабрь 2011 (1 год)</div>
+                </div>
+                <div class="job-company">Т-Банк (Тинькофф), Москва</div>
+                <div class="job-description">
+                    <ul>
+                        <li>Системное администрирование Windows/*Nix</li>
+                        <li>Мониторинг и оповещение о сбоях</li>
+                        <li>Масштаб: 250+ серверов, 1200+ пользователей, 4 ЦОД, команда 6 человек</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">Заместитель директора департамента ИТ</div>
+                    <div class="job-date">Февраль 2008 — Январь 2011 (3 года)</div>
+                </div>
+                <div class="job-company">ЛЕКСПРО, Москва</div>
+                <div class="job-description">
+                    <ul>
+                        <li>Построение IT-инфраструктуры с нуля</li>
+                        <li>Виртуализация MS Hyper-V, резервное копирование</li>
+                        <li>Масштаб: 40 серверов, ~500 пользователей, 6 офисов, команда ~12 человек</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Навыки</h2>
+            <div class="skills-grid">
+                <div class="skill-category">
+                    <h3>Контейнеризация и оркестрация</h3>
+                    <div class="skill-list">
+                        <span class="skill-tag">Docker</span>
+                        <span class="skill-tag">Kubernetes</span>
+                        <span class="skill-tag">OpenShift</span>
+                        <span class="skill-tag">Helm</span>
+                        <span class="skill-tag">Kubespray</span>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3>CI/CD и автоматизация</h3>
+                    <div class="skill-list">
+                        <span class="skill-tag">GitLab CI</span>
+                        <span class="skill-tag">Jenkins</span>
+                        <span class="skill-tag">TeamCity</span>
+                        <span class="skill-tag">Ansible</span>
+                        <span class="skill-tag">Terraform</span>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3>Облака и инфраструктура</h3>
+                    <div class="skill-list">
+                        <span class="skill-tag">AWS</span>
+                        <span class="skill-tag">Azure</span>
+                        <span class="skill-tag">Yandex Cloud</span>
+                        <span class="skill-tag">VMware ESXi</span>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3>Мониторинг и наблюдаемость</h3>
+                    <div class="skill-list">
+                        <span class="skill-tag">Prometheus</span>
+                        <span class="skill-tag">Grafana</span>
+                        <span class="skill-tag">Alertmanager</span>
+                        <span class="skill-tag">Zabbix</span>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3>Базы данных и очереди</h3>
+                    <div class="skill-list">
+                        <span class="skill-tag">PostgreSQL</span>
+                        <span class="skill-tag">MySQL</span>
+                        <span class="skill-tag">Kafka</span>
+                        <span class="skill-tag">ActiveMQ</span>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3>AI/ML инструменты</h3>
+                    <div class="skill-list">
+                        <span class="skill-tag">Claude Code</span>
+                        <span class="skill-tag">ChatGPT</span>
+                        <span class="skill-tag">MLflow</span>
+                        <span class="skill-tag">Ollama</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Образование</h2>
+            <div class="job">
+                <div class="job-header">
+                    <div class="job-title">Санкт-Петербургский государственный университет аэрокосмического приборостроения</div>
+                    <div class="job-date">2006</div>
+                </div>
+                <div class="job-company">Инженер-программист, Вычислительные машины, комплексы, системы и сети</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">О себе</h2>
+            <div class="about-text">
+                Прошёл путь от системного администратора до совладельца бизнеса и CEO/CIO. 
+                Последние 9+ лет полностью сфокусирован на DevOps и SRE-практиках: контейнеризация 
+                приложений на Docker с последующей оркестрацией в Kubernetes и OpenShift, преимущественно 
+                в финтех-проектах и highload-системах банковского уровня. Стремлюсь обеспечивать 
+                минимальный time-to-market для бизнеса и внедряю практики DevSecOps для повышения 
+                надёжности production-систем. Параллельно активно изучаю возможности искусственного 
+                интеллекта и нейросетей — тестирую и внедряю AI-инструменты для ускорения разработки, 
+                анализа кода и автоматизации рутинных DevOps-задач.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Рекомендации</h2>
+            <div class="job">
+                <div class="job-company">Сергей Мазиев, IT Director — ПрофИТ Солюшенз</div>
+                <div class="job-company">Екатерина Артемьева, HR Director — FINOM</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
