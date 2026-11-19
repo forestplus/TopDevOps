@@ -211,6 +211,19 @@
           Через <code>Machine Config Operator (MCO)</code>. Вы вносите изменения в <code>MachineConfig</code> (например, настройка ядра, systemd-юниты, сертификаты). MCO применяет изменения к нодам одного пула (pool) по очереди: cordons ноду, drain'ит поды, применяет конфигурацию, перезагружает ноду (если требуется), uncordons. Это обеспечивает zero-downtime обновление инфраструктуры, если приложения правильно настроены на graceful shutdown и имеют pod disruption budgets (PDB).
         </div>
       </div>
+
+      <div class="qa-block">
+        <div class="question">Что такое Operators и как они используются в OKD 4.x?</div>
+        <div class="answer">
+          Operators — это расширения Kubernetes, которые автоматизируют управление сложными приложениями. В OKD 4.x они используются для:
+          <ul>
+            <li>Управления жизненным циклом компонентов кластера (etcd, kube-apiserver, ingress).</li>
+            <li>Автоматического обновления и масштабирования.</li>
+            <li>Мониторинга и самовосстановления (self-healing).</li>
+            <li>Установки и настройки middleware (PostgreSQL, Kafka, Redis) через OLM (Operator Lifecycle Manager).</li>
+          </ul>
+        </div>
+      </div>
       <a class="top-link" href="#top">↑ Наверх</a>
     </section>
 
@@ -246,6 +259,31 @@
           </ul>
         </div>
       </div>
+
+      <div class="qa-block">
+        <div class="question">Как обеспечить безопасность артефактов и контейнеров в CI/CD?</div>
+        <div class="answer">
+          <ul>
+            <li><strong>SAST (Static Application Security Testing):</strong> Сканирование кода на уязвимости на этапе сборки.</li>
+            <li><strong>DAST (Dynamic Application Security Testing):</strong> Сканирование работающего приложения в тестовой среде.</li>
+            <li><strong>Container Scanning:</strong> Проверка Docker-образов на известные уязвимости (CVE) перед публикацией в registry.</li>
+            <li><strong>Dependency Scanning:</strong> Анализ зависимостей (npm, pip, maven) на уязвимости.</li>
+            <li><strong>License Compliance:</strong> Проверка лицензий используемых библиотек.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="question">Как вы организуете кэширование и артефакты в GitLab CI для ускорения пайплайнов?</div>
+        <div class="answer">
+          <ul>
+            <li><strong>Кэширование зависимостей:</strong> Кэшировать node_modules, vendor, .m2 между запусками (с учётом ключа кэша, привязанного к lock-файлу).</li>
+            <li><strong>Артефакты:</strong> Сохранять результаты сборки (бинарники, Docker-образы, отчёты тестов) для передачи между stages и для последующего деплоя.</li>
+            <li><strong>Docker Layer Caching:</strong> Использовать <code>--cache-from</code> для кэширования слоёв Docker-образов.</li>
+            <li><strong>Parallel testing:</strong> Разбивать тесты на параллельные job'ы для ускорения.</li>
+          </ul>
+        </div>
+      </div>
       <a class="top-link" href="#top">↑ Наверх</a>
     </section>
 
@@ -276,6 +314,19 @@
             <li>Использование механизмов fencing (например, STONITH для серверов или блокировка на уровне хранилища).</li>
             <li>Для Kubernetes: использование решений, которые не полагаются на кворум etcd, растянутый между ЦОД. Лучше иметь два независимых кворума.</li>
             <li>Чёткие runbooks и автоматизированные сценарии переключения, которые гарантируют, что старый primary полностью остановлен перед поднятием нового.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="question">Как вы организуете DR-тесты (Disaster Recovery) для проверки готовности к failover?</div>
+        <div class="answer">
+          <ul>
+            <li><strong>Регулярность:</strong> DR-тесты должны проводиться регулярно (например, ежеквартально) и после значительных изменений в архитектуре.</li>
+            <li><strong>Сценарии:</strong> Тестирование различных сценариев: отказ одного ЦОД, отказ сети между ЦОД, потеря данных, повреждение конфигураций.</li>
+            <li><strong>Автоматизация:</strong> По возможности автоматизировать сценарии тестирования (chaos engineering), чтобы их можно было запускать часто и без ручного вмешательства.</li>
+            <li><strong>Документирование:</strong> Фиксировать результаты тестов, выявленные проблемы и action items для их устранения.</li>
+            <li><strong>Метрики:</strong> Измерять фактические RTO и RPO, сравнивать с целевыми значениями.</li>
           </ul>
         </div>
       </div>
@@ -317,6 +368,20 @@
           </ul>
         </div>
       </div>
+
+      <div class="qa-block">
+        <div class="question">Как вы мониторите Kafka и какие метрики критичны?</div>
+        <div class="answer">
+          <ul>
+            <li><strong>Consumer Lag:</strong> Разница между последним оффсетом в топике и оффсетом, который прочитал консьюмер. Высокий лаг означает, что консьюмер не справляется с нагрузкой.</li>
+            <li><strong>Under-replicated Partitions:</strong> Количество партиций, у которых не все реплики синхронизированы. Критичный индикатор проблем с репликацией.</li>
+            <li><strong>Request Latency:</strong> Задержка обработки запросов producer/consumer.</li>
+            <li><strong>Broker Disk Usage:</strong> Использование дискового пространства брокерами.</li>
+            <li><strong>Network Throughput:</strong> Сетевая нагрузка на брокеры.</li>
+            <li><strong>ISR Shrink/Expand Rate:</strong> Частота изменения списка in-sync реплик. Высокая частота может указывать на нестабильность.</li>
+          </ul>
+        </div>
+      </div>
       <a class="top-link" href="#top">↑ Наверх</a>
     </section>
 
@@ -346,6 +411,19 @@
           <ul>
             <li><strong>HA:</strong> Запуск нескольких нод Vault с использованием хранилища с поддержкой HA (например, Raft storage или Consul). Настройка <code>auto-unseal</code> (через AWS KMS, GCP KMS или HashiCorp HSM), чтобы не вводить ключи вручную при перезагрузке.</li>
             <li><strong>DR:</strong> Настройка DR Replication (асинхронная репликация на резервный кластер Vault в другом ЦОД). В случае катастрофы основной кластер промоутится из DR-реплики.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="question">Что такое динамические секреты и как они работают в Vault?</div>
+        <div class="answer">
+          Динамические секреты — это секреты, которые генерируются Vault по запросу и имеют ограниченное время жизни (TTL). 
+          <ul>
+            <li><strong>Database Secrets:</strong> Vault создаёт временные учётные записи в базе данных (PostgreSQL, MySQL) с определёнными правами. После истечения TTL учётная запись автоматически удаляется.</li>
+            <li><strong>Cloud Provider Secrets:</strong> Генерация временных AWS IAM credentials, GCP service account keys.</li>
+            <li><strong>PKI:</strong> Выдача TLS-сертификатов с автоматической ротацией.</li>
+            <li><strong>Преимущества:</strong> Короткое время жизни снижает риск утечки, автоматическая ротация, аудит доступа.</li>
           </ul>
         </div>
       </div>
@@ -383,6 +461,31 @@
           «Хороший алерт должен отвечать на три вопроса: что случилось, насколько это критично и что делать прямо сейчас (ссылка на runbook)».
         </div>
       </div>
+
+      <div class="qa-block">
+        <div class="question">Как вы организуете централизованное логирование с использованием Elastic/OpenSearch?</div>
+        <div class="answer">
+          <ul>
+            <li><strong>Сбор логов:</strong> Использование Filebeat или Fluentd на нодах для сбора логов контейнеров и системных логов.</li>
+            <li><strong>Буферизация:</strong> Использование Kafka или Redis как буфера между shipper'ами и ElasticSearch для защиты от пиков нагрузки.</li>
+            <li><strong>Индексация:</strong> Настройка Index Lifecycle Management (ILM) для автоматического управления индексами (rollover, shrink, delete) на основе retention policy.</li>
+            <li><strong>Парсинг:</strong> Использование Grok patterns или Logstash pipelines для структурирования логов.</li>
+            <li><strong>Безопасность:</strong> Настройка ролевой модели доступа (RBAC) в Kibana, шифрование данных at rest и in transit.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="question">Что такое SLI, SLO и SLA, и как они связаны?</div>
+        <div class="answer">
+          <ul>
+            <li><strong>SLI (Service Level Indicator):</strong> Измеримая метрика, которая отражает качество сервиса. Например, latency, error rate, availability.</li>
+            <li><strong>SLO (Service Level Objective):</strong> Целевое значение SLI. Например, "99.9% запросов должны обрабатываться быстрее 200 мс".</li>
+            <li><strong>SLA (Service Level Agreement):</strong> Контрактное обязательство перед бизнесом/клиентами с последствиями при нарушении. Например, "Если доступность упадёт ниже 99.5%, мы выплатим компенсацию".</li>
+            <li><strong>Error Budget:</strong> Разница между 100% и SLO. Например, если SLO = 99.9%, то error budget = 0.1%. Этот бюджет можно "тратить" на эксперименты, деплои, или он накапливается для повышения надёжности.</li>
+          </ul>
+        </div>
+      </div>
       <a class="top-link" href="#top">↑ Наверх</a>
     </section>
 
@@ -410,6 +513,19 @@
           <strong>Ansible</strong> используется для конфигурации этих ВМ (если они не immutable) или для начальной настройки.
           <strong>OKD/Kubernetes</strong> управляет жизненным циклом приложений.
           Важно соблюдать границу: Terraform создаёт ресурсы, Ansible/K8s их настраивает. Состояние Terraform должно храниться в удалённом бэкенде (S3 + DynamoDB для lock) с контролем доступа.
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="question">Как вы обеспечиваете идемпотентность Ansible-плейбуков?</div>
+        <div class="answer">
+          Идемпотентность означает, что многократный запуск плейбука даёт тот же результат, что и однократный. Для этого:
+          <ul>
+            <li>Использование модулей Ansible, которые проверяют текущее состояние перед изменением (например, <code>file</code>, <code>template</code>, <code>package</code>).</li>
+            <li>Избегание <code>shell</code> и <code>command</code> модулей, если есть специализированные модули.</li>
+            <li>Использование <code>creates</code> и <code>removes</code> параметров в <code>shell</code>/<code>command</code> для проверки условий.</li>
+            <li>Тестирование плейбуков на тестовых средах перед применением в production.</li>
+          </ul>
         </div>
       </div>
       <a class="top-link" href="#top">↑ Наверх</a>
@@ -445,6 +561,32 @@
           </ul>
         </div>
       </div>
+
+      <div class="qa-block">
+        <div class="question">Как вы организуете on-call и дежурства в команде?</div>
+        <div class="answer">
+          <ul>
+            <li><strong>Ротация:</strong> Справедливое распределение дежурств между членами команды (например, неделя через неделю).</li>
+            <li><strong>Компенсация:</strong> Оплата дежурств (фиксированная ставка за неделю или почасовая за вызовы).</li>
+            <li><strong>Эскалация:</strong> Чёткая цепочка эскалации: если первый on-call не отвечает или не может решить, звонок уходит второму, затем менеджеру.</li>
+            <li><strong>Инструменты:</strong> Использование PagerDuty, Opsgenie или аналогов для управления дежурствами и нотификациями.</li>
+            <li><strong>Документация:</strong> Runbooks и playbooks для типовых инцидентов, чтобы on-call инженер мог быстро найти решение.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="question">Как вы внедряете Change Management в DevOps-процессы?</div>
+        <div class="answer">
+          Change Management не должен быть бюрократией, а должен обеспечивать безопасность изменений.
+          <ul>
+            <li><strong>Классификация изменений:</strong> Стандартные (pre-approved), Нормальные (требуют оценки и аппрува), Экстренные (срочные, с последующим документированием).</li>
+            <li><strong>Автоматизация:</strong> Использование CI/CD пайплайнов как механизма Change Management. Если изменение прошло все тесты и аппрувы в пайплайне, оно считается pre-approved.</li>
+            <li><strong>Окна изменений:</strong> Для критичных изменений выделяются специальные окна (например, ночь с субботы на воскресенье), когда нагрузка минимальна.</li>
+            <li><strong>Rollback plan:</strong> Для каждого изменения должен быть план отката, протестированный заранее.</li>
+          </ul>
+        </div>
+      </div>
       <a class="top-link" href="#top">↑ Наверх</a>
     </section>
 
@@ -475,6 +617,32 @@
             <li><strong>С командой:</strong> Прозрачный бэклог, регулярные 1-on-1, чёткое распределение зон ответственности (platform, SRE, CI/CD), поощрение кросс-функциональности (чтобы не было bus factor = 1).</li>
             <li><strong>С заказчиком:</strong> Говорить на языке бизнеса. Не "мы обновляем Kafka", а "мы снижаем риск простоя торговой площадки и ускоряем обработку транзакций". Регулярные демо результатов и прозрачный roadmap.</li>
             <li><strong>Смежные команды (DBA, сеть, ИБ):</strong> Вовлекать их на этапе проектирования (Shift-Left), а не ставить перед фактом перед деплоем.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="question">Как вы оцениваете технический долг и приоритизируете его устранение?</div>
+        <div class="answer">
+          Технический долг нужно оценивать по влиянию на бизнес:
+          <ul>
+            <li><strong>Риск:</strong> Насколько высок риск инцидента или безопасности из-за этого долга?</li>
+            <li><strong>Стоимость поддержки:</strong> Сколько времени команда тратит на ручную работу или обходные пути?</li>
+            <li><strong>Блокировка развития:</strong> Мешает ли этот долг внедрению новых фич или масштабированию?</li>
+            <li><strong>Приоритизация:</strong> Использую матрицу "Влияние vs Усилия". Сначала устраняем то, что даёт максимальный эффект при минимальных усилиях.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="question">Как вы развиваете команду и обеспечиваете передачу знаний?</div>
+        <div class="answer">
+          <ul>
+            <li><strong>Документация:</strong> Создание и поддержание актуальной документации (architecture diagrams, runbooks, ADR, onboarding guides).</li>
+            <li><strong>Pair programming / Shadowing:</strong> Младшие инженеры работают в паре с старшими, перенимая опыт.</li>
+            <li><strong>Tech Talks / Brown Bags:</strong> Регулярные внутренние презентации, где члены команды делятся знаниями по новым технологиям или интересным кейсам.</li>
+            <li><strong>Rotation:</strong> Периодическая ротация инженеров между зонами ответственности, чтобы избежать bus factor.</li>
+            <li><strong>Mentorship:</strong> Назначение менторов для новых членов команды и для тех, кто хочет расти.</li>
           </ul>
         </div>
       </div>
