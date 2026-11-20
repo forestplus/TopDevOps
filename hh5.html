@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR-Собеседование — Первый Бит | Senior System Administrator L3 | Дмитрий Парамонов</title>
+<style>
+:root{--pri:#1a73e8;--prid:#1557b0;--acc:#ff6d00;--suc:#2e7d32;--wrn:#f57c00;--dng:#c62828;--bg:#f4f6fb;--card:#fff;--txt:#1a1a2e;--mut:#5a6a7a;--brd:#dde3ef;--sw:278px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);line-height:1.65;display:flex;min-height:100vh}
+#sb{width:var(--sw);background:linear-gradient(180deg,#0d1b3e,#1a2f6b);color:#fff;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:100;padding:22px 0;transition:transform .3s}
+#sb::-webkit-scrollbar{width:4px}
+#sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
+.sh{padding:0 18px 18px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:10px}
+.sh h2{font-size:14px;font-weight:700}.sh p{font-size:11px;opacity:.6;margin-top:3px}
+.ng{font-size:9.5px;text-transform:uppercase;letter-spacing:1.2px;opacity:.4;padding:11px 18px 5px;font-weight:600}
+.nl{display:flex;align-items:center;gap:9px;padding:8px 18px;color:rgba(255,255,255,.75);text-decoration:none;font-size:12.5px;transition:all .15s;border-left:3px solid transparent}
+.nl:hover{background:rgba(255,255,255,.08);color:#fff}
+.nl.ac{background:rgba(255,255,255,.13);color:#fff;border-left-color:var(--acc)}
+.nl .ic{font-size:14px;width:18px;text-align:center}
+.nl .bd{margin-left:auto;background:var(--acc);color:#fff;font-size:9.5px;padding:1px 6px;border-radius:10px;font-weight:700}
+#mn{margin-left:var(--sw);flex:1;padding:30px 38px 60px;max-width:940px}
+.hero{background:linear-gradient(135deg,#1a2f6b,#1a73e8 60%,#4fc3f7);color:#fff;border-radius:16px;padding:34px 38px;margin-bottom:30px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;background:rgba(255,255,255,.07);border-radius:50%}
+.hb{display:inline-block;background:rgba(255,255,255,.2);padding:3px 12px;border-radius:20px;font-size:11.5px;font-weight:600;margin-bottom:11px}
+.hero h1{font-size:24px;font-weight:800;margin-bottom:7px}.hero>p{opacity:.85;font-size:14.5px}
+.hm{display:flex;gap:18px;margin-top:16px;flex-wrap:wrap}
+.hi{display:flex;align-items:center;gap:5px;font-size:12.5px;opacity:.9}
+.sc{background:var(--card);border-radius:14px;padding:26px 30px;margin-bottom:22px;border:1px solid var(--brd);box-shadow:0 2px 12px rgba(0,0,0,.05)}
+.st{font-size:17px;font-weight:700;color:var(--prid);margin-bottom:18px;padding-bottom:11px;border-bottom:2px solid var(--brd);display:flex;align-items:center;gap:9px}
+.st .em{font-size:20px}
+.ig{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px;margin-bottom:18px}
+.ic2{background:var(--bg);border-radius:9px;padding:13px 15px;border-left:3px solid var(--pri)}
+.ic2 .lb{font-size:10.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.ic2 .vl{font-size:13.5px;font-weight:600;margin-top:3px}
+.mw{margin-bottom:13px}.ml{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}
+.ml span:last-child{font-weight:700}
+.mb{height:7px;background:var(--brd);border-radius:4px;overflow:hidden}
+.mf{height:100%;border-radius:4px}
+.fh{background:linear-gradient(90deg,#43a047,#66bb6a)}.fm{background:linear-gradient(90deg,#f57c00,#ffb74d)}
+.qct{font-size:14px;font-weight:700;color:var(--pri);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.qct::after{content:'';flex:1;height:1px;background:var(--brd)}
+.qc{background:var(--bg);border-radius:9px;margin-bottom:11px;overflow:hidden;border:1px solid var(--brd);transition:box-shadow .2s}
+.qc:hover{box-shadow:0 4px 14px rgba(26,115,232,.1)}
+.qq{padding:13px 16px;cursor:pointer;display:flex;align-items:flex-start;gap:11px;user-select:none}
+.qq:hover{background:rgba(26,115,232,.04)}
+.qn{background:var(--pri);color:#fff;font-size:10.5px;font-weight:700;min-width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.qt{font-size:13.5px;font-weight:600;flex:1}
+.tg{font-size:9.5px;padding:2px 7px;border-radius:10px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.tm{background:#fce4ec;color:#c62828}.tl{background:#fff3e0;color:#e65100}.tb{background:#e8f5e9;color:#2e7d32}.tt{background:#f3e5f5;color:#6a1b9a}
+.qch{font-size:11px;color:var(--mut);transition:transform .2s;flex-shrink:0;margin-top:3px}
+.qc.op .qch{transform:rotate(180deg)}
+.qa{display:none;padding:0 16px 15px 50px;font-size:13px;color:#2a3a4a;line-height:1.75}
+.qc.op .qa{display:block}
+.at{background:#e8f5e9;border-left:3px solid var(--suc);padding:9px 13px;border-radius:0 7px 7px 0;margin-top:9px;font-size:12.5px}
+.at strong{color:var(--suc)}
+.aw{background:#fff8e1;border-left:3px solid var(--wrn);padding:9px 13px;border-radius:0 7px 7px 0;margin-top:9px;font-size:12.5px}
+.aw strong{color:var(--wrn)}
+.as{background:#e3f2fd;border-left:3px solid var(--pri);padding:9px 13px;border-radius:0 7px 7px 0;margin-top:9px;font-size:12.5px;font-style:italic}
+.as strong{color:var(--pri);font-style:normal}
+.cl{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--brd);font-size:13.5px}
+.cl:last-child{border-bottom:none}
+.ci{width:21px;height:21px;border:2px solid var(--pri);border-radius:5px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s;margin-top:1px}
+.ci.ck{background:var(--pri);color:#fff}
+.tgr{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:13px}
+.tc{background:var(--bg);border-radius:9px;padding:15px;border-top:3px solid var(--pri)}
+.tc.tw{border-top-color:var(--wrn)}.tc.tg2{border-top-color:var(--suc)}.tc.td{border-top-color:var(--dng)}
+.tc h4{font-size:12.5px;font-weight:700;margin-bottom:7px}.tc p{font-size:12px;color:var(--mut);line-height:1.6}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--pri);color:#fff;padding:9px 13px;text-align:left;font-weight:600}
+td{padding:9px 13px;border-bottom:1px solid var(--brd)}
+tr:nth-child(even) td{background:var(--bg)}tr:hover td{background:#e8f0fe}
+.tl2{position:relative;padding-left:26px}
+.tl2::before{content:'';position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--brd)}
+.ti{position:relative;margin-bottom:18px}
+.ti::before{content:'';position:absolute;left:-22px;top:4px;width:11px;height:11px;background:var(--pri);border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px var(--pri)}
+.ti .tt2{font-size:10.5px;color:var(--mut);font-weight:600;text-transform:uppercase}
+.ti .ev{font-size:13.5px;font-weight:600;margin:2px 0}.ti .ds{font-size:12.5px;color:var(--mut)}
+#mt{display:none;position:fixed;top:13px;left:13px;z-index:200;background:var(--pri);color:#fff;border:none;border-radius:8px;width:38px;height:38px;font-size:18px;cursor:pointer;align-items:center;justify-content:center}
+.tt3{display:inline-block;background:#e8f0fe;color:var(--pri);font-size:10.5px;padding:2px 7px;border-radius:4px;font-weight:600;margin:2px}
+@media(max-width:768px){#sb{transform:translateX(-100%)}#sb.op{transform:translateX(0)}#mn{margin-left:0;padding:65px 15px 40px}#mt{display:flex}.hero{padding:22px 18px}.hero h1{font-size:19px}.sc{padding:18px 15px}}
+@media print{#sb,#mt{display:none!important}#mn{margin-left:0}.qa{display:block!important}}
+</style>
+</head>
+<body>
+<button id="mt" onclick="document.getElementById('sb').classList.toggle('op')">&#9776;</button>
+<nav id="sb">
+<div class="sh"><h2>&#127919; HR-Собеседование</h2><p>Первый Бит &middot; Senior SysAdmin L3</p></div>
+<div class="ng">Общее</div>
+<a class="nl ac" href="#ov"><span class="ic">&#128203;</span>Обзор вакансии</a>
+<a class="nl" href="#co"><span class="ic">&#127970;</span>О компании</a>
+<a class="nl" href="#ma"><span class="ic">&#127919;</span>Match-анализ</a>
+<div class="ng">Вопросы и ответы</div>
+<a class="nl" href="#q1"><span class="ic">&#128075;</span>Знакомство<span class="bd">5</span></a>
+<a class="nl" href="#q2"><span class="ic">&#128188;</span>Опыт работы<span class="bd">6</span></a>
+<a class="nl" href="#q3"><span class="ic">&#9881;</span>Технологии<span class="bd">5</span></a>
+<a class="nl" href="#q4"><span class="ic">&#128293;</span>Мотивация<span class="bd">5</span></a>
+<a class="nl" href="#q5"><span class="ic">&#129309;</span>Soft Skills<span class="bd">4</span></a>
+<a class="nl" href="#q6"><span class="ic">&#127758;</span>Логистика<span class="bd">5</span></a>
+<a class="nl" href="#q7"><span class="ic">&#9888;</span>Ловушки<span class="bd">4</span></a>
+<a class="nl" href="#q8"><span class="ic">&#10067;</span>Ваши вопросы<span class="bd">6</span></a>
+<div class="ng">Подготовка</div>
+<a class="nl" href="#sal"><span class="ic">&#128176;</span>Зарплата</a>
+<a class="nl" href="#pit"><span class="ic">&#128483;</span>Elevator Pitch</a>
+<a class="nl" href="#chk"><span class="ic">&#9989;</span>Чек-лист</a>
+<a class="nl" href="#tip"><span class="ic">&#128161;</span>Советы/риски</a>
+<a class="nl" href="#tml"><span class="ic">&#128197;</span>Таймлайн</a>
+</nav>
+<main id="mn">
+
+<div class="hero" id="ov">
+<div class="hb">&#128204; Первичное HR-интервью</div>
+<h1>Senior System Administrator (L3 Remote Support)</h1>
+<p>Первый Бит &middot; Удалённо &middot; Армения / Ближний Восток</p>
+<div class="hm">
+<div class="hi">&#128336; Пн–Пт, 09:00–18:00 Dubai time (UTC+4)</div>
+<div class="hi">&#128197; Опубликовано 18 ноября 2026</div>
+<div class="hi">&#128101; 514 откликов</div>
+<div class="hi">&#11088; Рейтинг 4.1 / 2 514 отзывов</div>
+</div></div>
+
+<div class="sc" id="co">
+<div class="st"><span class="em">&#127970;</span>О работодателе — Первый Бит</div>
+<div class="ig">
+<div class="ic2"><div class="lb">Тип компании</div><div class="vl">Международный IT-интегратор</div></div>
+<div class="ic2"><div class="lb">Масштаб</div><div class="vl">100+ офисов в 8 странах</div></div>
+<div class="ic2"><div class="lb">Специализация</div><div class="vl">1С, инфраструктура, кибербез</div></div>
+<div class="ic2"><div class="lb">Регион вакансии</div><div class="vl">Ближний Восток (Dubai HQ)</div></div>
+<div class="ic2"><div class="lb">Оформление</div><div class="vl">ГПХ / ИП / самозанятый</div></div>
+<div class="ic2"><div class="lb">Рейтинг HH.ru</div><div class="vl">&#11088; 4.1 (2 514 отзывов)</div></div>
+</div>
+<p style="font-size:13.5px;color:var(--mut);margin-bottom:13px"><strong style="color:var(--txt)">Миссия:</strong> «Делать бизнес клиентов сильнее при помощи IT-технологий». Крупнейший партнёр 1С, IT-аутсорсинг, ERP, инфраструктура, кибербезопасность. Подразделение на Ближнем Востоке обслуживает международных клиентов.</p>
+<div class="aw"><strong>&#9888;&#65039; Важно знать:</strong> В отзывах — высокая нагрузка, быстрое наращивание компетенций, иногда формальный стиль. На собеседовании возможны нестандартные вопросы (логика, хобби, видение через N лет). Готовьтесь к быстрому темпу.</div>
+</div>
+
+<div class="sc" id="ma">
+<div class="st"><span class="em">&#127919;</span>Анализ соответствия — Ваш профиль vs Требования</div>
+<div class="mw"><div class="ml"><span>Опыт инфраструктуры (требуется 3–6+ лет)</span><span style="color:#2e7d32">20+ лет &#9989;</span></div><div class="mb"><div class="mf fh" style="width:100%"></div></div></div>
+<div class="mw"><div class="ml"><span>Windows Server / AD / GPO / DNS/DHCP</span><span style="color:#2e7d32">Есть &#9989;</span></div><div class="mb"><div class="mf fh" style="width:95%"></div></div></div>
+<div class="mw"><div class="ml"><span>Microsoft 365 / Exchange / Entra ID / Intune</span><span style="color:#2e7d32">Есть &#9989;</span></div><div class="mb"><div class="mf fh" style="width:90%"></div></div></div>
+<div class="mw"><div class="ml"><span>VMware ESXi / Hyper-V / Veeam</span><span style="color:#2e7d32">Есть &#9989;</span></div><div class="mb"><div class="mf fh" style="width:90%"></div></div></div>
+<div class="mw"><div class="ml"><span>PowerShell / автоматизация</span><span style="color:#2e7d32">Есть &#9989;</span></div><div class="mb"><div class="mf fh" style="width:88%"></div></div></div>
+<div class="mw"><div class="ml"><span>Microsoft Azure</span><span style="color:#f57c00">Частично &#9889;</span></div><div class="mb"><div class="mf fm" style="width:65%"></div></div></div>
+<div class="mw"><div class="ml"><span>Linux (плюс в вакансии)</span><span style="color:#2e7d32">Сильный плюс &#9989;&#9989;</span></div><div class="mb"><div class="mf fh" style="width:100%"></div></div></div>
+<div class="mw"><div class="ml"><span>Английский B2+</span><span style="color:#f57c00">Уточнить &#9889;</span></div><div class="mb"><div class="mf fm" style="width:70%"></div></div></div>
+<div class="mw"><div class="ml"><span>DevOps / SRE / DevSecOps (сверх требования)</span><span style="color:#2e7d32">9 лет &#9989;&#9989;&#9989;</span></div><div class="mb"><div class="mf fh" style="width:100%"></div></div></div>
+<div class="mw"><div class="ml"><span>Опыт руководства / менторства</span><span style="color:#2e7d32">Есть &#9989;</span></div><div class="mb"><div class="mf fh" style="width:90%"></div></div></div>
+<div class="at" style="margin-top:16px"><strong>&#128161; Итог:</strong> Профиль значительно превышает требования (overqualified). Грамотно подайте: интересна экспертная роль со сложными задачами. Ваша сила — глубина + широта + зрелость инженера.</div>
+</div>
+
+<div class="sc" id="q1">
+<div class="st"><span class="em">&#128075;</span>Блок 1 — Знакомство и самопрезентация</div>
+<div class="qct">Открывающие вопросы</div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">1</div><div class="qt">Расскажите о себе / Tell me about yourself</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><p><strong>Формула:</strong> Present → Past → Future</p>
+<div class="as"><strong>&#128483; Пример:</strong><br>«Меня зовут Дмитрий, 42 года, в IT более 20 лет. Начинал с техподдержки и администрирования сайтов, вырос в системного администратора Windows и Linux — универсальный инфраструктурный инженер. Последние 9 лет — DevOps, SRE, DevSecOps: CI/CD, мониторинг, IaC, безопасность. Руководил командой, внедрял ITSM на GLPI по ITIL.<br><br>Сейчас интересна роль для применения всего опыта в решении действительно сложных инфраструктурных задач — не закрывать тикеты, а находить корневые причины и строить надёжные системы. Поэтому привлекла позиция в Первом Бите.»</div>
+<div class="at"><strong>&#128161;</strong> 1.5–2 мин. Не пересказ резюме — нарратив. Цифры: 20+ лет, 9 лет DevOps/SRE, руководство.</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">2</div><div class="qt">Как узнали о вакансии? Почему откликнулись?</div><span class="tg tl">Вероятно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Пригласили напрямую — оказалось кстати. Изучил вакансию: не рутина, а сложные инциденты, RCA, автоматизация, проекты модернизации. Именно то, чем занимался в SRE. Плюс международный контекст и разнообразные клиентские инфраструктуры.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">3</div><div class="qt">Кем видите себя через 2–3–5 лет?</div><span class="tg tl">Вероятно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «2 года — углубиться в Microsoft Cloud (Azure, Entra ID, Intune), стать экспертом M365 для enterprise. 3–5 лет — tech lead направления удалённой поддержки или архитектор инфраструктуры для нескольких клиентов. Важна профессиональная глубина и влияние на инфраструктуру.»</div>
+<div class="at"><strong>&#128161;</strong> Не «фриланс» или «бизнес». Цели = рост внутри компании.</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">4</div><div class="qt">Хобби / чем увлекаетесь?</div><span class="tg tb">Бонус</span><span class="qch">&#9660;</span></div>
+<div class="qa"><p>В Первом Бите задают про хобби и сериалы.</p>
+<div class="as"><strong>&#128483;</strong> «Активно изучаю AI — LLM для инженерных задач: автоматизация диагностики, генерация скриптов, анализ логов. Также [спорт/чтение/музыка]. Важен баланс — интенсивная интеллектуальная работа требует физформы и переключения.»</div>
+<div class="at"><strong>&#128161;</strong> AI в 2026 — отличный ход, показывает что в тренде.</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">5</div><div class="qt">Уровень английского языка?</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><p>Требуется <strong>B2+</strong>. Русский — преимущество.</p>
+<div class="as"><strong>&#128483; B2:</strong> «Upper-Intermediate. Свободно читаю документацию, веду переписку, участвую в созвонах. В разговорной иногда подбираю слова, но для работы достаточно. Готов подтянуть — практика в международной команде = лучшая тренировка.»<br><br><strong>&#128483; C1:</strong> «Продвинутый. Технические обсуждения, документация, международные клиенты без затруднений.»</div>
+<div class="aw"><strong>&#9888;&#65039;</strong> Честность важна. HR может переключиться на English mid-call.</div></div></div>
+</div>
+
+<div class="sc" id="q2">
+<div class="st"><span class="em">&#128188;</span>Блок 2 — Опыт работы</div>
+<div class="qct">Карьерный путь и достижения</div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">6</div><div class="qt">Опыт работы системным администратором</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «В IT 20+ лет. Техподдержка и сайты → Windows-админ: AD, GPO, Exchange, файловые сервисы, терминальные фермы. Параллельно Linux → универсальный админ гетерогенной инфраструктуры.<br><br>Последние 9 лет — DevOps/SRE/DevSecOps: CI/CD, IaC (Terraform, Ansible), мониторинг (Zabbix, Prometheus, Grafana), безопасность. Руководство командой, ITSM по ITIL на GLPI — системная поддержка, не хаотичная.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">7</div><div class="qt">Самый сложный инцидент, который решили</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><p><strong>STAR:</strong> Situation → Task → Action → Result</p>
+<div class="as"><strong>&#128483; Шаблон:</strong><br><strong>S:</strong> «Критический инцидент в [компания]: [отказ VMware кластера / потеря Exchange / шифровальщик]. Затронуты [N пользователей].»<br><strong>T:</strong> «Восстановить ASAP, минимизировать простой, найти root cause.»<br><strong>A:</strong> «Диагностика: логи, метрики, компоненты. Причина — [деталь]. Решение — [действие]. Информирование stakeholders. Post-mortem, документация, превентивные меры.»<br><strong>R:</strong> «Восстановлено за [время]. Post-mortem → внедрили [улучшение], инциденты не повторялись.»</div>
+<div class="at"><strong>&#128161;</strong> Идеален кейс Windows/VMware/AD/Veeam. Покажите RCA, не «перезагрузил».</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">8</div><div class="qt">Почему уходите с текущего места?</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Благодарен текущему работодателю. 9 лет в DevOps/SRE — множество проектов, достиг потолка в текущем контуре. Хочу применить экспертизу в новом контексте: разнообразные клиентские инфраструктуры, нестандартные задачи, Microsoft Cloud. Первый Бит даёт именно это.»</div>
+<div class="aw"><strong>&#9888;&#65039; Никогда:</strong> «Плохой босс», «Мало платят» (единственная причина), «Конфликты», «Скучно». Фокус — рост.</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">9</div><div class="qt">20+ лет опыта vs требование 3–6+. Не слишком senior?</div><span class="tg tt">Ловушка</span><span class="qch">&#9660;</span></div>
+<div class="qa"><p><strong>Ключевой вопрос.</strong> HR опасается: скучно, быстро уйдёте.</p>
+<div class="as"><strong>&#128483;</strong> «Отличный вопрос, понимаю почему. Роль привлекательна сутью: сложные инциденты, RCA, разнообразные инфраструктуры, автоматизация. Не "тикеты" — инженерия высокого уровня, где опыт реально нужен.<br><br>20 лет от поддержки до SRE и руководства — сейчас сознательно выбираю экспертную роль без административных задач. Интересно быть инженером, к которому обращаются в тупике. Именно это — L3 Remote Support.»</div>
+<div class="at"><strong>&#128161; Ключ:</strong> Сознательный выбор экспертной роли. Мотивация: задачи, международность, MS Cloud.</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">10</div><div class="qt">Опыт руководства? Почему не руководящая роль?</div><span class="tg tl">Вероятно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Есть опыт — управлял командой, процессы, менторство. Плюс для L3: вижу картину целиком, приоритизирую, общаюсь с заказчиком на языке бизнеса.<br><br>Сейчас ближе hands-on. Удовольствие от технических задач, от нахождения root cause. Руководство — ценно, но страсть — инженерия. Tech lead/principal в будущем — да, сейчас фокус на технических вызовах.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">11</div><div class="qt">Опыт внедрения ITSM/ITIL</div><span class="tg tb">Бонус</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Внедрял ITSM на GLPI по ITIL: инциденты, запросы, проблемы, изменения. SLA, эскалации, база знаний. Результат — прозрачная поддержка с метриками: время реакции, решения, повторные инциденты. Напрямую применимо к L3: важны не только технавыки, но и дисциплина процессов.»</div>
+<div class="at"><strong>&#128161;</strong> Сильный дифференциатор. Большинство кандидатов не имеют. Конкурентное преимущество.</div></div></div>
+</div>
+
+<div class="sc" id="q3">
+<div class="st"><span class="em">&#9881;&#65039;</span>Блок 3 — Технологии (HR-уровень)</div>
+<p style="font-size:13px;color:var(--mut);margin-bottom:18px">Глубоких технических вопросов на HR-этапе обычно нет, но проверяют знакомство со стеком. Кратко подтвердите опыт.</p>
+<div class="qct">Проверка стека</div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">12</div><div class="qt">Windows Server, Active Directory, Microsoft 365?</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Windows Server — основная платформа много лет, 2008 R2–2022: установка, роли, кластеризация, обновления. AD — доменные структуры, GPO, репликация, trust relationships. M365 — тенанты, Exchange Online, SharePoint, Teams, лицензирование, Entra ID. Миграции on-premise Exchange → M365.»</div>
+<p style="margin-top:9px"><span class="tt3">Windows Server 2012–2022</span><span class="tt3">Active Directory</span><span class="tt3">Group Policy</span><span class="tt3">DNS/DHCP</span><span class="tt3">Microsoft 365</span><span class="tt3">Exchange Online</span><span class="tt3">Entra ID</span></p></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">13</div><div class="qt">VMware/Hyper-V и Veeam?</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «VMware ESXi/vCenter — кластеры, vMotion, DRS, хранилища, troubleshooting VM. Hyper-V — репликация, failover clustering, System Center. Veeam B&amp;R — jobs, репозитории, политики, восстановление VM/файлов, тестирование restore. Бэкап без проверки — не существует.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">14</div><div class="qt">PowerShell и автоматизация?</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «PowerShell — основной инструмент. Скрипты: массовое управление AD, инвентаризация, отчётность, конфигурация серверов, MS Graph API. В DevOps: Bash, Python, Ansible, Terraform. Принцип: задача &gt;2 раз вручную → автоматизировать.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">15</div><div class="qt">Microsoft Azure и облака?</div><span class="tg tl">Вероятно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="aw"><strong>&#9888;&#65039;</strong> Честность важна. Лучше готовность учиться, чем провал на уточнениях.</div>
+<div class="as"><strong>&#128483; Есть опыт:</strong> «Azure: VM, VNet, VPN Gateway, Entra ID, Portal/CLI. Миграции on-prem → Azure.»<br><br><strong>&#128483; Ограничен:</strong> «Базовый уровень — VM, сети, Entra ID. Production-опыта мало, активно изучаю. Опыт с другими облаками = хорошая база для быстрого входа.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">16</div><div class="qt">Linux? (плюс в вакансии)</div><span class="tg tb">Ваш козырь</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Linux — не "плюс", а основная платформа. Много лет: Debian/Ubuntu, CentOS/RHEL, Alpine. Веб, почта, БД, Docker, Kubernetes, мониторинг. Для этой роли — гетерогенные среды клиентов и задачи за рамками Windows.»</div>
+<div class="at"><strong>&#128161;</strong> Реальный дифференциатор. Большинство Windows-кандидатов Linux не знают.</div></div></div>
+</div>
+
+<div class="sc" id="q4">
+<div class="st"><span class="em">&#128293;</span>Блок 4 — Мотивация</div>
+<div class="qct">Почему вы, почему мы, почему сейчас</div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">17</div><div class="qt">Почему именно Первый Бит?</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Три причины. 1) Не "тикеты", а инженерия: RCA, автоматизация, модернизация — именно то, что интересно. 2) Международный контекст: разные отрасли и страны, англоязычная среда — вызов и рост. 3) Масштаб: 100+ офисов, зрелые процессы, интересные клиенты, долгосрочное развитие.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">18</div><div class="qt">Что важно в работе?</div><span class="tg tl">Вероятно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «1) Интересные техзадачи — каждый день новое, не инструкция. 2) Профессиональная команда — люди, у которых можно учиться. 3) Влияние — видеть, как работа делает инфраструктуру клиентов надёжнее.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">19</div><div class="qt">Почему именно сейчас?</div><span class="tg tl">Вероятно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Не в активном поиске — пригласили, своевременно. Хочу применить DevOps/SRE-опыт в новом контексте. Текущая роль дала многое, готов к новым вызовам — MS Cloud, международная база. Увидел вакансию — понял: это оно.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">20</div><div class="qt">Рутина? Не будет скучно?</div><span class="tg tt">Ловушка</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Рутина есть везде — нормально. Подход: рутина → автоматизировать. 9 лет в SRE этим занимался. Но это L3, не L1 — сложные инциденты после первой линии. По определению нерутинно. Именно это привлекает.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">21</div><div class="qt">Изучаете что-то новое сейчас?</div><span class="tg tb">Бонус</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «AI — LLM для инженерных задач: автоматизация диагностики, генерация скриптов, анализ логов. Microsoft Cloud — Azure, Entra ID, Intune. В IT нельзя останавливаться.»</div>
+<div class="at"><strong>&#128161;</strong> AI в 2026 — мощный сигнал, в тренде.</div></div></div>
+</div>
+
+<div class="sc" id="q5">
+<div class="st"><span class="em">&#129309;</span>Блок 5 — Soft Skills</div>
+<div class="qct">Коммуникация, стресс, конфликты</div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">22</div><div class="qt">Как общаетесь с раздражёнными клиентами?</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «20 лет в IT — тысячи пользователей, от рядовых до CEO. Принцип: эмпатия → решение. Раздражён = реальная проблема. Признаю фрустрацию, беру на контроль, объясняю простым языком. Жаргон — только с техспециалистами. С бизнесом: "почта недоступна 30 мин" вместо "перезапустить Exchange DAG".»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">23</div><div class="qt">Расскажите об ошибке на работе</div><span class="tg tt">Ловушка</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «При обновлении конфигурации недостаточно протестировал в staging — повлияло на prod. Сервис недоступен [время]. Откат, восстановление, информирование. Post-mortem: пропустил тестирование из-за спешки. Правило: любое изменение в prod — после staging + peer review. Подобного больше не было. Ошибки неизбежны. Важно — реакция.»</div>
+<div class="aw"><strong>&#9888;&#65039;</strong> Не «никогда не ошибаюсь» — красный флаг. Признание → действие → урок → улучшение.</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">24</div><div class="qt">Работа в условиях неопределённости?</div><span class="tg tl">Вероятно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «В SRE/L3 неполная информация — норма. "Ничего не работает" → разбираемся. Алгоритм: максимум данных (логи, метрики, время), гипотезы от вероятных, документирование. Тупик → эскалация. Лучше попросить помощи, чем биться в одиночку.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">25</div><div class="qt">Отношение к документации?</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Документация — часть инженерной работы. Runbook'и, post-mortem, KB-статьи для L1. При внедрении ITSM на GLPI создал базу знаний с нуля — десятки статей, сократили время решения, снизили нагрузку на L3. Хорошая документация = мультипликатор эффективности команды.»</div></div></div>
+</div>
+
+<div class="sc" id="q6">
+<div class="st"><span class="em">&#127758;</span>Блок 6 — Логистика и условия</div>
+<div class="qct">График, формат, оформление</div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">26</div><div class="qt">График 09–18 Dubai (UTC+4). Подходит?</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><p><strong>Dubai=UTC+4.</strong> МСК: 08–17. Армения: 09–18 AMT (совпадает!).</p>
+<div class="as"><strong>&#128483;</strong> «Да, подходит. Разница [N]ч — комфортно. Привык к структурированному графику. 40 ч/week — именно то, что ищу.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">27</div><div class="qt">ГПХ / ИП / самозанятый — устраивает?</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="aw"><strong>&#9888;&#65039;</strong> НЕ ТК = нет отпуска, больничных, соцгарантий. Учитывайте в зарплате.</div>
+<div class="as"><strong>&#128483;</strong> «Да, рассматриваю. Статус: [самозанятый/ИП/готов оформить]. Понимаю особенности, учитываю в ожиданиях. Важнее содержание и общая компенсация.»</div>
+<div class="at"><strong>&#128161;</strong> Самозанятый/ИП — прямо. Нет — готовность оформить. Может быть dealbreaker.</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">28</div><div class="qt">Удалёнка? Оборудованное место?</div><span class="tg tl">Вероятно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Удалённо [N] лет, адаптирован. Место: интернет, резервный канал, гарнитура, 2 монитора. Дисциплинирован, эффективно без офиса.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">29</div><div class="qt">Когда готовы выйти? Отработка?</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483; Отработка:</strong> «[N недель] по договору. Готов обсудить ранний выход.»<br><strong>&#128483; Свободен:</strong> «1–2 недели для завершения обязательств и подготовки места.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">30</div><div class="qt">Другие предложения? Офферы?</div><span class="tg tt">Ловушка</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Несколько параллельных переговоров — нормально. Честно: Первый Бит — приоритет [причина]. Не тороплюсь, осознанный выбор.»</div>
+<div class="aw"><strong>&#9888;&#65039;</strong> Не «нет вариантов» (слабо) и не «5 офферов» (проверят). Честность + интерес.</div></div></div>
+</div>
+
+<div class="sc" id="q7">
+<div class="st"><span class="em">&#9888;&#65039;</span>Блок 7 — Вопросы-ловушки</div>
+<div class="qct">Провокационные вопросы</div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">31</div><div class="qt">20+ лет — не будете учить нас работать?</div><span class="tg tt">Ловушка</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Опыт — инструмент, не высокомерие. Пришёл по вашим процессам, не навязывать свои. Опыт помогает быстрее разбираться, но уважаю практики. Увижу улучшение — предложу в правильной форме и время. Первые недели — обучение: ваши процессы, клиенты, инструменты. Контекст → изменения.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">32</div><div class="qt">Overqualified. Что помешает уйти через 3 месяца?</div><span class="tg tt">Ловушка</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Понимаю беспокойство. Честно: не ищу "лучшее" — ищу подходящее сейчас. Подходит: сложные задачи, международность, MS Cloud. 42 года, прошёл этап "работа = строчка в резюме". Стабильность, интересная работа, комфортная команда = лояльный долгосрочный сотрудник. Трек подтверждает.»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">33</div><div class="qt">Зарплата не указана — как относитесь?</div><span class="tg tl">Вероятно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Диапазон зависит от опыта. Есть ожидания на основе опыта и рынка, готов обсудить. Важна общая компенсация. Каков ваш бюджетный диапазон?»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">34</div><div class="qt">Конфликты с руководством/коллегами?</div><span class="tg tt">Ловушка</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «20 лет — расходились мнения, неизбежно. Подход: проблема, не личность. Не согласен — аргументирую, принимаю итоговое решение. Случай: альтернатива с расчётами рисков → компромисс. Главное — профессионализм в разногласиях.»</div></div></div>
+</div>
+
+<div class="sc" id="q8">
+<div class="st"><span class="em">&#10067;</span>Блок 8 — Ваши вопросы HR (задайте обязательно!)</div>
+<p style="font-size:13px;color:var(--mut);margin-bottom:18px">Вопросы кандидата = заинтересованность и зрелость. Минимум 3–4 вопроса.</p>
+<div class="qct">Рекомендуемые вопросы</div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">Q1</div><div class="qt">Как устроен онбординг?</div><span class="tg tb">Рекомендуется</span><span class="qch">&#9660;</span></div>
+<div class="qa"><p><strong>Почему:</strong> Думаете о качественном старте. Ответ = зрелость процессов.</p>
+<div class="as"><strong>&#128483;</strong> «Как устроен онбординг? Адаптация, менторство, ознакомление с клиентскими средами перед самостоятельной работой?»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">Q2</div><div class="qt">Состав команды и кому подчиняюсь?</div><span class="tg tb">Рекомендуется</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Структура: сколько инженеров, L1/L2/L3, непосредственный руководитель?»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">Q3</div><div class="qt">Типы клиентов и инфраструктур?</div><span class="tg tb">Рекомендуется</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Отрасли, масштабы? SMB или enterprise? Разнообразие инфраструктур?»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">Q4</div><div class="qt">Возможности роста?</div><span class="tg tb">Рекомендуется</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Карьерный трек L3? Архитектура, tech lead, облачная специализация? Поддержка сертификаций Microsoft?»</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">Q5</div><div class="qt">Диапазон компенсации?</div><span class="tg tm">Важно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Зарплата не указана — сориентируйте по диапазону для моего уровня? Совпадение ожиданий.»</div>
+<div class="at"><strong>&#128161;</strong> Нормально спрашивать о деньгах на HR-этапе. Деловой подход.</div></div></div>
+
+<div class="qc" onclick="this.classList.toggle('op')"><div class="qq"><div class="qn">Q6</div><div class="qt">Следующие этапы найма?</div><span class="tg tm">Обязательно</span><span class="qch">&#9660;</span></div>
+<div class="qa"><div class="as"><strong>&#128483;</strong> «Этапы дальше? Техсобеседование, тестовое, руководитель? Сроки решения?»</div></div></div>
+</div>
+
+<div class="sc" id="sal">
+<div class="st"><span class="em">&#128176;</span>Зарплатные ожидания</div>
+<p style="font-size:13.5px;color:var(--mut);margin-bottom:16px">Зарплата не указана. ГПХ/ИП = выше аналога по ТК (нет отпуска, больничных).</p>
+<table><thead><tr><th>Фактор</th><th>Влияние</th><th>Комментарий</th></tr></thead><tbody>
+<tr><td>Опыт 20+ лет (vs 3–6+)</td><td style="color:#2e7d32;font-weight:700">&#8593; Повышает</td><td>Значительно выше требований</td></tr>
+<tr><td>DevOps/SRE/DevSecOps 9 лет</td><td style="color:#2e7d32;font-weight:700">&#8593; Повышает</td><td>Уникальная комбинация</td></tr>
+<tr><td>Опыт руководства</td><td style="color:#2e7d32;font-weight:700">&#8593; Повышает</td><td>Soft skills, менторство</td></tr>
+<tr><td>Linux + Windows</td><td style="color:#2e7d32;font-weight:700">&#8593; Повышает</td><td>Редкая комбинация</td></tr>
+<tr><td>ГПХ/ИП (нет соцпакета)</td><td style="color:#2e7d32;font-weight:700">&#8593; Повышает</td><td>+20–30% к ставке ТК</td></tr>
+<tr><td>International remote</td><td style="color:#f57c00;font-weight:700">&#8594; Нейтрально</td><td>Стандарт рынка</td></tr>
+<tr><td>L3 Support (не lead/arch)</td><td style="color:#e53935;font-weight:700">&#8595; Ограничивает</td><td>Потолок роли</td></tr>
+</tbody></table>
+<div class="at" style="margin-top:16px"><strong>&#128161; Стратегия:</strong><br>1. Сначала узнайте диапазон работодателя<br>2. Диапазон, не точная цифра<br>3. ГПХ: +20–30% к ТК<br>4. Ориентир international remote senior sysadmin: $2,500–4,500 USD/мес<br>5. Не называйте цифру первым</div>
+<div class="as" style="margin-top:11px"><strong>&#128483; Скрипт:</strong><br>«Ожидания зависят от пакета. 20+ лет инфраструктура, 9 лет DevOps/SRE, руководство, ГПХ — ориентируюсь на [диапазон] USD/мес net. Открыт к обсуждению, хотел бы понять ваш бюджет.»</div>
+</div>
+
+<div class="sc" id="pit">
+<div class="st"><span class="em">&#128483;&#65039;</span>Elevator Pitch — 60 секунд</div>
+<div style="background:linear-gradient(135deg,#e3f2fd,#f3e5f5);border-radius:12px;padding:22px;font-size:14px;line-height:1.85;border-left:4px solid var(--pri)">
+<p>«Меня зовут <strong>Дмитрий Парамонов</strong>, инфраструктурный инженер с <strong>20+ лет опыта</strong>.</p>
+<p style="margin-top:11px">Прошёл путь от техподдержки до <strong>SRE и DevSecOps</strong> — научился не просто решать проблемы, а находить корневые причины и строить системы, которые не ломаются.</p>
+<p style="margin-top:11px">Уникальность — <strong>глубина + ширина</strong>: Windows и Linux, on-premise и облако, инфраструктура и безопасность. 9 лет: CI/CD, мониторинг, автоматизация, руководство командой.</p>
+<p style="margin-top:11px">Сейчас — роль для применения всего опыта в <strong>действительно сложных инфраструктурных задачах</strong>. L3 Remote Support — не "тикеты", а инженерия высокого уровня, каждый день новые вызовы.»</p>
+</div>
+<div class="at" style="margin-top:14px"><strong>&#128161;</strong> Используйте в начале собеседования и для краткой самопрезентации.</div>
+</div>
+
+<div class="sc" id="chk">
+<div class="st"><span class="em">&#9989;</span>Чек-лист подготовки</div>
+<div class="cl"><div class="ci" onclick="this.classList.toggle('ck');this.innerHTML=this.classList.contains('ck')?'&#10003;':''"></div><div><strong>Компания изучена:</strong> Первый Бит — интегратор, 100+ офисов, 8 стран, 1С, Ближний Восток</div></div>
+<div class="cl"><div class="ci" onclick="this.classList.toggle('ck');this.innerHTML=this.classList.contains('ck')?'&#10003;':''"></div><div><strong>Вакансия прочитана:</strong> каждое требование → подтвердить опытом</div></div>
+<div class="cl"><div class="ci" onclick="this.classList.toggle('ck');this.innerHTML=this.classList.contains('ck')?'&#10003;':''"></div><div><strong>Elevator pitch:</strong> 60 секунд готовы</div></div>
+<div class="cl"><div class="ci" onclick="this.classList.toggle('ck');this.innerHTML=this.classList.contains('ck')?'&#10003;':''"></div><div><strong>2–3 STAR-кейса:</strong> сложные инциденты подготовлены</div></div>
+<div class="cl"><div class="ci" onclick="this.classList.toggle('ck');this.innerHTML=this.classList.contains('ck')?'&#10003;':''"></div><div><strong>Зарплатный диапазон:</strong> рынок, ГПХ, аргументация</div></div>
+<div class="cl"><div class="ci" onclick="this.classList.toggle('ck');this.innerHTML=this.classList.contains('ck')?'&#10003;':''"></div><div><strong>Английский:</strong> готов переключиться mid-call</div></div>
+<div class="cl"><div class="ci" onclick="this.classList.toggle('ck');this.innerHTML=this.classList.contains('ck')?'&#10003;':''"></div><div><strong>Вопросы HR:</strong> 3–4 вопроса готовы</div></div>
+<div class="cl"><div class="ci" onclick="this.classList.toggle('ck');this.innerHTML=this.classList.contains('ck')?'&#10003;':''"></div><div><strong>Техника:</strong> интернет, гарнитура, тихое место, ноутбук</div></div>
+<div class="cl"><div class="ci" onclick="this.classList.toggle('ck');this.innerHTML=this.classList.contains('ck')?'&#10003;':''"></div><div><strong>Резюме PDF:</strong> релевантная версия под рукой</div></div>
+<div class="cl"><div class="ci" onclick="this.classList.toggle('ck');this.innerHTML=this.classList.contains('ck')?'&#10003;':''"></div><div><strong>Рабочее место:</strong> вакансия открыта, заметки, вода</div></div>
+<div class="cl"><div class="ci" onclick="this.classList.toggle('ck');this.innerHTML=this.classList.contains('ck')?'&#10003;':''"></div><div><strong>Настрой:</strong> вы — сильный кандидат. Собеседование = диалог.</div></div>
+</div>
+
+<div class="sc" id="tip">
+<div class="st"><span class="em">&#128161;</span>Советы и зоны риска</div>
+<div class="tgr">
+<div class="tc tg2"><h4>&#9989; Сильные стороны</h4><p>20+ лет, DevOps/SRE 9 лет, руководство, Linux+Windows, ITSM/ITIL, AI — значительно сильнее среднего кандидата.</p></div>
+<div class="tc tw"><h4>&#9889; Overqualification</h4><p>Риск: HR решит — скучно, уйдёте. Активно: «Сознательно выбираю экспертную роль».</p></div>
+<div class="tc tw"><h4>&#9889; Английский B2+</h4><p>Готовность переключиться в любой момент. Ключевые фразы на English.</p></div>
+<div class="tc td"><h4>&#9888;&#65039; ГПХ-оформление</h4><p>Нет отпуска, больничных. +20–30% к ставке ТК в ожиданиях.</p></div>
+<div class="tc tg2"><h4>&#9989; Linux = козырь</h4><p>Для Microsoft-роли — редкий бонус. Гетерогенные среды клиентов.</p></div>
+<div class="tc tg2"><h4>&#9989; AI-направление</h4><p>Изучение AI в 2026 — мощный сигнал, в тренде.</p></div>
+<div class="tc tw"><h4>&#9889; Dubai time UTC+4</h4><p>Москва: 08–17 МСК. Ранний старт — не проблема.</p></div>
+<div class="tc td"><h4>&#9888;&#65039; 514 откликов</h4><p>Высокая конкуренция. Преимущество — глубина и уникальная комбинация.</p></div>
+</div>
+</div>
+
+<div class="sc" id="tml">
+<div class="st"><span class="em">&#128197;</span>Таймлайн найма</div>
+<div class="tl2">
+<div class="ti"><div class="tt2">Этап 1 &middot; Сейчас</div><div class="ev">&#128222; HR-скрининг</div><div class="ds">30–45 мин. Мотивация, опыт, логистика, зарплата, английский. Этот документ = подготовка.</div></div>
+<div class="ti"><div class="tt2">Этап 2 &middot; 1–2 недели</div><div class="ev">&#9881;&#65039; Техническое собеседование</div><div class="ds">Win Server, AD, M365, VMware/Hyper-V, Veeam, PowerShell, Azure, сети. Возможен тест.</div></div>
+<div class="ti"><div class="tt2">Этап 3 &middot; 2–3 недели</div><div class="ev">&#128101; Интервью с руководителем</div><div class="ds">Культурное соответствие, soft skills, процессы, команда.</div></div>
+<div class="ti"><div class="tt2">Этап 4 &middot; 3–4 недели</div><div class="ev">&#128203; Оффер и онбординг</div><div class="ds">Предложение, условия, ГПХ/ИП, старт работы.</div></div>
+</div>
+<div class="at" style="margin-top:18px"><strong>&#128161; После звонка:</strong> Thank-you в чат HH.ru — спасибо + интерес. Выделяет среди 514 кандидатов.</div>
+</div>
+
+<div style="text-align:center;padding:28px 0 14px;color:var(--mut);font-size:11.5px">
+<p>&#128196; Подготовка к HR-собеседованию &middot; Senior System Administrator L3 &middot; Первый Бит</p>
+<p style="margin-top:3px">Дмитрий Парамонов &middot; Ноябрь 2026 &middot; Удачи! &#127808;</p>
+</div>
+
+</main>
+<script>
+document.querySelectorAll('.nl').forEach(function(l){l.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector(this.getAttribute('href'));if(t){t.scrollIntoView({behavior:'smooth',block:'start'});document.querySelectorAll('.nl').forEach(function(x){x.classList.remove('ac')});this.classList.add('ac');document.getElementById('sb').classList.remove('op')}})});
+var secs=document.querySelectorAll('.sc,.hero'),nls=document.querySelectorAll('.nl');
+window.addEventListener('scroll',function(){var c='';secs.forEach(function(s){if(window.scrollY>=s.offsetTop-100)c=s.getAttribute('id')});nls.forEach(function(l){l.classList.remove('ac');if(l.getAttribute('href')==='#'+c)l.classList.add('ac')})});
+</script>
+</body>
+</html>
