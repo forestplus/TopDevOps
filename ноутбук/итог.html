@@ -18,6 +18,31 @@
 <p>История обслуживания Windows-ноутбука <strong>HOME</strong>: от диагностики и восстановления управляемости до оптимизации автозагрузки, проверки безопасности, обновления инструментов и точечной очистки программ.</p>
 <div class="actions"><a class="btn primary" href="#summary">Смотреть итоги ↓</a><a class="btn" href="#timeline">Хронология работ</a></div>
 </div>
+<section id="before-after" style="margin:0 0 38px">
+<div class="section-head"><span class="num">↔</span><h2>Было → стало</h2></div>
+<p class="lead">Короткий срез: с какой точки стартовали и к чему пришли после аудита и обслуживания.</p>
+<div class="grid">
+<div class="card" style="border-color:#70404a;background:linear-gradient(145deg,#2a1b29,#171827)">
+<h3><span class="tag risk">Было</span> Система требовала разбора</h3>
+<ul style="margin:8px 0 0;padding-left:19px;color:#d7c4cf">
+<li>Много фоновых запусков и лишних заданий планировщика.</li>
+<li>Ненужные приложения и остатки старого ПО.</li>
+<li>Инструменты разработки и Java-среда нуждались в актуализации.</li>
+<li>Не было полной картины по службам, безопасности и системным ошибкам.</li>
+<li>Отдельные сбои SideBySide и длительная блокировка Firewall требовали расследования.</li>
+</ul></div>
+<div class="card" style="border-color:#24624d;background:linear-gradient(145deg,#142c2a,#101d28)">
+<h3><span class="tag done">Стало</span> Система под контролем</h3>
+<ul style="margin:8px 0 0;padding-left:19px;color:#c8e8d9">
+<li>Автозагрузка и часть фоновых задач очищены; изменения сохранены с резервными копиями.</li>
+<li>Удалены подтверждённо ненужные приложения и остатки; спорные компоненты оставлены до идентификации.</li>
+<li>Установлены и проверены 7-Zip, PuTTY, Java 8 и Microsoft OpenJDK 11.</li>
+<li>Defender и Firewall включены; Docker, WSL2, Hyper-V и NVIDIA сохранены.</li>
+<li>Проблемные события локализованы, составлен конкретный список оставшихся проверок.</li>
+</ul></div>
+</div>
+<div class="callout blue" style="margin-top:14px"><strong>Итог:</strong> вместо хаотичной чистки — документированное и контролируемое обслуживание. Основная оптимизация выполнена; финальная верификация лицензии, обновлений и диагностических событий ещё впереди.</div>
+</section>
 <div class="stats" id="summary">
 <div class="stat"><b>Windows 11 Pro</b><span>Сборка 26200 · x64</span></div>
 <div class="stat"><b>12 GB</b><span>Оперативная память</span></div>
