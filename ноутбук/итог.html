@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1020">
+<title>HOME · Аудит и обслуживание ноутбука</title>
+<style>
+:root{--bg:#090e1b;--panel:#111a2d;--panel2:#16223a;--line:#263653;--text:#edf3ff;--muted:#9aabc7;--cyan:#63e2e8;--green:#5be0a0;--amber:#ffc66d;--red:#ff7e8a;--blue:#86aaff}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:radial-gradient(ellipse at 75% -10%,#1d3a60 0,transparent 42%),linear-gradient(180deg,#090e1b,#0c1425 55%,#090e1b);color:var(--text);font:15px/1.65 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:1180px;margin:auto;padding:28px 24px 80px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;color:var(--muted);font-size:12px;letter-spacing:.14em;text-transform:uppercase}.pill{border:1px solid #34506e;border-radius:999px;padding:7px 12px;color:var(--cyan);background:#10243a}.hero{padding:76px 0 48px;max-width:900px}.eyebrow{color:var(--cyan);font-weight:700;letter-spacing:.18em;text-transform:uppercase;font-size:12px}.hero h1{font-size:clamp(42px,7vw,76px);line-height:1.02;letter-spacing:-.055em;margin:18px 0}.hero p{font-size:18px;color:#b7c7e1;max-width:760px}.hero strong{color:#fff}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-flex;padding:11px 16px;border:1px solid #35516f;border-radius:10px;background:#12243b;color:#e9f8ff;font-weight:650}.btn.primary{background:linear-gradient(120deg,#1d8b9c,#315eaa);border:0}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:12px 0 54px}.stat,.card{background:linear-gradient(145deg,#131f34,#0f192b);border:1px solid var(--line);border-radius:17px;padding:20px}.stat b{font-size:30px;display:block;letter-spacing:-.04em}.stat span{color:var(--muted);font-size:13px}.layout{display:grid;grid-template-columns:245px minmax(0,1fr);gap:28px}.nav{position:sticky;top:20px;align-self:start;background:#0e1728cc;border:1px solid var(--line);border-radius:15px;padding:16px}.nav b{display:block;margin:0 0 10px;color:var(--muted);font-size:11px;letter-spacing:.14em;text-transform:uppercase}.nav a{display:block;padding:7px 9px;color:#c1cee3;border-radius:7px;font-size:13px}.nav a:hover{background:#1a2a43;text-decoration:none;color:#fff}section{margin:0 0 48px}.section-head{display:flex;align-items:center;gap:13px;margin-bottom:18px}.num{width:34px;height:34px;border-radius:10px;background:#17364a;color:var(--cyan);display:grid;place-items:center;font-weight:800}.section-head h2{font-size:26px;letter-spacing:-.03em;margin:0}.lead{color:#b4c3db;font-size:16px;margin:0 0 18px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card h3{margin:0 0 8px;font-size:17px}.card p{margin:6px 0;color:#b8c6dc}.muted{color:var(--muted)!important}.tag{display:inline-block;font-size:11px;font-weight:750;letter-spacing:.07em;text-transform:uppercase;border-radius:6px;padding:3px 7px;margin:0 6px 6px 0}.done{color:var(--green);background:#153b32}.pending{color:var(--amber);background:#46351c}.info{color:var(--blue);background:#1b2d50}.risk{color:var(--red);background:#45232d}.timeline{border-left:1px solid #34506e;margin-left:10px;padding-left:24px}.event{position:relative;padding:0 0 24px}.event:before{content:"";position:absolute;width:10px;height:10px;border-radius:50%;background:var(--cyan);left:-30px;top:8px;box-shadow:0 0 0 5px #10283b}.event h3{margin:0 0 5px}.event p{margin:0;color:#b5c5dd}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}table{width:100%;border-collapse:collapse;min-width:650px;background:#101a2b}th,td{text-align:left;padding:13px 15px;border-bottom:1px solid #24334c;vertical-align:top}th{color:#9fb2d0;background:#142139;font-size:12px;text-transform:uppercase;letter-spacing:.08em}td{color:#d9e4f5}tr:last-child td{border-bottom:0}.callout{border:1px solid #5b4b2d;background:#2b2419;border-radius:13px;padding:16px 18px;color:#f4dfb9}.callout.blue{border-color:#2d5278;background:#12243a;color:#c9e0ff}.callout.green{border-color:#24624d;background:#10291f;color:#c8f5df}.bar{height:9px;background:#1d2a40;border-radius:99px;overflow:hidden;margin:12px 0}.bar i{display:block;width:72%;height:100%;background:linear-gradient(90deg,#36b7c5,#65e2a2);border-radius:99px}.foot{border-top:1px solid var(--line);padding-top:22px;color:var(--muted);font-size:13px;margin-top:50px}.small{font-size:12px;color:var(--muted)}code{background:#1b2940;border:1px solid #2a3c59;border-radius:5px;padding:2px 5px;color:#c8eaff}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.nav{position:static;display:grid;grid-template-columns:repeat(2,1fr)}.nav b{grid-column:1/-1}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.wrap{padding:18px 15px 55px}.hero{padding:55px 0 35px}.grid{grid-template-columns:1fr}.stats{gap:9px}.stat{padding:14px}.stat b{font-size:25px}.nav{grid-template-columns:1fr 1fr}.section-head h2{font-size:22px}}
+</style>
+</head>
+<body><div class="wrap">
+<header class="top"><span>TOPDEVOPS / FIELD REPORT</span><span class="pill">PROJECT HOME · WINDOWS 11</span></header>
+<div class="hero">
+<div class="eyebrow">Ноутбук · технический аудит · ноябрь 2026</div>
+<h1>Приведение системы<br>в порядок.</h1>
+<p>История обслуживания Windows-ноутбука <strong>HOME</strong>: от диагностики и восстановления управляемости до оптимизации автозагрузки, проверки безопасности, обновления инструментов и точечной очистки программ.</p>
+<div class="actions"><a class="btn primary" href="#summary">Смотреть итоги ↓</a><a class="btn" href="#timeline">Хронология работ</a></div>
+</div>
+<div class="stats" id="summary">
+<div class="stat"><b>Windows 11 Pro</b><span>Сборка 26200 · x64</span></div>
+<div class="stat"><b>12 GB</b><span>Оперативная память</span></div>
+<div class="stat"><b>169 GB</b><span>Свободно на диске C: из 893 GB</span></div>
+<div class="stat"><b>72%</b><span>Оценка выполнения плана работ*</span></div>
+</div>
+<div class="layout">
+<aside class="nav"><b>Навигация по отчёту</b>
+<a href="#starting">01 · С чего начали</a><a href="#license">02 · Windows и лицензия</a><a href="#startup">03 · Автозагрузка</a><a href="#tasks">04 · Службы и задачи</a><a href="#cleanup">05 · Очистка ПО</a><a href="#software">06 · Установки и обновления</a><a href="#security">07 · Безопасность</a><a href="#errors">08 · Ошибки и диагностика</a><a href="#preserved">09 · Что сохранили</a><a href="#pending">10 · Что осталось</a>
+</aside>
+<main>
+<section id="starting"><div class="section-head"><span class="num">01</span><h2>С чего начали</h2></div>
+<p class="lead">Задача — не «вырубить всё подряд», а привести ноутбук в предсказуемое состояние: убрать лишнее из фона, исправить системные проблемы и не сломать рабочую среду.</p>
+<div class="grid">
+<div class="card"><h3>Исходная конфигурация</h3><p>Intel Core i5-5200U, 12 GB RAM, Windows 11 Pro x64, сборка 26200. Системный диск C: — 893 GB, свободно около 169 GB на момент инвентаризации.</p></div>
+<div class="card"><h3>Ограничения проекта</h3><p>Сохранить Docker, WSL2, Hyper-V, NVIDIA-драйверы, Defender, Yandex Browser и пользовательские данные. Не выполнять перезагрузку без отдельного разрешения.</p></div>
+<div class="card"><h3>Сначала — диагностика</h3><p>Проверяли службы, автозапуск, планировщик заданий, сетевую доступность, системные события и установленные приложения. Перед изменениями автозагрузки сохраняли резервные копии.</p></div>
+<div class="card"><h3>Контроль изменений</h3><p>Подход точечный: сначала идентифицировать компонент, затем отключать или удалять только при понятном назначении. Системные компоненты и драйверы не чистить «на глаз».</p></div>
+</div></section>
+<section id="license"><div class="section-head"><span class="num">02</span><h2>Windows и лицензирование</h2></div>
+<div class="callout blue"><strong>Что подтверждено:</strong> на ноутбуке установлена Windows 11 Pro, сборка 26200. В сохранённой истории аудита нет достоверной записи о канале лицензии, ключе продукта или способе активации. Поэтому мы не приписываем системе KMS, цифровую лицензию или OEM-активацию без проверки.</div>
+<p>Важное различие: редакция Windows (Pro) и состояние активации — разные параметры. Чтобы корректно зафиксировать лицензию, нужно отдельно проверить страницу <em>Параметры → Система → Активация</em> либо выполнить <code>slmgr /dlv</code> и <code>slmgr /xpr</code>. Ключ продукта в публичный отчёт не помещается.</p>
+<div class="card"><h3>Статус раздела</h3><span class="tag pending">Нужна финальная верификация</span><p>Редакция и сборка известны; факт и тип активации требуют контрольного подтверждения. Это намеренно отмечено как незавершённая проверка, а не выдуманный результат.</p></div>
+</section>
+<section id="startup"><div class="section-head"><span class="num">03</span><h2>Автозагрузка и фоновые процессы</h2></div>
+<p class="lead">Сократили количество приложений, которые стартуют вместе с Windows. Резервные копии ключей реестра и ярлыков сохранены в <code>C:\Users\Admin\Desktop\HomeAudit</code>.</p>
+<div class="table-wrap"><table><thead><tr><th>Компонент</th><th>Действие</th><th>Примечание</th></tr></thead><tbody>
+<tr><td>Discord</td><td><span class="tag done">Отключён</span></td><td>Убран из автозагрузки.</td></tr><tr><td>Adobe Acrobat Synchronizer</td><td><span class="tag done">Отключён</span></td><td>Фоновый автозапуск.</td></tr><tr><td>Yandex Browser AutoLaunch</td><td><span class="tag done">Отключён</span></td><td>Сам браузер и профиль сохранены.</td></tr><tr><td>Opera GX / Opera Browser Assistant</td><td><span class="tag done">Отключён</span></td><td>Также отдельно проверяется удаление Opera GX.</td></tr><tr><td>Telegram</td><td><span class="tag done">Отключён</span></td><td>Запуск вручную остаётся доступен.</td></tr><tr><td>Proton VPN</td><td><span class="tag done">Отключён</span></td><td>Автозапуск; приложение позднее числилось среди удалённых.</td></tr><tr><td>OneDrive</td><td><span class="tag done">Отключён</span></td><td>Автозапуск и часть задач планировщика отключены.</td></tr><tr><td>Yandex Disk</td><td><span class="tag info">Сохранён</span></td><td>Не отключали.</td></tr></tbody></table></div>
+<div class="callout green" style="margin-top:14px"><strong>Резервные копии:</strong> <code>HKCU-Run-before.xml</code>, <code>HKCU-Run-before-user-selected.xml</code>, <code>Telegram.lnk</code>. Они созданы до изменения пользовательского автозапуска.</div>
+</section>
+<section id="tasks"><div class="section-head"><span class="num">04</span><h2>Службы и планировщик заданий</h2></div>
+<div class="grid">
+<div class="card"><h3>8GadgetPack</h3><span class="tag done">Остатки удалены</span><p>Удалены обнаруженные остатки пакета гаджетов, которые больше не требовались.</p></div>
+<div class="card"><h3>NVIDIA Telemetry</h3><span class="tag done">5 задач отключено</span><p>Отключены пять задач телеметрии NVIDIA. Сам драйвер NVIDIA не удалялся и не отключался.</p></div>
+<div class="card"><h3>OneDrive</h3><span class="tag done">3 задачи отключено</span><p>Отключены три задания планировщика OneDrive вместе с отключением автозапуска.</p></div>
+<div class="card"><h3>Chrome background tasks</h3><span class="tag done">Отключены</span><p>Отключены Chrome Metrics и Memory Cleanup. Файл <code>C:\EmptyStandbyList.exe</code> не удаляли.</p></div>
+<div class="card"><h3>Yandex / Opera GX</h3><span class="tag done">Автозапуск очищен</span><p>Удалены соответствующие записи автозапуска; пользовательские браузеры и данные не трогали.</p></div>
+<div class="card"><h3>Осторожный режим</h3><span class="tag info">Системные службы сохранены</span><p>Не проводилось массовое отключение служб Windows. Docker/WSL2, Hyper-V и защитные компоненты оставлены.</p></div>
+</div></section>
+<section id="cleanup"><div class="section-head"><span class="num">05</span><h2>Удаление и очистка программ</h2></div>
+<div class="table-wrap"><table><thead><tr><th>Программа / компонент</th><th>Результат</th><th>Статус</th></tr></thead><tbody>
+<tr><td>ASUS Live Update</td><td>Удалено, отсутствие проверено.</td><td><span class="tag done">Готово</span></td></tr>
+<tr><td>Lens 5.2.6</td><td>Удалено, отсутствие проверено.</td><td><span class="tag done">Готово</span></td></tr>
+<tr><td>inSSIDer</td><td>Удалено, отсутствие проверено.</td><td><span class="tag done">Готово</span></td></tr>
+<tr><td>Proton VPN</td><td>Ранее удалено; автозапуск также очищен.</td><td><span class="tag done">Готово</span></td></tr>
+<tr><td>CodeReady Containers</td><td>Ранее удалено.</td><td><span class="tag done">Готово</span></td></tr>
+<tr><td>8GadgetPack</td><td>Остатки очищены.</td><td><span class="tag done">Готово</span></td></tr>
+<tr><td>CPU-Z 149 service/driver</td><td>Служба/драйвер не обнаружены; удалять было нечего.</td><td><span class="tag info">Проверено</span></td></tr>
+<tr><td>Adobe Flash Player PPAPI</td><td>Найден в инвентаризации; удаление ещё требовало выполнения и проверки.</td><td><span class="tag pending">В работе</span></td></tr>
+<tr><td>3uTools (x64 и 32-bit)</td><td>Найдены две записи версии 3.02.012; удаление и проверка не подтверждены.</td><td><span class="tag pending">В работе</span></td></tr>
+<tr><td>DisplayDriverAnalyzer 425.31</td><td>Компонент NVIDIA требует проверки связи с драйверным пакетом; удалять без неё нельзя.</td><td><span class="tag pending">Проверка</span></td></tr>
+<tr><td>Opera GX</td><td>Запуск деинсталлятора инициирован; исчезновение записи и файлов ещё не подтверждено.</td><td><span class="tag pending">Проверка</span></td></tr>
+<tr><td>Adobe Refresh Manager 1.8.0</td><td>Найден как возможный кандидат на ранее упомянутый EDA PM; тождество не доказано.</td><td><span class="tag pending">Идентификация</span></td></tr>
+</tbody></table></div>
+</section>
+<section id="software"><div class="section-head"><span class="num">06</span><h2>Установки и обновления</h2></div>
+<div class="grid">
+<div class="card"><h3>Oracle Java 8 Update 513</h3><span class="tag done">Установлено</span><p>64-bit. Версия в реестре: <code>8.0.5130.4</code>. Подпись официального установщика проверена.</p></div>
+<div class="card"><h3>Microsoft Build of OpenJDK 11</h3><span class="tag done">Установлено</span><p>x64, версия <code>11.0.33.101</code> (11.0.33.1+1). Наличие подтверждено в инвентаризации.</p></div>
+<div class="card"><h3>PuTTY 0.85</h3><span class="tag done">Установлено</span><p>64-bit, версия <code>0.85.0.0</code>. Authenticode Valid; SHA-256 установщика сверён.</p></div>
+<div class="card"><h3>7-Zip 26.06</h3><span class="tag done">Установлено</span><p>x64. Хэш официального GitHub-артефакта совпал; код завершения установщика — 0.</p></div>
+<div class="card"><h3>Eclipse Temurin JDK 11</h3><span class="tag pending">Обновление не подтверждено</span><p>В инвентаризации оставалась версия 11.0.13.8. Более новая сборка скачивалась, но факт установки требует повторной проверки.</p></div>
+<div class="card"><h3>ImgBurn 2.5.8.0</h3><span class="tag info">Сохранён</span><p>Пользователь периодически использует программу. Не удалять; проверить актуальность версии отдельно.</p></div>
+</div></section>
+<section id="security"><div class="section-head"><span class="num">07</span><h2>Безопасность и целостность</h2></div>
+<div class="grid">
+<div class="card"><h3>Microsoft Defender</h3><span class="tag done">Защита включена</span><p>Defender Enabled = True, Real-Time Protection = True. Обновление сигнатур выполнено; на контрольной точке версия <code>1.463.407.0</code>, возраст сигнатур — 0 дней.</p></div>
+<div class="card"><h3>DISM</h3><span class="tag info">Запуск подтверждён</span><p>Запускалась проверка/восстановление образа Windows через <code>DISM /RestoreHealth</code>. Финальный код завершения и итоговый лог нужно приложить после контрольного чтения.</p></div>
+<div class="card"><h3>Secure Boot</h3><span class="tag info">Не включали</span><p>Secure Boot отключён намеренно и оставлен без изменений. Не сбрасывали TPM и не меняли ключи Secure Boot.</p></div>
+<div class="card"><h3>Сеть</h3><span class="tag done">Доступность проверена</span><p>Устройство отвечало на 5/5 ICMP-пакетов, потерь 0%, средняя задержка 25,2 мс. Проверка портов показала доступность ряда Windows-служб в локальной сети.</p></div>
+</div></section>
+<section id="errors"><div class="section-head"><span class="num">08</span><h2>Ошибки и отдельные расследования</h2></div>
+<div class="card" style="margin-bottom:14px"><h3>Windows Firewall · длительная блокировка MpsSvc</h3><span class="tag pending">Диагностика продолжается</span><p>В журнале FirewallDiagnostics найдено событие ожидания/удержания внутренней блокировки: <strong>523 016 мс (8 минут 43 секунды)</strong>. Функция — <code>FwGetConSecRuleIdFromFilterId</code>, вызывающий компонент — <code>MPSSVC</code>. На момент проверки MpsSvc и BFE работали; профили Firewall были включены.</p><p>Зафиксирован также Event ID 2042 с <code>0x80070005</code> (Access Denied). Вероятна проблема логирования/взаимодействия политики после обновления Windows, но причинная связь не доказана. Политики, ACL и правила Firewall не сбрасывали и не меняли.</p></div>
+<div class="card" style="margin-bottom:14px"><h3>Yandex Browser · SideBySide</h3><span class="tag pending">Расследование продолжается</span><p>События SideBySide ссылались на временный <code>browser.exe</code> в <code>C:\Windows\SystemTemp\sdwra_*</code>, версия файла <code>26.10.3.771</code>. Подпись YANDEX LLC была действительной. Временный файл исчез к моменту повторного осмотра. Требуется установить родительский процесс и проверить обновляющий механизм.</p><p>Браузер и профиль пользователя сохраняются. План — обновить штатным способом без удаления пользовательских данных.</p></div>
+<div class="card"><h3>ASUS Wireless Router Device Discovery Utility</h3><span class="tag pending">Идентификация</span><p>Версия 1.4.8.2. Утилита обнаружения ASUS-роутеров; назначение уточняется. Автоматически не удаляли, пока не подтверждена необходимость.</p></div>
+<div class="callout"><strong>Принцип безопасности:</strong> Firewall не сбрасывали, службы MpsSvc/BFE не останавливали, NVIDIA-драйверы не трогали. Наблюдаемая ошибка не стала поводом для рискованного «ремонта наугад».</div>
+</section>
+<section id="preserved"><div class="section-head"><span class="num">09</span><h2>Что сознательно сохранили</h2></div>
+<div class="grid">
+<div class="card"><h3>Среда разработки</h3><p>Docker, WSL2, Hyper-V, Kimi и Node.js не удалялись и не отключались.</p></div>
+<div class="card"><h3>Контейнеры и WSL</h3><p>WSL 2.6.3.0, kernel 6.6.87.2. Ubuntu и docker-desktop были остановлены на контрольной точке; <code>com.docker.service</code> — Running.</p></div>
+<div class="card"><h3>Защита и драйверы</h3><p>Microsoft Defender оставлен включённым. NVIDIA-драйверы сохранены. Secure Boot оставлен в исходном намеренном состоянии.</p></div>
+<div class="card"><h3>Пользовательские приложения</h3><p>Yandex Browser с профилем, Sublime Text, Opera Stable, ImgBurn и Yandex Disk сохранены. Edge не менялся.</p></div>
+</div></section>
+<section id="pending"><div class="section-head"><span class="num">10</span><h2>Текущая точка и оставшиеся шаги</h2></div>
+<p class="lead">Основная оптимизация автозапуска и часть очистки уже сделаны. Осталось закрыть несколько точечных задач и провести финальную проверку после всех установок.</p>
+<div class="bar"><i></i></div><p class="small">72% — ориентировочная оценка объёма плана, а не автоматическая метрика Windows. Выполненные и незавершённые пункты перечислены отдельно ниже.</p>
+<div class="table-wrap"><table><thead><tr><th>Задача</th><th>Что нужно подтвердить</th><th>Приоритет</th></tr></thead><tbody>
+<tr><td>Windows activation</td><td>Состояние активации и канал лицензии; не публиковать ключ.</td><td><span class="tag pending">Высокий</span></td></tr>
+<tr><td>Temurin JDK 11</td><td>Проверить MSI, завершить обновление и сверить версию.</td><td><span class="tag pending">Высокий</span></td></tr>
+<tr><td>Yandex Browser</td><td>Проверить установленную версию, обновить штатно, сохранить профиль; найти источник SideBySide.</td><td><span class="tag pending">Высокий</span></td></tr>
+<tr><td>Flash Player / 3uTools</td><td>Удалить PPAPI Flash и обе записи 3uTools; проверить отсутствие.</td><td><span class="tag pending">Средний</span></td></tr>
+<tr><td>DisplayDriverAnalyzer</td><td>Проверить связь с драйверным пакетом и только затем решить вопрос удаления.</td><td><span class="tag pending">Средний</span></td></tr>
+<tr><td>Opera GX</td><td>Подтвердить завершение деинсталляции; Opera Stable не затрагивать.</td><td><span class="tag pending">Средний</span></td></tr>
+<tr><td>ImgBurn / ASUS Utility / EDA PM</td><td>Проверить актуальность ImgBurn и точно идентифицировать ASUS utility и EDA PM service.</td><td><span class="tag pending">Средний</span></td></tr>
+<tr><td>MpsSvc lock</td><td>Проверить повторяемость события за 48 часов/7 дней и сопоставить с системными событиями.</td><td><span class="tag pending">Высокий</span></td></tr>
+<tr><td>Финальная валидация</td><td>Снять итоговые CPU/RAM/disk, службы, автозагрузку, Defender, DISM/SFC и Docker/WSL/Hyper-V.</td><td><span class="tag pending">Финал</span></td></tr>
+</tbody></table></div>
+<div class="callout green" style="margin-top:18px"><strong>Главный результат на текущий момент:</strong> ноутбук прошёл инвентаризацию и точечную оптимизацию автозагрузки; удалены несколько ненужных приложений и хвостов, установлены актуальные инструменты, защитные компоненты и рабочая инфраструктура сохранены. Незавершённые пункты не маскируются под готовые.</div>
+</section>
+<div class="foot"><strong>HOME · Maintenance log</strong><br>Подготовлено для личной технической документации · TopDevOps · 22 ноября 2026<br><span class="small">Отчёт отражает подтверждённые результаты, известные на момент подготовки. Значения и статусы, требующие повторной проверки, помечены отдельно. Секреты, ключи продукта и персональные данные не включены.</span></div>
+</main></div></div>
+</body></html>
