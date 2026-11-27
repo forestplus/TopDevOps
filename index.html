@@ -487,9 +487,9 @@
         .skill-category-title .icon { font-size: 1.2rem; }
         .skill-items { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
         .skill-item {
-            padding: 0.4rem 0.8rem; background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.1);
+            display: inline-block; padding: 0.4rem 0.8rem; background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.1);
             border-radius: 6px; font-size: 0.8rem; color: var(--text-secondary); transition: all 0.3s ease;
-            font-family: 'JetBrains Mono', monospace; cursor: default; position: relative;
+            font-family: 'JetBrains Mono', monospace; cursor: pointer; position: relative; text-decoration: none;
         }
         .skill-item:hover { background: rgba(0,212,255,0.15); border-color: var(--accent-cyan); color: var(--accent-cyan); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,212,255,0.15); }
         /* hover tooltip "cloud" with a short explanation */
@@ -1279,13 +1279,13 @@
             <div class="skill-category fade-in spotlight">
                 <div class="skill-category-title"><span class="icon">🤖</span> <span data-ru="AI / ML / LLM" data-en="AI / ML / LLM">AI / ML / LLM</span></div>
                 <div class="skill-items">
-                    <span class="skill-item" data-tip-ru="AI-агент для написания и рефакторинга кода" data-tip-en="AI agent for coding & refactoring">Claude Code</span>
-                    <span class="skill-item" data-tip-ru="Диалоговая LLM для анализа и генерации текста/кода" data-tip-en="Conversational LLM for text & code generation">ChatGPT</span>
-                    <span class="skill-item" data-tip-ru="Открытая LLM с сильными возможностями в коде" data-tip-en="Open-weight LLM strong at coding tasks">DeepSeek</span>
-                    <span class="skill-item" data-tip-ru="Семейство открытых моделей для генерации кода, анализа и локального запуска" data-tip-en="Open-weight model family for coding, analysis, and local deployment">Qwen</span>
-                    <span class="skill-item" data-tip-ru="LLM-ассистент для анализа и работы с текстом" data-tip-en="LLM assistant for analysis & text work">Kimi</span>
-                    <span class="skill-item" data-tip-ru="AI-ассистент и мультимодальная LLM от xAI" data-tip-en="AI assistant and multimodal LLM by xAI">Grok</span>
-                    <span class="skill-item" data-tip-ru="AI-поисковик и answer engine с источниками" data-tip-en="AI-powered answer engine with cited sources">Perplexity</span>
+                    <a class="skill-item" href="https://claude.com/product/claude-code" target="_blank" rel="noopener noreferrer" aria-label="Claude Code — official website" data-tip-ru="AI-агент для написания и рефакторинга кода" data-tip-en="AI agent for coding & refactoring">Claude Code</a>
+                    <a class="skill-item" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" aria-label="ChatGPT — official website" data-tip-ru="Диалоговая LLM для анализа и генерации текста/кода" data-tip-en="Conversational LLM for text & code generation">ChatGPT</a>
+                    <a class="skill-item" href="https://www.deepseek.com/" target="_blank" rel="noopener noreferrer" aria-label="DeepSeek — official website" data-tip-ru="Открытая LLM с сильными возможностями в коде" data-tip-en="Open-weight LLM strong at coding tasks">DeepSeek</a>
+                    <a class="skill-item" href="https://qwen.ai/" target="_blank" rel="noopener noreferrer" aria-label="Qwen — official website" data-tip-ru="Семейство открытых моделей для генерации кода, анализа и локального запуска" data-tip-en="Open-weight model family for coding, analysis, and local deployment">Qwen</a>
+                    <a class="skill-item" href="https://www.kimi.com/" target="_blank" rel="noopener noreferrer" aria-label="Kimi — official website" data-tip-ru="LLM-ассистент для анализа и работы с текстом" data-tip-en="LLM assistant for analysis & text work">Kimi</a>
+                    <a class="skill-item" href="https://grok.com/" target="_blank" rel="noopener noreferrer" aria-label="Grok — official website" data-tip-ru="AI-ассистент и мультимодальная LLM от xAI" data-tip-en="AI assistant and multimodal LLM by xAI">Grok</a>
+                    <a class="skill-item" href="https://www.perplexity.ai/" target="_blank" rel="noopener noreferrer" aria-label="Perplexity — official website" data-tip-ru="AI-поисковик и answer engine с источниками" data-tip-en="AI-powered answer engine with cited sources">Perplexity</a>
                 </div>
             </div>
             <div class="skill-category fade-in spotlight">
