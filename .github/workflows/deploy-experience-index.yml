@@ -1,0 +1,28 @@
+name: Deploy experience-updated index
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/deploy-experience-index.yml'
+      - 'scripts/idx_exp_b64/**'
+      - 'scripts/decode_idx_exp.py'
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Decode and write index.html
+        run: |
+          set -euo pipefail
+          python3 scripts/decode_idx_exp.py
+          grep -q 'NDA (ОАЭ, Дубай)' index.html
+      - name: Commit
+        run: |
+          git config user.name "TopDevOps Bot"
+          git config user.email "forestplus@ya.ru"
+          git add index.html
+          git status --short | head
+          git commit -m "feat(experience): full resume-aligned timeline cards (RU/EN)" || exit 0
+          git push
