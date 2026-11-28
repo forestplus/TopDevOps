@@ -1,0 +1,28 @@
+name: Apply motion polish
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/apply-motion-polish.yml'
+      - 'scripts/apply_motion_polish.py'
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Polish motion
+        run: |
+          set -euo pipefail
+          python3 scripts/apply_motion_polish.py
+          grep -q 'motion-polish v1' index.html
+          grep -q 'resumeSheen' index.html
+      - name: Commit
+        run: |
+          git config user.name "TopDevOps Bot"
+          git config user.email "forestplus@ya.ru"
+          git add index.html
+          git diff --staged --stat
+          git commit -m "feat(ui): modern restrained motion — stagger, sheen, soft magnetic" || exit 0
+          git push
