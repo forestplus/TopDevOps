@@ -1,1 +1,93 @@
-PLACEHOLDER0
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Upgrade timeline experience cards from resume content (RU + EN)."""
+from pathlib import Path
+import re
+
+idx = Path('index.html')
+t = idx.read_text(encoding='utf-8')
+
+def card(date_ru, date_en, role_ru, role_en, company_ru, company_en, bullets, tags=None):
+    lis = []
+    for ru, en in bullets:
+        lis.append(f'                            <li data-ru="{ru}" data-en="{en}">{ru}</li>')
+    tags_html = ''
+    if tags:
+        chips = ''.join(f'<span class="timeline-tag">{x}</span>' for x in tags)
+        tags_html = f'\n                        <div class="timeline-tags">{chips}</div>'
+    if role_ru != role_en:
+        role_html = f'<div class="timeline-role" data-ru="{role_ru}" data-en="{role_en}">{role_ru}</div>'
+    else:
+        role_html = f'<div class="timeline-role">{role_ru}</div>'
+    return f'''            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content spotlight" onclick="toggleDetails(this)">
+                    <div class="timeline-date" data-ru="{date_ru}" data-en="{date_en}">{date_ru}</div>
+                    {role_html}
+                    <div class="timeline-company" data-ru="{company_ru}" data-en="{company_en}">{company_ru}</div>
+                    <div class="expand-hint" data-ru="▸ Нажмите, чтобы раскрыть" data-en="▸ Click to expand">▸ Нажмите, чтобы раскрыть</div>
+                    <div class="timeline-details">
+                        <ul>
+{chr(10).join(lis)}
+                        </ul>{tags_html}
+                    </div>
+                </div>
+            </div>'''
+
+CARDS_HTML = '\n'.join([
+  card(
+    'июн 2023 — окт 2026', 'Jun 2023 — Oct 2026',
+    'DevOps Team Lead', 'DevOps Team Lead',
+    'NDA (ОАЭ, Дубай)', 'NDA (UAE, Dubai)',
+    [
+      ('Руководил DevOps-командой: организация работы, распределение зон ответственности и техническое планирование',
+       'Led the DevOps team: organized work, distributed ownership, and drove technical planning'),
+      ('Определял технические приоритеты и координировал инфраструктурные инициативы на уровне платформы',
+       'Set technical priorities and coordinated platform-level infrastructure initiatives'),
+      ('Развивал архитектуру микросервисных приложений и инфраструктурных платформ',
+       'Evolved microservice application architecture and infrastructure platforms'),
+      ('Проектировал и развивал CI/CD и автоматизацию поставки приложений',
+       'Designed and advanced CI/CD and application delivery automation'),
+      ('Развивал контейнерную инфраструктуру и практики эксплуатации сервисов',
+       'Advanced container infrastructure and service operations practices'),
+      ('Организовал мониторинг, incident management и контроль стабильности критичных IT-систем',
+       'Organized monitoring, incident management, and stability control for critical IT systems'),
+      ('Координировал взаимодействие DevOps, разработки и смежных технических подразделений',
+       'Coordinated collaboration between DevOps, development, and other engineering units'),
+      ('Участвовал в найме, онбординге и развитии инженерных специалистов',
+       'Participated in hiring, onboarding, and development of engineering specialists'),
+      ('Внедрял AI-assisted engineering: автоматизация диагностики, разработки и инфраструктурных задач; оценка интеграции LLM/AI API',
+       'Applied AI-assisted engineering to automate diagnostics, development, and infrastructure tasks; evaluated LLM/AI API integration'),
+    ],
+    tags=['Kubernetes', 'CI/CD', 'Microservices', 'SRE', 'AI/LLM'],
+  ),
+  card(
+    'апр 2021 — июн 2023', 'Apr 2021 — Jun 2023',
+    'Lead DevOps', 'Lead DevOps',
+    'Иннотех, ГК · проекты для Банка ВТБ · Москва', 'Innotech Group · banking projects for VTB · Moscow',
+    [
+      ('Координировал DevOps- и инфраструктурные задачи в банковских IT-проектах (в т.ч. для ВТБ)',
+       'Coordinated DevOps and infrastructure delivery within banking IT projects (including VTB)'),
+      ('Участвовал в проектировании и развитии контейнерной инфраструктуры Kubernetes и OpenShift',
+       'Contributed to design and evolution of Kubernetes and OpenShift container platforms'),
+      ('Развивал CI/CD на TeamCity; использовал Helm для конфигураций и релизов',
+       'Developed CI/CD with TeamCity; used Helm for configuration and releases'),
+      ('Работал со стеком PostgreSQL, Kafka, Nexus, Bitbucket и VTB.Cloud',
+       'Worked with PostgreSQL, Kafka, Nexus, Bitbucket, and VTB.Cloud'),
+      ('Координировал разработку, архитектуру, QA, SRE и эксплуатацию; согласовывал решения с ИБ',
+       'Aligned development, architecture, QA, SRE, and operations; coordinated decisions with InfoSec'),
+      ('Участвовал в аудитах, приёмочных испытаниях и подготовке решений к production',
+       'Took part in audits, acceptance testing, and preparing solutions for production'),
+      ('Провёл технические собеседования, наставничество и стандартизацию инфраструктурных процессов',
+       'Conducted technical interviews, mentoring, and standardization of infrastructure processes'),
+    ],
+    tags=['Kubernetes', 'OpenShift', 'TeamCity', 'Helm', 'PostgreSQL', 'Kafka', 'VTB.Cloud'],
+  ),
+  card(
+    'дек 2018 — апр 2021', 'Dec 2018 — Apr 2021',
+    'Senior DevOps', 'Senior DevOps',
+    'DELL, Россия', 'DELL, Russia',
+    [
+      ('Развивал Kubernetes-инфраструктуру в гибридной облачной среде (Azure + VMware ESXi)',
+       'Developed Kubernetes infrastructure in a hybrid cloud (Azure + VMware ESXi)'),
+      ('Спроектир
