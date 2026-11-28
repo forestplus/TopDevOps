@@ -1,0 +1,184 @@
+name: Site polish
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/site-polish.yml'
+      - 'scripts/unify_notes.py'
+      - 'assets/notes.css'
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python deps
+        run: python3 -m pip install --quiet pillow reportlab
+
+      - name: Unify notes pages (dark theme + nav)
+        run: python3 scripts/unify_notes.py
+
+      - name: Build avatar + resume photo
+        continue-on-error: true
+        run: |
+          python3 << 'PY'
+          from pathlib import Path
+          from PIL import Image, ImageDraw, ImageFilter
+
+          candidates = sorted(
+              list(Path('.').glob('IMG_*.jpeg'))
+              + list(Path('.').glob('IMG_*.jpg'))
+              + list(Path('.').glob('IMG_*.png'))
+          )
+          if not candidates:
+              print('No source photo')
+              raise SystemExit(0)
+          src = Image.open(candidates[0]).convert('RGBA')
+          print('source', candidates[0], src.size)
+          w, h = src.size
+          side = min(w, h)
+          left = (w - side) // 2
+          top = max(0, (h - side) // 2 - int(side * 0.06))
+          face = src.crop((left, top, left + side, top + side))
+
+          av = face.resize((240, 240), Image.LANCZOS)
+          mask = Image.new('L', (240, 240), 0)
+          ImageDraw.Draw(mask).ellipse((0, 0, 239, 239), fill=255)
+          mask = mask.filter(ImageFilter.GaussianBlur(0.8))
+          out = Image.new('RGBA', (240, 240), (0, 0, 0, 0))
+          out.paste(av, (0, 0))
+          out.putalpha(mask)
+          out.save('photo-avatar-240.png', optimize=True)
+
+          face.convert('RGB').resize((200, 200), Image.LANCZOS).save(
+              'photo-resume.jpg', 'JPEG', quality=90, optimize=True
+          )
+          print('avatar/resume photo ok')
+          PY
+
+      - name: Build resume PDFs with photo
+        continue-on-error: true
+        run: |
+          python3 << 'PY'
+          from pathlib import Path
+          from reportlab.lib.pagesizes import A4
+          from reportlab.lib.units import mm
+          from reportlab.lib.colors import HexColor
+          from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage, KeepTogether, HRFlowable
+          from reportlab.lib.styles import ParagraphStyle
+          from reportlab.pdfbase import pdfmetrics
+          from reportlab.pdfbase.ttfonts import TTFont
+
+          pdfmetrics.registerFont(TTFont('DejaVu', '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'))
+          pdfmetrics.registerFont(TTFont('DejaVuBold', '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'))
+
+          CYAN, DARK, MUTED, TEXT, LINE = HexColor('#00a8cc'), HexColor('#0a0a12'), HexColor('#555566'), HexColor('#1a1a22'), HexColor('#d0d5e0')
+
+          def styles():
+              return {
+                  'name': ParagraphStyle('name', fontName='DejaVuBold', fontSize=15, textColor=DARK, spaceAfter=2, leading=18),
+                  'role': ParagraphStyle('role', fontName='DejaVuBold', fontSize=10.5, textColor=CYAN, spaceAfter=3, leading=13),
+                  'meta': ParagraphStyle('meta', fontName='DejaVu', fontSize=8, textColor=MUTED, leading=10.5, spaceAfter=1),
+                  'h2': ParagraphStyle('h2', fontName='DejaVuBold', fontSize=10, textColor=CYAN, spaceBefore=9, spaceAfter=3, leading=12),
+                  'jt': ParagraphStyle('jt', fontName='DejaVuBold', fontSize=9, textColor=TEXT, leading=11, spaceAfter=1),
+                  'jm': ParagraphStyle('jm', fontName='DejaVu', fontSize=7.8, textColor=MUTED, leading=10, spaceAfter=2),
+                  'body': ParagraphStyle('body', fontName='DejaVu', fontSize=8.2, textColor=TEXT, leading=11, spaceAfter=2),
+                  'b': ParagraphStyle('b', fontName='DejaVu', fontSize=8, textColor=TEXT, leading=10.5, leftIndent=6, spaceAfter=1),
+                  'sm': ParagraphStyle('sm', fontName='DejaVu', fontSize=7.8, textColor=TEXT, leading=10),
+              }
+
+          def header(s, photo, name, role, contacts, loc):
+              img = RLImage(photo, width=26*mm, height=26*mm) if Path(photo).exists() else Spacer(26*mm, 26*mm)
+              right = [Paragraph(name, s['name']), Paragraph(role, s['role']), Paragraph(contacts, s['meta']), Paragraph(loc, s['meta'])]
+              t = Table([[img, right]], colWidths=[30*mm, 148*mm])
+              t.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'TOP'), ('LEFTPADDING', (0,0), (-1,-1), 0), ('RIGHTPADDING', (0,0), (-1,-1), 3), ('TOPPADDING', (0,0), (-1,-1), 0), ('BOTTOMPADDING', (0,0), (-1,-1), 0)]))
+              return t
+
+          def section(title, s):
+              return [Paragraph(title, s['h2']), HRFlowable(width='100%', thickness=1, color=LINE, spaceAfter=3)]
+
+          def job(title, meta, bullets, s):
+              parts = [Paragraph(title, s['jt']), Paragraph(meta, s['jm'])]
+              for b in bullets:
+                  parts.append(Paragraph('• ' + b, s['b']))
+              return KeepTogether(parts)
+
+          photo = 'photo-resume.jpg' if Path('photo-resume.jpg').exists() else 'photo-avatar-240.png'
+          s = styles()
+
+          # RU
+          doc = SimpleDocTemplate('resume.pdf', pagesize=A4, leftMargin=14*mm, rightMargin=14*mm, topMargin=11*mm, bottomMargin=11*mm)
+          story = [header(s, photo, 'Парамонов Дмитрий Валерьевич', 'DevOps / SRE Team Lead',
+              'Telegram: @TopDevOps · paramdim@ya.ru · LinkedIn: /in/topdevops · topdevops.pro',
+              'Санкт-Петербург · Россия · Готов к переезду · 42 года'), Spacer(1, 3*mm)]
+          story += section('Желаемая должность', s)
+          story.append(Paragraph('DevOps Team Lead · Полная занятость · Удалённо / гибрид / офис', s['body']))
+          story += section('Опыт работы — 18+ лет', s)
+          story.append(job('DevOps Team Lead', 'Июнь 2023 — наст. время · NDA (UAE) · CryptoTech',
+              ['Руководство DevOps-командой и развитие специалистов.', 'Архитектура микросервисов и платформ, CI/CD, контейнеризация.',
+               'Мониторинг, incident management, стабильность сервисов.', 'Координация DevOps/dev/QA/SRE; найм и онбординг.',
+               'AI-инструменты: LLM, AI API, MCP.'], s))
+          story.append(Spacer(1, 1.5*mm))
+          story.append(job('Lead DevOps', 'Апрель 2021 — Июнь 2023 · Иннотех (ВТБ) · Москва',
+              ['Эквайринг МСБ: 9 микросервисов, миграция в VTB.Cloud.', 'Госуслуги (ФНП): 12 микросервисов, DreamPipe CI/CD.',
+               'IBM MQ → ActiveMQ; PostgreSQL на Astra Linux.', 'Docker, OpenShift, TeamCity, Kafka, SonarQube, Fortify.'], s))
+          story.append(Spacer(1, 1.5*mm))
+          story.append(job('Senior DevOps', 'Декабрь 2018 — Апрель 2021 · DELL',
+              ['Kubernetes (kubeadm) в Azure + VMware ESXi; GitLab CI/CD.', 'Atlassian Stack; roadmap модернизации legacy.',
+               'Ansible, UrBackup, Prometheus/Grafana/Alertmanager.'], s))
+          story.append(Spacer(1, 1.5*mm))
+          story.append(job('Ранние роли: DevOps, CEO/CIO, Head SysAdmin, Deputy IT Director', '2011–2018 · FINOM, ПрофИТ, Т-Банк, ЛЕКСПРО и др.',
+              ['Т-Банк: 250+ серверов, 1200+ пользователей, 4 ЦОД.', 'ЛЕКСПРО: IT с нуля, Hyper-V, 40 серверов, 6 офисов.',
+               'ITSM/ITIL (GLPI), Jenkins/GitLab, Docker, Azure.'], s))
+          story += section('Образование', s)
+          story.append(Paragraph('2006 — СПбГУАП · Вычислительные машины, системы и сети, инженер-программист', s['body']))
+          story += section('Навыки', s)
+          story.append(Paragraph('<b>Leadership:</b> DevOps Team Lead · Engineering Management · Hiring<br/><b>Platform:</b> Kubernetes · OpenShift · Docker · Helm<br/><b>CI/CD:</b> Jenkins · GitLab CI · TeamCity · Ansible · Git<br/><b>Observability:</b> Prometheus · Grafana · Zabbix · ELK · ITIL<br/><b>Data:</b> PostgreSQL · Kafka · ActiveMQ<br/><b>Cloud:</b> AWS · Azure · GCP · Yandex · VTB.Cloud<br/><b>AI:</b> LLM/MCP · FastAPI · Prompt Engineering<br/><b>Languages:</b> RU native · EN B2', s['sm']))
+          doc.build(story)
+          print('resume.pdf', Path('resume.pdf').stat().st_size)
+
+          # EN
+          doc = SimpleDocTemplate('resume_en.pdf', pagesize=A4, leftMargin=14*mm, rightMargin=14*mm, topMargin=11*mm, bottomMargin=11*mm)
+          story = [header(s, photo, 'Dmitry Valerievich Paramonov', 'DevOps / SRE Team Lead',
+              'Telegram: @TopDevOps · paramdim@ya.ru · LinkedIn: /in/topdevops · topdevops.pro',
+              'Saint Petersburg · Russia · Open to relocation · Age 42'), Spacer(1, 3*mm)]
+          story += section('Desired Position', s)
+          story.append(Paragraph('DevOps Team Lead · Full-time · Remote / hybrid / on-site', s['body']))
+          story += section('Work Experience — 18+ years', s)
+          story.append(job('DevOps Team Lead', 'Jun 2023 — present · NDA (UAE) · CryptoTech',
+              ['Leading the DevOps team and engineer development.', 'Microservice/platform architecture, CI/CD, containers.',
+               'Monitoring, incident management, reliability.', 'Cross-team coordination; hiring and onboarding.',
+               'AI tooling: LLMs, AI APIs, MCP.'], s))
+          story.append(Spacer(1, 1.5*mm))
+          story.append(job('Lead DevOps', 'Apr 2021 — Jun 2023 · Innotech (Bank VTB) · Moscow',
+              ['SME acquiring: 9 microservices, VTB.Cloud migration.', 'Government services: 12 microservices, DreamPipe CI/CD.',
+               'IBM MQ → ActiveMQ; PostgreSQL on Astra Linux.', 'Docker, OpenShift, TeamCity, Kafka, SonarQube, Fortify.'], s))
+          story.append(Spacer(1, 1.5*mm))
+          story.append(job('Senior DevOps', 'Dec 2018 — Apr 2021 · DELL',
+              ['Kubernetes from scratch on Azure + VMware ESXi; GitLab CI/CD.', 'Atlassian Stack; legacy modernization roadmap.',
+               'Ansible, UrBackup, Prometheus/Grafana/Alertmanager.'], s))
+          story.append(Spacer(1, 1.5*mm))
+          story.append(job('Earlier roles: DevOps, CEO/CIO, Head SysAdmin, Deputy IT Director', '2011–2018 · FINOM, ProfIT, T-Bank, LEXPRO, etc.',
+              ['T-Bank: 250+ servers, 1200+ users, 4 DCs.', 'LEXPRO: IT from scratch, Hyper-V, 40 servers, 6 offices.',
+               'ITSM/ITIL (GLPI), Jenkins/GitLab, Docker, Azure.'], s))
+          story += section('Education', s)
+          story.append(Paragraph('2006 — SUAI, Saint Petersburg · Computers, systems and networks, software engineer', s['body']))
+          story += section('Skills', s)
+          story.append(Paragraph('<b>Leadership:</b> DevOps Team Lead · Engineering Management · Hiring<br/><b>Platform:</b> Kubernetes · OpenShift · Docker · Helm<br/><b>CI/CD:</b> Jenkins · GitLab CI · TeamCity · Ansible · Git<br/><b>Observability:</b> Prometheus · Grafana · Zabbix · ELK · ITIL<br/><b>Data:</b> PostgreSQL · Kafka · ActiveMQ<br/><b>Cloud:</b> AWS · Azure · GCP · Yandex · VTB.Cloud<br/><b>AI:</b> LLM/MCP · FastAPI · Prompt Engineering<br/><b>Languages:</b> RU native · EN B2', s['sm']))
+          doc.build(story)
+          print('resume_en.pdf', Path('resume_en.pdf').stat().st_size)
+          PY
+
+      - name: Commit all polish artifacts
+        run: |
+          git config user.name "TopDevOps Bot"
+          git config user.email "forestplus@ya.ru"
+          git add assets/notes.css scripts/unify_notes.py || true
+          git add $(find . -name '*.html' -not -path './new/*' -not -path './archive/*' -not -path './backups/*' -not -path './.git/*' | head -80) || true
+          git add photo-avatar-240.png photo-resume.jpg resume.pdf resume_en.pdf 2>/dev/null || true
+          git status --short | head -50
+          git diff --staged --quiet && echo "No changes" && exit 0
+          git commit -m "feat: unified notes theme, avatar, resumes with photo"
+          git push
