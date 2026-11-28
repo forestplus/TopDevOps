@@ -20,25 +20,7 @@
 <meta name="twitter:title" content="Linux: пользователи, группы и sudo">
 <meta name="twitter:description" content="Создание, изменение и удаление учётных записей и групп, права администратора и контроль сессий">
 <meta name="twitter:image" content="https://topdevops.pro/og-image.png">
-<style>
-  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --green:#2e6b47; --red:#b5232b; --line:#c9d3e6; }
-  @media (prefers-color-scheme: dark) { :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --green:#7fd6a0; --red:#ff7b7b; --line:#3a4352; } }
-  * { box-sizing:border-box; }
-  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5; }
-  .wrap { max-width:980px; margin:0 auto; }
-  h1 { text-align:center; color:var(--green); font-size:26px; margin:0 0 4px; }
-  .lead { text-align:center; opacity:.8; margin:0 0 20px; }
-  h2 { color:var(--green); border-bottom:2px solid var(--line); padding-bottom:4px; font-size:18px; margin:26px 0 10px; }
-  table { width:100%; border-collapse:collapse; margin-bottom:6px; }
-  th { background:var(--green); color:#fff; padding:7px 8px; text-align:left; }
-  td, th { border:1px solid var(--line); padding:6px 8px; vertical-align:top; text-align:left; }
-  td.cmd { font-family:Consolas,"Courier New",monospace; color:var(--blue); font-weight:600; white-space:nowrap; }
-  td.ex { font-family:Consolas,"Courier New",monospace; color:var(--ink); }
-  tbody tr:nth-child(even) { background:rgba(127,127,127,.05); }
-  pre { font-family:Consolas,"Courier New",monospace; font-size:13px; background:rgba(127,127,127,.08); border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto; }
-  .warn { border-left:4px solid var(--red); padding:8px 12px; background:rgba(181,35,43,.07); border-radius:4px; margin:12px 0; }
-  .tip { border-left:4px solid var(--green); padding:8px 12px; background:rgba(46,107,71,.08); border-radius:4px; margin:12px 0; }
-</style>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -66,8 +48,21 @@
   "image": "https://topdevops.pro/og-image.png"
 }
 </script>
+<link rel="stylesheet" href="../assets/notes.css">
+<meta name="theme-color" content="#050508">
 </head>
 <body>
+<nav class="notes-topnav" aria-label="Site">
+  <a class="brand" href="/">dmitriy@devops<span>~</span></a>
+  <div class="notes-topnav-links">
+    <a href="/#about">Обо мне</a>
+    <a href="/#experience">Опыт</a>
+    <a href="/#notes">Заметки</a>
+    <a href="/#contacts">Контакты</a>
+    <a href="/resume.pdf">Резюме</a>
+  </div>
+</nav>
+
 <div class="wrap">
 
 <h1>Linux: пользователи, группы и sudo</h1>
@@ -224,5 +219,11 @@ ivan ALL=(root) NOPASSWD: /usr/bin/systemctl restart nginx
 </div>
 
 </div>
+<div class="notes-footer">
+  <a href="/#notes">← Все заметки</a> ·
+  <a href="/">topdevops.pro</a> ·
+  Дмитрий Парамонов
+</div>
+
 </body>
 </html>

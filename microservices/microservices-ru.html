@@ -20,164 +20,7 @@
 <meta name="twitter:title" content="Микросервисы: архитектура, компоненты и устройство">
 <meta name="twitter:description" content="Микросервисы: архитектура, компоненты и устройство — заметка Дмитрия Парамонова, DevOps/SRE Team Lead.">
 <meta name="twitter:image" content="https://topdevops.pro/og-image.png">
-<style>
-  :root{
-    --bg:#f7f5ef;          /* кремовый фон как на скриншотах */
-    --ink:#2b3a4a;         /* основной тёмно-синий текст */
-    --heading:#2d6a4f;     /* зелёные заголовки разделов */
-    --link:#2563eb;        /* синие ссылки с подчёркиванием */
-    --green-bg:#eaf4ec;    /* светло-зелёный блок "Коротко" */
-    --green-border:#2d6a4f;/* зелёная полоса слева у блока */
-    --table-head:#dbeafe;  /* голубые шапки таблиц */
-    --border:#cbd5e1;      /* серо-голубые границы */
-    --muted:#64748b;
-    --code-bg:#f1f5f9;
-    --blue-box:#3b5bdb;    /* синий блок control plane / API Gateway */
-    --purple-box:#7c5cbf;  /* фиолетовые Поды/сервисы */
-    --amber-box:#f59f00;   /* оранжевые блоки */
-    --teal-box:#0ca678;    /* бирюзовые БД */
-    --rose-box:#e8590c;
-    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-    --mono:"JetBrains Mono","SF Mono",ui-monospace,Menlo,Consolas,monospace;
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    margin:0;background:var(--bg);color:var(--ink);
-    font-family:var(--sans);font-size:19px;line-height:1.75;
-    -webkit-font-smoothing:antialiased;
-  }
-  .wrap{max-width:720px;margin:0 auto;padding:0 22px}
-  a{color:var(--link);text-decoration:underline;text-underline-offset:3px}
-  p{margin:0 0 18px}
-  strong,b{font-weight:700;color:var(--ink)}
-  code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);color:#1e3a8a;
-    padding:2px 7px;border-radius:6px;font-weight:500}
 
-  /* ---------- TITLE + SUBTITLE ---------- */
-  header.top{text-align:center;padding:56px 0 20px}
-  h1.main-title{
-    color:var(--link);font-size:clamp(2rem,6vw,2.7rem);line-height:1.2;
-    font-weight:800;letter-spacing:-.01em;margin:0 0 18px;
-  }
-  .subtitle{color:var(--heading);font-size:1.25rem;font-weight:500;margin:0;line-height:1.5}
-
-  /* ---------- CONTENTS BOX ---------- */
-  .contents{
-    background:#fff;border:1.5px solid var(--border);border-radius:16px;
-    padding:26px 30px;margin:30px auto 10px;
-  }
-  .contents h2{color:var(--heading);font-size:1.5rem;font-weight:800;margin:0 0 16px}
-  .contents ol{list-style:none;counter-reset:c;margin:0;padding:0}
-  .contents ol li{counter-increment:c;margin:0;padding:0}
-  .contents ol li a{
-    display:block;padding:9px 0 9px 34px;position:relative;
-    color:var(--link);font-weight:500;font-size:1.08rem;line-height:1.4;
-    border-bottom:1px solid #eef2f7;text-decoration:none;
-  }
-  .contents ol li:last-child a{border-bottom:none}
-  .contents ol li a::before{content:counter(c) ".";position:absolute;left:0;top:9px;
-    color:var(--ink);font-weight:700}
-  .contents ol li a:hover{text-decoration:underline}
-
-  /* ---------- SECTION HEADINGS ---------- */
-  section.block{padding:34px 0 4px}
-  h2.sec{
-    color:var(--heading);font-size:clamp(1.5rem,4.5vw,2rem);font-weight:800;
-    line-height:1.25;margin:0 0 6px;
-  }
-  h2.sec .n{margin-right:2px}
-  .rule{height:3px;background:linear-gradient(90deg,#bcd3e8,#e2e8f0);border:none;
-    border-radius:3px;margin:0 0 22px}
-  h3.sub{color:var(--heading);font-size:1.3rem;font-weight:700;margin:26px 0 10px}
-
-  /* bullet lists */
-  ul.list{list-style:none;margin:0 0 18px;padding:0}
-  ul.list>li{position:relative;padding-left:26px;margin:0 0 12px}
-  ul.list>li::before{content:"";position:absolute;left:2px;top:11px;width:8px;height:8px;
-    border-radius:50%;background:var(--ink)}
-  ul.list ul{list-style:none;margin:8px 0 0;padding:0}
-  ul.list ul li{position:relative;padding-left:22px;margin:0 0 6px;font-size:.98em}
-  ul.list ul li::before{content:"–";position:absolute;left:2px;color:var(--muted);font-weight:700}
-
-  /* ordered inline steps */
-  ol.steps{list-style:none;counter-reset:s;margin:0 0 18px;padding:0}
-  ol.steps li{counter-increment:s;position:relative;padding-left:38px;margin:0 0 10px}
-  ol.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;
-    border-radius:50%;background:var(--link);color:#fff;font-weight:700;font-size:.85rem;
-    display:flex;align-items:center;justify-content:center}
-
-  /* ---------- "КОРОТКО" CALLOUT ---------- */
-  .short{
-    background:var(--green-bg);border-left:5px solid var(--green-border);
-    border-radius:0 12px 12px 0;padding:18px 24px;margin:22px 0;
-  }
-  .short .lbl{display:block;color:var(--heading);font-weight:800;font-size:1.15rem;margin-bottom:6px}
-  .short p{margin:0}
-  .callout{border-left:5px solid var(--link);background:#eff6ff;border-radius:0 12px 12px 0;
-    padding:16px 22px;margin:22px 0}
-  .callout.warn{border-color:var(--rose-box);background:#fff4ed}
-  .callout.tip{border-color:var(--amber-box);background:#fffbeb}
-  .callout .lbl{display:block;font-weight:800;margin-bottom:4px}
-  .callout.warn .lbl{color:var(--rose-box)}.callout.tip .lbl{color:#b45309}.callout .lbl{color:var(--link)}
-  .callout p{margin:0}
-
-  /* ---------- TABLES ---------- */
-  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:18px 0}
-  table.t{width:100%;border-collapse:collapse;font-size:.95rem;background:#fff;
-    border:1px solid var(--border);border-radius:10px;overflow:hidden}
-  table.t th{background:var(--table-head);color:var(--link);text-align:left;font-weight:700;
-    padding:12px 14px;border:1px solid var(--border)}
-  table.t td{padding:11px 14px;border:1px solid var(--border);vertical-align:top}
-  table.t td:first-child{font-weight:700;color:var(--ink)}
-  table.t tbody tr:nth-child(even){background:#fafbfd}
-
-  /* ---------- CODE BLOCKS ---------- */
-  pre.code{font-family:var(--mono);font-size:.86rem;line-height:1.6;background:var(--code-bg);
-    border:1px solid var(--border);border-radius:10px;padding:16px 18px;overflow-x:auto;margin:16px 0;color:#1e293b}
-  pre.code .cm{color:#64748b}
-  pre.code .kw{color:#7c3aed;font-weight:600}
-  pre.code .st{color:#0a7d5a}
-  pre.code .tg{color:#2563eb}
-  pre.tree{font-family:var(--mono);font-size:.85rem;line-height:1.55;background:#fff;
-    border:1px solid var(--border);border-radius:10px;padding:16px 18px;overflow-x:auto;margin:16px 0;color:var(--ink)}
-  pre.tree .c{color:var(--muted)}
-
-  /* ---------- DIAGRAM (SVG boxes like k8s page) ---------- */
-  figure.diagram{margin:24px 0;text-align:center}
-  svg.dgm{width:100%;height:auto;display:inline-block}
-  .figcap{color:var(--muted);font-size:.95rem;margin-top:10px;font-style:normal}
-  text{font-family:var(--sans)}
-
-  /* flow of pills for pipelines */
-  .flowrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin:14px 0}
-  .chip{border-radius:10px;padding:9px 14px;font-weight:600;font-size:.9rem;color:#fff;text-align:center;line-height:1.2}
-  .chip small{display:block;font-weight:400;font-size:.72rem;opacity:.9}
-  .chip.blue{background:var(--blue-box)}.chip.purple{background:var(--purple-box)}
-  .chip.amber{background:var(--amber-box)}.chip.teal{background:var(--teal-box)}
-  .chip.rose{background:var(--rose-box)}.chip.green{background:var(--heading)}
-  .arw{color:var(--muted);font-size:1.3rem;font-weight:700}
-
-  /* two-col compare cards */
-  .cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
-  @media(max-width:560px){.cards{grid-template-columns:1fr}}
-  .card{background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:18px 20px}
-  .card h4{margin:0 0 10px;font-size:1.1rem;color:var(--ink)}
-  .card.plus{border-top:4px solid var(--heading)}
-  .card.minus{border-top:4px solid var(--rose-box)}
-  .card ul{list-style:none;margin:0;padding:0}
-  .card li{position:relative;padding-left:22px;margin:0 0 8px;font-size:.95rem}
-  .card.plus li::before{content:"+";position:absolute;left:0;color:var(--heading);font-weight:800}
-  .card.minus li::before{content:"−";position:absolute;left:0;color:var(--rose-box);font-weight:800}
-
-  footer{padding:40px 0 70px;text-align:center;color:var(--muted);font-size:.95rem}
-  footer .end{color:var(--heading);font-weight:700;font-size:1.15rem}
-
-  /* reveal */
-  .rv{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
-  .rv.in{opacity:1;transform:none}
-  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.rv{opacity:1;transform:none}}
-</style>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -205,8 +48,21 @@
   "image": "https://topdevops.pro/og-image.png"
 }
 </script>
+<link rel="stylesheet" href="../assets/notes.css">
+<meta name="theme-color" content="#050508">
 </head>
 <body>
+<nav class="notes-topnav" aria-label="Site">
+  <a class="brand" href="/">dmitriy@devops<span>~</span></a>
+  <div class="notes-topnav-links">
+    <a href="/#about">Обо мне</a>
+    <a href="/#experience">Опыт</a>
+    <a href="/#notes">Заметки</a>
+    <a href="/#contacts">Контакты</a>
+    <a href="/resume.pdf">Резюме</a>
+  </div>
+</nav>
+
 
 <header class="top">
   <div class="wrap">
@@ -1292,5 +1148,11 @@ docker stop &lt;container_id&gt;</pre>
   document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 })();
 </script>
+<div class="notes-footer">
+  <a href="/#notes">← Все заметки</a> ·
+  <a href="/">topdevops.pro</a> ·
+  Дмитрий Парамонов
+</div>
+
 </body>
 </html>

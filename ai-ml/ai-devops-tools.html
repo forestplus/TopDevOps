@@ -14,26 +14,25 @@
 <meta property="og:title" content="Основные AI-инструменты для DevOps">
 <meta property="og:description" content="Каталог инструментов для AI-assisted engineering, автоматизации, локальных LLM и эксплуатации AI-систем.">
 <meta property="og:image" content="https://topdevops.pro/og-image.png">
-<style>
-:root{--paper:#fbfaf5;--ink:#1f2a44;--blue:#1e4fa3;--green:#2e7d4f;--red:#b5232b;--line:#c9d3e6;--panel:#f1f4fa;--muted:#58657b}
-@media(prefers-color-scheme:dark){:root{--paper:#1b1f27;--ink:#e6e9ef;--blue:#7fa8ff;--green:#7fd6a0;--red:#ff7b7b;--line:#3a4352;--panel:#242b36;--muted:#aab4c4}}
-*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:18px}body{margin:0;padding:24px;background:var(--paper);color:var(--ink);font:15px/1.65 "Segoe UI",Roboto,Arial,sans-serif}.wrap{max-width:1000px;margin:auto}
-.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin:0 0 22px;padding-bottom:14px;border-bottom:1px solid var(--line)}.topbar a,.back{color:var(--blue);text-decoration:none;font-weight:700}.crumb{font-size:12px;color:var(--muted)}
-h1{text-align:center;color:var(--blue);font-size:clamp(25px,4vw,36px);line-height:1.2;margin:16px 0 8px}.lead{text-align:center;color:var(--muted);max-width:800px;margin:0 auto 22px}
-.meta{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:28px}.pill{border:1px solid var(--line);border-radius:30px;padding:4px 10px;font-size:12px;color:var(--muted)}
-.toc{position:sticky;top:10px;z-index:5;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 15px;margin:22px 0;box-shadow:0 5px 20px rgba(0,0,0,.07)}.toc strong{display:block;color:var(--green);margin-bottom:7px}.toc-links{display:flex;flex-wrap:wrap;gap:7px 14px}.toc a{font-size:13px;color:var(--blue);text-decoration:none}.toc a:hover{text-decoration:underline}
-section{scroll-margin-top:100px}h2{color:var(--green);border-bottom:2px solid var(--line);padding-bottom:5px;font-size:22px;margin:36px 0 12px}h3{font-size:17px;color:var(--blue);margin:22px 0 8px}.intro{color:var(--muted);margin:5px 0 14px}
-.tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tool{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:12px 14px;break-inside:avoid}.tool h3{margin:0 0 4px;font-size:16px}.tool p{margin:0;font-size:13px}.tool a{color:var(--blue);text-decoration:none}.tool a:hover{text-decoration:underline}.kind{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--green);font-weight:800}
-.tip,.warn{padding:12px 15px;border-radius:8px;margin:16px 0}.tip{border-left:4px solid var(--green);background:rgba(46,125,79,.09)}.warn{border-left:4px solid var(--red);background:rgba(181,35,43,.08)}
-ol,ul{padding-left:22px}li{margin:6px 0}.priority{width:100%;border-collapse:collapse;margin:12px 0}.priority th,.priority td{border:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}.priority th{color:var(--blue);background:var(--panel)}
-.footer{margin-top:38px;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px}
-@media(max-width:680px){body{padding:16px}.tool-grid{grid-template-columns:1fr}.toc{position:relative;top:auto}.priority{font-size:13px}.priority th,.priority td{padding:7px}}
-</style>
+
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"TechArticle","headline":"Основные AI-инструменты для DevOps","description":"Практический каталог AI-инструментов для DevOps, разработки, автоматизации и эксплуатации AI-систем.","url":"https://topdevops.pro/ai-ml/ai-devops-tools.html","inLanguage":"ru","datePublished":"2026-11-27","dateModified":"2026-11-27","author":{"@type":"Person","name":"Дмитрий Парамонов","url":"https://topdevops.pro/"}}
 </script>
+<link rel="stylesheet" href="../assets/notes.css">
+<meta name="theme-color" content="#050508">
 </head>
-<body><main class="wrap" id="top">
+<body>
+<nav class="notes-topnav" aria-label="Site">
+  <a class="brand" href="/">dmitriy@devops<span>~</span></a>
+  <div class="notes-topnav-links">
+    <a href="/#about">Обо мне</a>
+    <a href="/#experience">Опыт</a>
+    <a href="/#notes">Заметки</a>
+    <a href="/#contacts">Контакты</a>
+    <a href="/resume.pdf">Резюме</a>
+  </div>
+</nav>
+<main class="wrap" id="top">
 <div class="topbar"><a href="../">← TopDevOps</a><span class="crumb">Мои заметки / AI / ML / LLM</span></div>
 <h1>Основные AI-инструменты для DevOps</h1>
 <p class="lead">Практическая карта инструментов, которые помогают инженеру быстрее разбираться в системах, писать и проверять код, автоматизировать процессы и строить собственную AI-инфраструктуру.</p>
@@ -139,4 +138,10 @@ ol,ul{padding-left:22px}li{margin:6px 0}.priority{width:100%;border-collapse:col
 </ul><div class="warn"><strong>Важно:</strong> AI — помощник, а не источник истины и не замена change management. Не передавай агенту неограниченный доступ к production-кластерам, облачным аккаунтам и системам управления секретами.</div></section>
 
 <div class="footer"><a class="back" href="../">← На главную TopDevOps</a><a href="#top">Наверх ↑</a><span>© <span id="year"></span> Дмитрий Парамонов</span></div>
-</main><script>document.getElementById('year').textContent=new Date().getFullYear();</script></body></html>
+</main><script>document.getElementById('year').textContent=new Date().getFullYear();</script><div class="notes-footer">
+  <a href="/#notes">← Все заметки</a> ·
+  <a href="/">topdevops.pro</a> ·
+  Дмитрий Парамонов
+</div>
+
+</body></html>

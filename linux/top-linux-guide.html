@@ -20,43 +20,7 @@
 <meta name="twitter:title" content="Linux: команда top и htop — как читать вывод">
 <meta name="twitter:description" content="Как читать вывод, что означают цифры и где искать причину проблемы">
 <meta name="twitter:image" content="https://topdevops.pro/og-image.png">
-<style>
-  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --red:#b5232b; --green:#2e7d4f; --line:#c9d3e6; --code:#f1f4fa; --purple:#6a4fb3; --orange:#d97706; }
-  @media (prefers-color-scheme: dark) {
-    :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --red:#ff7b7b; --green:#7fd6a0; --line:#3a4352; --code:#242a36; --purple:#b59cff; --orange:#fbbf24; }
-  }
-  * { box-sizing:border-box; }
-  html { scroll-behavior:smooth; }
-  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:16px; line-height:1.65; }
-  .wrap { max-width:900px; margin:0 auto; }
-  h1 { text-align:center; color:var(--blue); font-size:28px; margin:0 0 6px; }
-  .lead { text-align:center; color:var(--green); margin:0 0 22px; }
-  h2 { color:var(--green); font-size:22px; margin:36px 0 12px; border-bottom:2px solid var(--line); padding-bottom:4px; }
-  h3 { color:var(--blue); font-size:18px; margin:22px 0 8px; }
-  p { margin:8px 0; }
-  ul, ol { margin:6px 0 6px 22px; padding:0; }
-  li { margin:5px 0; }
-  code { font-family:Consolas,"Courier New",monospace; color:var(--red); font-size:14px; background:rgba(127,127,127,.12); padding:1px 5px; border-radius:3px; }
-  pre { background:var(--code); border:1px solid var(--line); border-radius:6px; padding:12px 14px; overflow-x:auto; }
-  pre code { color:var(--ink); background:none; padding:0; font-size:13.5px; line-height:1.5; }
-  .toc { border:2px solid var(--line); border-radius:8px; padding:14px 18px; }
-  .toc h2 { margin:0 0 8px; border:none; font-size:18px; }
-  .toc ol { margin:0 0 0 20px; }
-  .toc li { margin:3px 0; }
-  .toc a { color:var(--blue); text-decoration:none; border-bottom:1px dashed var(--blue); }
-  .toc a:hover { color:var(--green); }
-  .tip { border-left:4px solid var(--green); background:rgba(46,125,79,.08); padding:8px 12px; margin:12px 0; border-radius:4px; }
-  .warn { border-left:4px solid var(--red); background:rgba(181,35,43,.07); padding:8px 12px; margin:12px 0; border-radius:4px; }
-  .tip b, .warn b { display:block; margin-bottom:2px; }
-  figure { margin:16px auto; text-align:center; }
-  figure svg { max-width:100%; height:auto; }
-  figcaption { font-size:14px; opacity:.75; margin-top:6px; }
-  table { border-collapse:collapse; width:100%; margin:10px 0; font-size:15px; }
-  th, td { border:1px solid var(--line); padding:6px 9px; text-align:left; vertical-align:top; }
-  th { color:var(--blue); }
-  .top { font-size:14px; margin-top:12px; display:inline-block; }
-  .top a { color:var(--blue); text-decoration:none; }
-</style>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -84,8 +48,21 @@
   "image": "https://topdevops.pro/og-image.png"
 }
 </script>
+<link rel="stylesheet" href="../assets/notes.css">
+<meta name="theme-color" content="#050508">
 </head>
 <body>
+<nav class="notes-topnav" aria-label="Site">
+  <a class="brand" href="/">dmitriy@devops<span>~</span></a>
+  <div class="notes-topnav-links">
+    <a href="/#about">Обо мне</a>
+    <a href="/#experience">Опыт</a>
+    <a href="/#notes">Заметки</a>
+    <a href="/#contacts">Контакты</a>
+    <a href="/resume.pdf">Резюме</a>
+  </div>
+</nav>
+
 <div class="wrap">
 
 <h1 id="top">Linux: команда top и htop</h1>
@@ -388,5 +365,11 @@ top -H -p 1187             # потоки конкретного процесс�
 <p class="top"><a href="#top">↑ Наверх</a></p>
 
 </div>
+<div class="notes-footer">
+  <a href="/#notes">← Все заметки</a> ·
+  <a href="/">topdevops.pro</a> ·
+  Дмитрий Парамонов
+</div>
+
 </body>
 </html>

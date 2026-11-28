@@ -21,85 +21,7 @@
 <meta name="twitter:description" content="Backend. Важные вопросы и детали — заметка Дмитрия Парамонова, DevOps/SRE Team Lead.">
 <meta name="twitter:image" content="https://topdevops.pro/og-image.png">
 <link rel="stylesheet" href="../assets/fonts.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#faf9f6;--card:#fff;--text:#2a2a2a;--muted:#6b7280;--blue:#2c4a7c;--accent:#3b6fb5;--green:#1a7a4d;--orange:#c46a10;--purple:#6a4c93;--teal:#14706a;--red:#a03030;--border:#e2e5ec;--shadow:0 1px 8px rgba(0,0,0,.06);--radius:12px}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:16px}
-a{color:var(--accent);text-decoration:none;border-bottom:1px dashed var(--accent)}
-a:hover{border-bottom-style:solid}
 
-/* ===== TITLE HEADER ===== */
-.title-header{text-align:center;padding:40px 20px 30px;max-width:820px;margin:0 auto}
-.title-header h1{font-size:2em;font-weight:800;color:var(--blue);letter-spacing:-.5px;line-height:1.3}
-.title-header .sub{font-size:1.05em;color:var(--green);margin-top:8px;font-weight:500}
-
-/* ===== TOC ===== */
-.toc-wrap{max-width:820px;margin:0 auto 30px;padding:0 20px}
-.toc{background:var(--card);border-radius:var(--radius);box-shadow:0 4px 20px rgba(0,0,0,.08);padding:26px 30px;border:1px solid var(--border)}
-.toc h2{font-size:1.2em;color:var(--green);font-weight:700;margin-bottom:12px}
-.toc ol{list-style:none;padding:0;counter-reset:t}
-.toc ol li{counter-increment:t;padding:5px 0;font-size:.93em}
-.toc ol li a::before{content:counter(t)". ";font-weight:700;color:var(--muted)}
-
-.content{max-width:820px;margin:0 auto;padding:0 20px 60px}
-.sh{font-size:1.6em;font-weight:800;color:var(--green);margin:48px 0 6px;padding-top:18px;border-top:3px solid var(--green)}
-.ssh{font-size:1.2em;font-weight:700;color:var(--blue);margin:26px 0 6px}
-p{margin:8px 0}
-strong{color:var(--blue)}
-code.i{background:#eef1f8;color:var(--purple);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:.87em}
-ul.l{padding-left:18px;margin:6px 0}ul.l li{padding:2px 0;font-size:.94em}
-ol.l{padding-left:18px;margin:6px 0}ol.l li{padding:2px 0;font-size:.94em}
-.nc{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin:14px 0;box-shadow:var(--shadow)}
-.nc.ga{border-left:4px solid var(--green)}.nc.ba{border-left:4px solid var(--blue)}.nc.oa{border-left:4px solid var(--orange)}.nc.pa{border-left:4px solid var(--purple)}.nc.ta{border-left:4px solid var(--teal)}.nc.ra{border-left:4px solid var(--red)}
-.nc h4{font-size:.95em;font-weight:700;margin-bottom:6px;color:var(--blue)}
-.tb{background:#fef9e7;border-left:4px solid #e8b830;padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0;font-size:.92em}
-.wb{background:#fce8e6;border-left:4px solid var(--red);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0;font-size:.92em}
-.ib{background:#e8f4fd;border-left:4px solid var(--accent);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0;font-size:.92em}
-.tw{overflow-x:auto;margin:10px 0;border-radius:10px;border:1px solid var(--border);box-shadow:var(--shadow)}
-.tbl{width:100%;border-collapse:collapse;font-size:.88em}
-.tbl th{background:var(--blue);color:#fff;padding:9px 12px;text-align:left;font-weight:600;white-space:nowrap}
-.tbl td{padding:8px 12px;border-bottom:1px solid #eef2fa}
-.tbl tr:nth-child(even) td{background:#f8faff}.tbl tr:last-child td{border-bottom:none}
-.cb{background:#1a2536;color:#d0dae6;border-radius:10px;padding:16px 20px;font-family:'JetBrains Mono',monospace;font-size:.84em;line-height:1.8;overflow-x:auto;margin:12px 0;white-space:pre}
-.cb .cm{color:#6a8a6a}.cb .kw{color:#cc7832}.cb .an{color:#bbb529}.cb .st{color:#6a8759}
-.dc{text-align:center;margin:18px 0}.dc svg{max-width:100%;height:auto}
-.dc .cap{font-size:.84em;color:var(--muted);margin-top:4px;font-style:italic}
-.cr{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:14px 0}
-@media(max-width:700px){.cr{grid-template-columns:1fr}}
-
-/* ===== Q&A STYLING ===== */
-.qa-c{font-size:1.2em;font-weight:700;color:var(--blue);margin:28px 0 8px;padding-bottom:4px;border-bottom:2px solid #e8edf7}
-.qi{margin:10px 0;padding:16px 20px;background:var(--card);border-radius:10px;border:1px solid var(--border);box-shadow:var(--shadow)}
-.qi .q{font-weight:700;color:var(--blue);margin-bottom:8px;font-size:.95em;display:flex;align-items:flex-start;gap:6px}
-.qi .q::before{content:"❓";flex-shrink:0}
-.qi .a{font-size:.92em;line-height:1.7;color:var(--text)}
-.qi .a strong{color:var(--blue);font-weight:700}
-.qi .a em{color:var(--green);font-style:normal;font-weight:600}
-.qi .a p{margin:6px 0}
-.qi .a ul{padding-left:16px;margin:4px 0}
-.qi .a ul li{padding:2px 0;font-size:.95em}
-.qi .a ol{padding-left:16px;margin:4px 0}
-.qi .a ol li{padding:2px 0;font-size:.95em}
-
-/* ===== ANIMATIONS ===== */
-@keyframes dash{to{stroke-dashoffset:-20}}
-.fa{stroke-dasharray:8 4;animation:dash 1s linear infinite}
-@keyframes pulse{0%,100%{opacity:.6;r:5}50%{opacity:1;r:8}}
-.pulse-node{animation:pulse 2s ease-in-out infinite}
-@keyframes glow{0%,100%{filter:drop-shadow(0 0 2px rgba(59,111,181,.3))}50%{filter:drop-shadow(0 0 8px rgba(59,111,181,.6))}}
-.glow{animation:glow 3s ease-in-out infinite}
-@keyframes bounceArrow{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-.bounce{animation:bounceArrow 1.5s ease-in-out infinite}
-@keyframes fadeSlideUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
-.fade-up{animation:fadeSlideUp .6s ease both}
-.fd1{animation-delay:.1s}.fd2{animation-delay:.2s}.fd3{animation-delay:.3s}.fd4{animation-delay:.4s}.fd5{animation-delay:.5s}.fd6{animation-delay:.6s}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.blink{animation:blink 2s ease-in-out infinite}
-@keyframes scalePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-.scale-pulse{animation:scalePulse 2s ease-in-out infinite}
-
-@media(max-width:600px){.toc{padding:18px}.sh{font-size:1.25em}.nc{padding:14px}.qi{padding:14px 16px}}
-</style>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -127,8 +49,21 @@ ol.l{padding-left:18px;margin:6px 0}ol.l li{padding:2px 0;font-size:.94em}
   "image": "https://topdevops.pro/og-image.png"
 }
 </script>
+<link rel="stylesheet" href="../assets/notes.css">
+<meta name="theme-color" content="#050508">
 </head>
 <body>
+<nav class="notes-topnav" aria-label="Site">
+  <a class="brand" href="/">dmitriy@devops<span>~</span></a>
+  <div class="notes-topnav-links">
+    <a href="/#about">Обо мне</a>
+    <a href="/#experience">Опыт</a>
+    <a href="/#notes">Заметки</a>
+    <a href="/#contacts">Контакты</a>
+    <a href="/resume.pdf">Резюме</a>
+  </div>
+</nav>
+
 
 <!-- ===== TITLE ===== -->
 <div class="title-header">
@@ -1346,6 +1281,12 @@ spec:
 </div>
 
 </main>
+
+<div class="notes-footer">
+  <a href="/#notes">← Все заметки</a> ·
+  <a href="/">topdevops.pro</a> ·
+  Дмитрий Парамонов
+</div>
 
 </body>
 </html>

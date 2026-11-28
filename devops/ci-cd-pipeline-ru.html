@@ -20,37 +20,7 @@
 <meta name="twitter:title" content="CI/CD Pipeline">
 <meta name="twitter:description" content="CI/CD Pipeline — заметка Дмитрия Парамонова, DevOps/SRE Team Lead.">
 <meta name="twitter:image" content="https://topdevops.pro/og-image.png">
-<style>
-  :root { --paper:#fbfaf5; --ink:#1f2a44; --blue:#1e4fa3; --red:#b5232b; --green:#2e7d4f; --line:#c9d3e6; }
-  @media (prefers-color-scheme: dark) {
-    :root { --paper:#1b1f27; --ink:#e6e9ef; --blue:#7fa8ff; --red:#ff7b7b; --green:#7fd6a0; --line:#3a4352; }
-  }
-  * { box-sizing:border-box; }
-  html { scroll-behavior:smooth; }
-  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:15px; line-height:1.6; }
-  .wrap { max-width:900px; margin:0 auto; }
-  h1 { text-align:center; color:var(--blue); font-size:28px; margin:0 0 24px; }
-  h2 { color:var(--green); font-size:20px; margin:32px 0 10px; border-bottom:2px solid var(--line); padding-bottom:4px; }
-  h3 { color:var(--blue); font-size:16px; margin:18px 0 6px; }
-  p { margin:6px 0; }
-  ul { margin:6px 0 6px 20px; padding:0; }
-  li { margin:4px 0; }
-  code { font-family:Consolas,"Courier New",monospace; color:var(--red); font-size:13px; background:rgba(127,127,127,.12); padding:1px 4px; border-radius:3px; }
-  .toc { border:2px solid var(--line); border-radius:8px; padding:14px 18px; }
-  .toc h2 { margin:0 0 8px; border:none; font-size:17px; }
-  .toc ol { margin:0 0 0 20px; padding:0; }
-  .toc li { margin:3px 0; }
-  .toc a { color:var(--blue); text-decoration:none; border-bottom:1px dashed var(--blue); }
-  .toc a:hover { color:var(--green); }
-  .top { font-size:13px; margin-top:6px; display:inline-block; }
-  .top a { color:var(--blue); text-decoration:none; }
-  .flow { font-family:Consolas,monospace; color:var(--blue); background:rgba(127,127,127,.08); padding:6px 10px; border-radius:4px; display:inline-block; }
-  .note { border-left:3px solid var(--red); padding:6px 10px; margin:10px 0; }
-  .tag { color:var(--green); font-weight:600; }
-  figure { margin:14px auto; text-align:center; }
-  figure img { max-width:100%; height:auto; border-radius:6px; }
-  figcaption { font-size:13px; opacity:.75; margin-top:4px; }
-</style>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -78,8 +48,21 @@
   "image": "https://topdevops.pro/og-image.png"
 }
 </script>
+<link rel="stylesheet" href="../assets/notes.css">
+<meta name="theme-color" content="#050508">
 </head>
 <body>
+<nav class="notes-topnav" aria-label="Site">
+  <a class="brand" href="/">dmitriy@devops<span>~</span></a>
+  <div class="notes-topnav-links">
+    <a href="/#about">Обо мне</a>
+    <a href="/#experience">Опыт</a>
+    <a href="/#notes">Заметки</a>
+    <a href="/#contacts">Контакты</a>
+    <a href="/resume.pdf">Резюме</a>
+  </div>
+</nav>
+
 <div class="wrap">
 
 <h1 id="top">CI/CD Pipeline</h1>
@@ -321,5 +304,11 @@
 <p class="top"><a href="#top">↑ Наверх</a></p>
 
 </div>
+<div class="notes-footer">
+  <a href="/#notes">← Все заметки</a> ·
+  <a href="/">topdevops.pro</a> ·
+  Дмитрий Парамонов
+</div>
+
 </body>
 </html>
