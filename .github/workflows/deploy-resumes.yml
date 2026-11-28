@@ -1,0 +1,30 @@
+name: Deploy resumes
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/deploy-resumes.yml'
+      - 'build/resume_b64/**'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble and extract resumes
+        run: |
+          set -e
+          cat build/resume_b64/*.b64 | tr -d '\n' | base64 -d > /tmp/resumes.tar.gz
+          tar -tzf /tmp/resumes.tar.gz
+          tar -xzf /tmp/resumes.tar.gz -C .
+          ls -la resume.pdf resume_en.pdf
+          file resume.pdf resume_en.pdf
+      - name: Commit
+        run: |
+          git config user.name "TopDevOps Bot"
+          git config user.email "forestplus@ya.ru"
+          git add resume.pdf resume_en.pdf
+          git diff --staged --quiet && echo "No changes" && exit 0
+          git commit -m "feat: HH-faithful resumes (RU/EN) — full experience, requested edits only"
+          git push
