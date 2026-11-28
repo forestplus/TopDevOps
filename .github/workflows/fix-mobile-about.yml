@@ -1,0 +1,28 @@
+name: Fix mobile about and notes home
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fix-mobile-about.yml'
+      - 'scripts/fix_mobile_about_notes.py'
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply fixes
+        run: |
+          set -euo pipefail
+          python3 scripts/fix_mobile_about_notes.py
+          grep -q 'about mobile readability' index.html
+          grep -q 'nav-home' postgresql/postgresql-guide.html
+      - name: Commit
+        run: |
+          git config user.name "TopDevOps Bot"
+          git config user.email "forestplus@ya.ru"
+          git add -A
+          git status --short | head -50
+          git commit -m "fix(ui): mobile About typography, reduce black flash, notes home nav" || exit 0
+          git push
