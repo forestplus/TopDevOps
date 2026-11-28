@@ -17,22 +17,19 @@ jobs:
         run: python3 scripts/patch_index.py
 
       - name: Build circular avatar from existing photo
+        continue-on-error: true
         run: |
+          python3 -m pip install --quiet pillow
           python3 << 'PY'
           from pathlib import Path
-          try:
-              from PIL import Image, ImageDraw, ImageFilter
-          except ImportError:
-              import subprocess
-              subprocess.check_call(['pip', 'install', 'pillow', '-q'])
-              from PIL import Image, ImageDraw, ImageFilter
+          from PIL import Image, ImageDraw, ImageFilter
 
-          src_path = Path('IMG_1447.jpeg')
-          if not src_path.exists():
-              src_path = Path('IMG_1447.jpg')
-          if not src_path.exists():
-              print('No source photo, skip avatar')
+          candidates = list(Path('.').glob('IMG_*.jpeg')) + list(Path('.').glob('IMG_*.jpg')) + list(Path('.').glob('IMG_*.png'))
+          if not candidates:
+              print('No source photo found, skip')
               raise SystemExit(0)
+          src_path = candidates[0]
+          print('source', src_path)
 
           im = Image.open(src_path).convert('RGBA')
           w, h = im.size
@@ -54,7 +51,8 @@ jobs:
         run: |
           git config user.name "TopDevOps Bot"
           git config user.email "forestplus@ya.ru"
-          git add index.html photo-avatar-240.png || true
+          git add index.html
+          test -f photo-avatar-240.png && git add photo-avatar-240.png || true
           git diff --staged --quiet && echo "No changes" && exit 0
           git commit -m "feat: full homepage — notes search, profile photo, OG cache-buster"
           git push
