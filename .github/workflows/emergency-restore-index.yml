@@ -1,0 +1,27 @@
+name: Emergency restore index
+on:
+  workflow_dispatch:
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore index from good commit
+        run: |
+          set -euo pipefail
+          # last known good before placeholder experiments
+          git show 3303559d3272ec6307f8e3d50b44e5f5a8d02500:index.html > index.html
+          wc -c index.html
+          grep -q 'timeline-item' index.html
+          head -c 80 index.html
+      - name: Commit
+        run: |
+          git config user.name "TopDevOps Bot"
+          git config user.email "forestplus@ya.ru"
+          git add index.html
+          git commit -m "fix: emergency restore index.html from commit 3303559" || exit 0
+          git push
