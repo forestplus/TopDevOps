@@ -1,0 +1,49 @@
+name: Build resumes
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-resumes.yml'
+      - 'scripts/build_resumes.d/**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install deps
+        run: python3 -m pip install --quiet reportlab pillow
+      - name: Assemble build script
+        run: |
+          cat scripts/build_resumes.d/*.txt > scripts/build_resumes.py
+          wc -c scripts/build_resumes.py
+          head -3 scripts/build_resumes.py
+      - name: Prepare photo
+        run: |
+          python3 << 'PY'
+          from pathlib import Path
+          from PIL import Image
+          cands = sorted(list(Path('.').glob('IMG_*.jpeg')) + list(Path('.').glob('IMG_*.jpg')) + list(Path('.').glob('IMG_*.png')) + list(Path('.').glob('photo-*.png')) + list(Path('.').glob('photo-*.jpg')))
+          if not cands:
+              print('no photo'); raise SystemExit(0)
+          src = Image.open(cands[0]).convert('RGB')
+          print('photo src', cands[0], src.size)
+          w,h = src.size
+          side = min(w,h)
+          left = (w-side)//2
+          top = max(0, (h-side)//2 - int(side*0.06))
+          face = src.crop((left, top, left+side, top+side)).resize((220,220), Image.LANCZOS)
+          face.save('photo-resume.jpg', 'JPEG', quality=90, optimize=True)
+          print('written photo-resume.jpg')
+          PY
+      - name: Build resumes
+        run: python3 scripts/build_resumes.py
+      - name: Commit
+        run: |
+          git config user.name "TopDevOps Bot"
+          git config user.email "forestplus@ya.ru"
+          git add resume.pdf resume_en.pdf photo-resume.jpg scripts/build_resumes.py
+          git diff --staged --quiet && echo "No changes" && exit 0
+          git commit -m "feat: full resumes from HH.ru — all roles, photo, no phone"
+          git push
