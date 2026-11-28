@@ -1,0 +1,37 @@
+name: Upgrade experience cards
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/upgrade-experience-cards.yml'
+      - 'scripts/exp_parts/**'
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble and run
+        run: |
+          set -euo pipefail
+          cat scripts/exp_parts/*.py.txt > scripts/upgrade_experience_cards.py
+          python3 scripts/upgrade_experience_cards.py
+          grep -q 'NDA (ОАЭ, Дубай)' index.html
+          python3 - <<'PY'
+          from pathlib import Path
+          t = Path('index.html').read_text(encoding='utf-8')
+          exp = t[t.find('id="experience"'):]
+          exp = exp[:exp.find('id="skills"')] if 'id="skills"' in exp else exp[:80000]
+          n = exp.count('class="timeline-item"')
+          assert n == 10, n
+          print('OK items', n)
+          PY
+      - name: Commit
+        run: |
+          git config user.name "TopDevOps Bot"
+          git config user.email "forestplus@ya.ru"
+          git add index.html scripts/upgrade_experience_cards.py
+          git status --short | head
+          git commit -m "feat(experience): professional resume-aligned timeline cards (RU/EN)" || exit 0
+          git push
