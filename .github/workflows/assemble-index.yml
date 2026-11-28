@@ -1,0 +1,29 @@
+name: Assemble index
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'build/chunks/**'
+      - '.github/workflows/assemble-index.yml'
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble index.html from chunks
+        run: |
+          set -e
+          cat build/chunks/*.b64 | tr -d '\n' | base64 -d > /tmp/index.html
+          wc -c /tmp/index.html
+          head -c 100 /tmp/index.html; echo
+          cp /tmp/index.html index.html
+      - name: Commit and push
+        run: |
+          git config user.name "TopDevOps Bot"
+          git config user.email "forestplus@ya.ru"
+          git add index.html
+          git diff --staged --quiet && echo "No changes" && exit 0
+          git commit -m "feat: restore full homepage with search, photo, OG update"
+          git push
