@@ -1,0 +1,31 @@
+name: Fix notes navigation UX
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fix-notes-nav.yml'
+      - 'scripts/fix_notes_nav.py'
+      - 'assets/notes.css'
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply notes nav fixes
+        run: |
+          set -euo pipefail
+          python3 scripts/fix_notes_nav.py
+          grep -q 'margin: 0.35rem auto 1.25rem' index.html
+          grep -q 'toc-links' assets/notes.css
+      - name: Commit
+        run: |
+          git config user.name "TopDevOps Bot"
+          git config user.email "forestplus@ya.ru"
+          git add index.html assets/notes.css
+          git add -u -- '*.html' || true
+          git add linux docker k8s git devops ai-ml microservices 2>/dev/null || true
+          git status --short | head -40
+          git commit -m "fix(notes): TOC list layout, same-window links, expand spacing, home nav" || exit 0
+          git push
