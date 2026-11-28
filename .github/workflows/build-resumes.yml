@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/build-resumes.yml'
-      - 'scripts/build_resumes.d/**'
+      - 'scripts/build_resumes.py'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,11 +14,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install deps
         run: python3 -m pip install --quiet reportlab pillow
-      - name: Assemble build script
-        run: |
-          cat scripts/build_resumes.d/*.txt > scripts/build_resumes.py
-          wc -c scripts/build_resumes.py
-          head -3 scripts/build_resumes.py
       - name: Prepare photo
         run: |
           python3 << 'PY'
@@ -43,7 +38,7 @@ jobs:
         run: |
           git config user.name "TopDevOps Bot"
           git config user.email "forestplus@ya.ru"
-          git add resume.pdf resume_en.pdf photo-resume.jpg scripts/build_resumes.py
+          git add resume.pdf resume_en.pdf photo-resume.jpg
           git diff --staged --quiet && echo "No changes" && exit 0
           git commit -m "feat: full resumes from HH.ru — all roles, photo, no phone"
           git push
