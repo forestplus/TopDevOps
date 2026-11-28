@@ -1,0 +1,21 @@
+name: Patch NDA role
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/patch-nda.yml'
+      - 'scripts/patch_nda_role.py'
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/patch_nda_role.py
+      - run: |
+          git config user.name "TopDevOps Bot"
+          git config user.email "forestplus@ya.ru"
+          git add index.html
+          git commit -m "fix(experience): NDA (UAE, Dubai) + dates on current role" || exit 0
+          git push
